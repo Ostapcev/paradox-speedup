@@ -1,0 +1,38 @@
+# Whitelist: only plugin sources, build scripts and tools go into the repository.
+# The game copy, decompile (eu4_kit), simulator, saves, crash dumps and build output stay local.
+/*
+!/.gitignore
+!/.gitattributes
+!/README.md
+!/LICENSE*
+!/THIRD_PARTY.md
+!/docs/
+
+!/eu4_*_patch/
+!/eu4_ai_serial/
+!/eu4_sampler/
+!/eu4_bench/
+
+# build output and local data inside the plugin folders
+build/
+dist/
+backups/
+crash_reports/
+runtime_logs/
+validation/
+downloads/
+__pycache__/
+vendor/
+/eu4_bench/results/
+/eu4_bench/saves/
+/eu4_bench/state/
+*.dll
+*.exe
+*.lib
+*.pdb
+*.obj
+*.o
+*.log
+*.dmp
+*.eu4
+*.zip
