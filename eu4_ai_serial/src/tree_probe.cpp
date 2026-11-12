@@ -85,15 +85,16 @@ using AllHooks = Hooks<0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12>;
 bool install(std::uintptr_t image, char* error, std::size_t error_size) {
     image_base = image;
     for (int k = 0; k < kinds; ++k) {
-        auto** walk = reinterpret_cast<void**>(image + eu4build::rva(walk_slot_rvas[k]));
-        if (*walk != reinterpret_cast<void*>(image + eu4build::rva(walk_rva))) {
+        const auto at = eu4build::rva(walk_slot_rvas[k]);
+        auto** walk = reinterpret_cast<void**>(image + at);
+        if (!at || *walk != reinterpret_cast<void*>(image + eu4build::rva(walk_rva))) {
             std::snprintf(error, error_size, "tree probe: slot 0x%llx is not the walk",
                 static_cast<unsigned long long>(walk_slot_rvas[k]));
             return false;
         }
     }
     for (int k = 0; k < kinds; ++k) {
-        auto** slot = reinterpret_cast<void**>(image + eu4build::rva(walk_slot_rvas[k] + 8));  // +0x60
+        auto** slot = reinterpret_cast<void**>(image + eu4build::rva(walk_slot_rvas[k]) + 8);  // +0x60
         originals[k] = reinterpret_cast<UpdateFn>(*slot);
         update_rvas[k] = reinterpret_cast<std::uintptr_t>(*slot) - image;
         DWORD old = 0;

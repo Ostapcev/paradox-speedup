@@ -31,6 +31,7 @@
 #include <vector>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 #include "bellows/modules.hpp"
 
 namespace {
@@ -560,13 +561,13 @@ bool exists_hook(void* self, const void* name) {
 }
 
 bool install_exists() {
-    auto** slot = reinterpret_cast<void**>(image + exists_slot_rva);
-    if (*slot != reinterpret_cast<void*>(image + exists_rva) ||
-        std::memcmp(reinterpret_cast<void*>(image + exists_rva), exists_bytes, sizeof(exists_bytes)) != 0) {
+    auto** slot = reinterpret_cast<void**>(image + eu4build::rva(exists_slot_rva));
+    if (*slot != reinterpret_cast<void*>(image + eu4build::rva(exists_rva)) ||
+        !eu4build::code_matches(image, exists_rva, exists_bytes, sizeof(exists_bytes))) {
         log("exists REFUSED: slot or bytes differ");
         return false;
     }
-    original_exists = reinterpret_cast<ExistsFn>(image + exists_rva);
+    original_exists = reinterpret_cast<ExistsFn>(image + eu4build::rva(exists_rva));
     DWORD old = 0;
     if (!VirtualProtect(slot, sizeof(void*), PAGE_READWRITE, &old)) {
         log("exists REFUSED: VirtualProtect %lu", GetLastError());
@@ -731,7 +732,7 @@ Answer vp_decide(const char* root, const char* name, Kind& kind) {
 }
 
 __attribute__((noinline)) int stat_hook(void* opaque, const char* name, void* stat_out) {
-    if (reinterpret_cast<std::uintptr_t>(__builtin_return_address(0)) != image + verifypath_return_rva) {
+    if (reinterpret_cast<std::uintptr_t>(__builtin_return_address(0)) != image + eu4build::rva(verifypath_return_rva)) {
         return original_stat(opaque, name, stat_out);
     }
     Stats& s = verify_stats;
@@ -796,15 +797,14 @@ bool install_verifypath() {
     physfs_set_error = reinterpret_cast<void (*)(int)>(GetProcAddress(exe, "PHYSFS_setErrorCode"));
     physfs_get_error = reinterpret_cast<int (*)()>(GetProcAddress(exe, "PHYSFS_getLastErrorCode"));
     physfs_write_dir = reinterpret_cast<const char* (*)()>(GetProcAddress(exe, "PHYSFS_getWriteDir"));
-    auto** slot = reinterpret_cast<void**>(image + dir_stat_slot_rva);
+    auto** slot = reinterpret_cast<void**>(image + eu4build::rva(dir_stat_slot_rva));
     if (!physfs_set_error || !physfs_get_error || !physfs_write_dir ||
-        *slot != reinterpret_cast<void*>(image + dir_stat_rva) ||
-        std::memcmp(reinterpret_cast<void*>(image + verifypath_return_rva - 4), verifypath_call_bytes,
-            sizeof(verifypath_call_bytes)) != 0) {
+        *slot != reinterpret_cast<void*>(image + eu4build::rva(dir_stat_rva)) ||
+        !eu4build::code_matches(image, verifypath_return_rva - 4, verifypath_call_bytes, sizeof(verifypath_call_bytes))) {
         log("verifypath REFUSED: exports, slot or call bytes differ");
         return false;
     }
-    original_stat = reinterpret_cast<StatFn>(image + dir_stat_rva);
+    original_stat = reinterpret_cast<StatFn>(image + eu4build::rva(dir_stat_rva));
     DWORD old = 0;
     if (!VirtualProtect(slot, sizeof(void*), PAGE_READWRITE, &old)) {
         log("verifypath REFUSED: VirtualProtect %lu", GetLastError());
@@ -867,8 +867,8 @@ struct TokenCache {
 thread_local TokenCache* token_cache = nullptr;
 
 std::uint32_t token_dynamic_count() {
-    const auto begin = *reinterpret_cast<const volatile std::uintptr_t*>(image + token_dynamic_rva);
-    const auto end = *reinterpret_cast<const volatile std::uintptr_t*>(image + token_dynamic_rva + 8);
+    const auto begin = *reinterpret_cast<const volatile std::uintptr_t*>(image + eu4build::rva(token_dynamic_rva));
+    const auto end = *reinterpret_cast<const volatile std::uintptr_t*>(image + eu4build::rva(token_dynamic_rva) + 8);
     return (begin != 0 && end >= begin) ? static_cast<std::uint32_t>((end - begin) / sizeof(void*)) : 0;
 }
 
@@ -1042,7 +1042,7 @@ DWORD WINAPI finish_bellows(void*) {
 
 std::uint64_t init_hook(void* game) {
     const double start = since_start_ms();
-    const std::uint64_t result = reinterpret_cast<Fn1>(image + init_rva)(game);
+    const std::uint64_t result = reinterpret_cast<Fn1>(image + eu4build::rva(init_rva))(game);
     const double end = since_start_ms();
     log("PHASE init_game start_ms=%.0f end_ms=%.0f took_ms=%.0f", start, end, end - start);
     InterlockedExchange(&::sb::g_gameReady, 1);
@@ -1055,7 +1055,7 @@ std::uint64_t init_hook(void* game) {
 
 std::uint64_t save_hook(void* a, void* b, void* c, void* d) {
     const double start = since_start_ms();
-    const std::uint64_t result = reinterpret_cast<Fn4>(image + save_rva)(a, b, c, d);
+    const std::uint64_t result = reinterpret_cast<Fn4>(image + eu4build::rva(save_rva))(a, b, c, d);
     const double end = since_start_ms();
     log("PHASE save_read start_ms=%.0f end_ms=%.0f took_ms=%.0f", start, end, end - start);
     return result;
@@ -1064,8 +1064,8 @@ std::uint64_t save_hook(void* a, void* b, void* c, void* d) {
 bool hook_call(std::uintptr_t site_rva, std::uintptr_t target_rva, const void* hook, const char* name) {
     char error[160]{};
     speedpatch::CallPatch patch;
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + site_rva),
-            reinterpret_cast<const void*>(image + target_rva), hook, patch, error, sizeof(error)) ||
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(site_rva)),
+            reinterpret_cast<const void*>(image + eu4build::rva(target_rva)), hook, patch, error, sizeof(error)) ||
         !speedpatch::commit_call(patch, error, sizeof(error))) {
         speedpatch::discard_call(patch);
         log("%s REFUSED: %s", name, error);
@@ -1202,8 +1202,8 @@ extern "C" std::uint64_t history_decide(const std::uint8_t* list, std::uintptr_t
 
 // call [rax+disp] (6 bytes) -> call stub; nop. The stub notes rdx and jumps to the virtual target.
 bool history_site(std::uintptr_t site_rva, const std::uint8_t* expected, std::uint32_t disp, void (*note)(std::uintptr_t)) {
-    if (std::memcmp(reinterpret_cast<void*>(image + site_rva), expected, 6) != 0) return false;
-    Code c{allocate_code_near(image + site_rva, 64)};
+    if (!eu4build::code_matches(image, site_rva, expected, 6)) return false;
+    Code c{allocate_code_near(image + eu4build::rva(site_rva), 64)};
     if (!c.base) return false;
     c.bytes({0x50, 0x51, 0x52, 0x41, 0x50, 0x41, 0x51});  // push rax, rcx, rdx, r8, r9
     c.bytes({0x48, 0x83, 0xEC, 0x20});                    // sub rsp, 20h
@@ -1214,7 +1214,7 @@ bool history_site(std::uintptr_t site_rva, const std::uint8_t* expected, std::ui
     c.bytes({0x41, 0x59, 0x41, 0x58, 0x5A, 0x59, 0x58});  // pop r9, r8, rdx, rcx, rax
     c.bytes({0xFF, 0xA0});                                // jmp [rax+disp32]
     c.u32(disp);
-    const std::uintptr_t site = image + site_rva;
+    const std::uintptr_t site = image + eu4build::rva(site_rva);
     const std::int64_t rel = reinterpret_cast<std::int64_t>(c.base) - static_cast<std::int64_t>(site + 5);
     if (rel > INT32_MAX || rel < INT32_MIN) return false;
     std::uint8_t patch[6] = {0xE8, 0, 0, 0, 0, 0x90};
@@ -1224,16 +1224,15 @@ bool history_site(std::uintptr_t site_rva, const std::uint8_t* expected, std::ui
 }
 
 bool install_history() {
-    if (std::memcmp(reinterpret_cast<void*>(image + history_add_rva), history_add_bytes, sizeof(history_add_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + history_after_walk_rva), history_after_bytes,
-            sizeof(history_after_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + history_owner_call_rva), history_owner_bytes, 6) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + history_global_call_rva), history_global_bytes, 6) != 0) {
+    if (!eu4build::code_matches(image, history_add_rva, history_add_bytes, sizeof(history_add_bytes)) ||
+        !eu4build::code_matches(image, history_after_walk_rva, history_after_bytes, sizeof(history_after_bytes)) ||
+        !eu4build::code_matches(image, history_owner_call_rva, history_owner_bytes, 6) ||
+        !eu4build::code_matches(image, history_global_call_rva, history_global_bytes, 6)) {
         log("history REFUSED: bytes differ");
         return false;
     }
     // entry stub of 0x7E7CD0
-    Code c{allocate_code_near(image + history_add_rva, 128)};
+    Code c{allocate_code_near(image + eu4build::rva(history_add_rva), 128)};
     if (!c.base) return false;
     c.bytes({0x51, 0x52, 0x41, 0x50, 0x41, 0x51});        // push rcx, rdx, r8, r9
     c.bytes({0x48, 0x83, 0xEC, 0x28});                    // sub rsp, 28h
@@ -1248,11 +1247,11 @@ bool install_history() {
     const std::size_t jnz_at = c.size + 1;
     c.bytes({0x75, 0x00});                                // jnz skip
     c.bytes({0x48, 0x8B, 0x41, 0x20});                    // mov rax, [rcx+20h]
-    c.jmp_abs(image + history_add_rva + 14);              // 14 bytes -> 0x7E7CDE (mov rdi,rdx ...)
+    c.jmp_abs(image + eu4build::rva(history_add_rva + 14));              // 14 bytes -> 0x7E7CDE (mov rdi,rdx ...)
     c.base[jnz_at] = static_cast<std::uint8_t>(c.size - (jnz_at + 1));  // skip:
     c.bytes({0x48, 0x89, 0xD7});                          // mov rdi, rdx
     c.bytes({0x48, 0x89, 0xCE});                          // mov rsi, rcx
-    c.jmp_abs(image + history_after_walk_rva);
+    c.jmp_abs(image + eu4build::rva(history_after_walk_rva));
     std::uint8_t entry[14] = {0xFF, 0x25, 0, 0, 0, 0};
     const auto target = reinterpret_cast<std::uint64_t>(c.base);
     std::memcpy(entry + 6, &target, 8);
@@ -1261,7 +1260,7 @@ bool install_history() {
         log("history REFUSED: call site stubs");
         return false;
     }
-    if (!write_code(image + history_add_rva, entry, sizeof(entry))) {
+    if (!write_code(image + eu4build::rva(history_add_rva), entry, sizeof(entry))) {
         log("history REFUSED: entry write");
         return false;
     }
@@ -1284,7 +1283,7 @@ using AddFileFn = int (*)(void*, const char*, void**, bool);
 Stats transfer_stats;
 
 int transfer_hook(void* manager, const char* name, void** data, bool compress) {
-    auto original = reinterpret_cast<AddFileFn>(image + transfer_add_rva);
+    auto original = reinterpret_cast<AddFileFn>(image + eu4build::rva(transfer_add_rva));
     if (!compress) return original(manager, name, data, compress);
     Stats& s = transfer_stats;
     s.calls.fetch_add(1, std::memory_order_relaxed);
@@ -1311,9 +1310,9 @@ int transfer_hook(void* manager, const char* name, void** data, bool compress) {
 }
 
 bool install_transfer() {
-    if (std::memcmp(reinterpret_cast<void*>(image + transfer_add_rva), transfer_add_bytes, sizeof(transfer_add_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + 0x1133713), session_check_bytes, sizeof(session_check_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + 0xD7AE4E), get_session_bytes, sizeof(get_session_bytes)) != 0) {
+    if (!eu4build::code_matches(image, transfer_add_rva, transfer_add_bytes, sizeof(transfer_add_bytes)) ||
+        !eu4build::code_matches(image, 0x1133713, session_check_bytes, sizeof(session_check_bytes)) ||
+        !eu4build::code_matches(image, 0xD7AE4E, get_session_bytes, sizeof(get_session_bytes))) {
         log("transfer REFUSED: bytes differ");
         return false;
     }
@@ -1527,7 +1526,7 @@ bool install_range() {
         {range_bonusv_rva, {0x8B, 0x3D, 0x1D, 0xB8, 0xFE, 0x01}},
     };
     for (const auto& c : checks) {
-        if (std::memcmp(reinterpret_cast<const void*>(image + c.rva), c.bytes.begin(), c.bytes.size()) != 0) {
+        if (!eu4build::code_matches(image, c.rva, c.bytes.begin(), c.bytes.size())) {
             log("range REFUSED: bytes differ at 0x%llx", static_cast<unsigned long long>(c.rva));
             return false;
         }
@@ -1537,19 +1536,19 @@ bool install_range() {
     } catch (...) {
         return false;
     }
-    range_walk = reinterpret_cast<RangeWalkFn>(image + range_walk_rva);
-    range_distance = reinterpret_cast<RangeDistanceFn>(image + range_distance_rva);
-    range_line = reinterpret_cast<RangeLineFn>(image + range_line_rva);
-    range_bonus = reinterpret_cast<RangeBoolFn>(image + range_bonus_rva);
-    range_related_bonus = reinterpret_cast<RangeBoolFn>(image + range_related_bonus_rva);
-    range_default_a = reinterpret_cast<RangeGetterFn>(image + range_default_a_rva);
-    range_default_b = reinterpret_cast<RangeGetterFn>(image + range_default_b_rva);
-    range_root = rip_target<const unsigned char*>(image + range_root_rva, 3, 7);
-    range_date_offset = rd<std::uint32_t>(reinterpret_cast<const void*>(image + range_root_rva), 9);
-    range_scale = *rip_target<float>(image + range_scale_rva, 4, 8);
-    range_offset = *rip_target<float>(image + range_scale_rva + 8, 4, 8);
-    range_map = rip_target<const unsigned char*>(image + range_map_rva, 3, 7);
-    range_bonus_value = rip_target<int>(image + range_bonusv_rva, 2, 6);
+    range_walk = reinterpret_cast<RangeWalkFn>(image + eu4build::rva(range_walk_rva));
+    range_distance = reinterpret_cast<RangeDistanceFn>(image + eu4build::rva(range_distance_rva));
+    range_line = reinterpret_cast<RangeLineFn>(image + eu4build::rva(range_line_rva));
+    range_bonus = reinterpret_cast<RangeBoolFn>(image + eu4build::rva(range_bonus_rva));
+    range_related_bonus = reinterpret_cast<RangeBoolFn>(image + eu4build::rva(range_related_bonus_rva));
+    range_default_a = reinterpret_cast<RangeGetterFn>(image + eu4build::rva(range_default_a_rva));
+    range_default_b = reinterpret_cast<RangeGetterFn>(image + eu4build::rva(range_default_b_rva));
+    range_root = rip_target<const unsigned char*>(image + eu4build::rva(range_root_rva), 3, 7);
+    range_date_offset = rd<std::uint32_t>(reinterpret_cast<const void*>(image + eu4build::rva(range_root_rva)), 9);
+    range_scale = *rip_target<float>(image + eu4build::rva(range_scale_rva), 4, 8);
+    range_offset = *rip_target<float>(image + eu4build::rva(range_scale_rva + 8), 4, 8);
+    range_map = rip_target<const unsigned char*>(image + eu4build::rva(range_map_rva), 3, 7);
+    range_bonus_value = rip_target<int>(image + eu4build::rva(range_bonusv_rva), 2, 6);
     log("range: scale %.3f offset %.3f date_offset 0x%zx", range_scale, range_offset, range_date_offset);
     return hook_call(range_call_rva, range_walk_rva, reinterpret_cast<const void*>(&range_hook), "range");
 }
@@ -1558,9 +1557,9 @@ bool install_range() {
 // prologue (whole instructions, no RIP-relative ones) and jumps back.
 void* hook_entry(std::uintptr_t rva, std::initializer_list<std::uint8_t> prologue, std::size_t copy,
     const void* hook, const char* name) {
-    const std::uintptr_t target = image + rva;
-    if (copy < 5 || copy > prologue.size() ||
-        std::memcmp(reinterpret_cast<const void*>(target), prologue.begin(), prologue.size()) != 0) {
+    const std::uintptr_t target = image + eu4build::rva(rva);
+    if (copy < 5 || copy > prologue.size() || target == image ||
+        !eu4build::code_matches(image, rva, prologue.begin(), prologue.size())) {
         log("%s REFUSED: entry bytes differ at 0x%llx", name, static_cast<unsigned long long>(rva));
         return nullptr;
     }
@@ -1692,14 +1691,14 @@ bool install_port() {
         {range_root_rva, {0x48, 0x8B, 0x05, 0x75, 0xDC, 0xF0, 0x00}},
     };
     for (const auto& c : checks) {
-        if (std::memcmp(reinterpret_cast<const void*>(image + c.rva), c.bytes.begin(), c.bytes.size()) != 0) {
+        if (!eu4build::code_matches(image, c.rva, c.bytes.begin(), c.bytes.size())) {
             log("port REFUSED: bytes differ at 0x%llx", static_cast<unsigned long long>(c.rva));
             return false;
         }
     }
-    port_range = reinterpret_cast<PortRangeFn>(image + port_range_rva);
-    port_distance = reinterpret_cast<PortDistanceFn>(image + range_distance_rva);
-    port_root = rip_target<const unsigned char*>(image + range_root_rva, 3, 7);
+    port_range = reinterpret_cast<PortRangeFn>(image + eu4build::rva(port_range_rva));
+    port_distance = reinterpret_cast<PortDistanceFn>(image + eu4build::rva(range_distance_rva));
+    port_root = rip_target<const unsigned char*>(image + eu4build::rva(range_root_rva), 3, 7);
     void* next = hook_entry(port_table_rva,
         {0x4C, 0x8B, 0xDC, 0x53, 0x55, 0x56, 0x57, 0x41, 0x56, 0x41, 0x57, 0x48, 0x81, 0xEC, 0x98, 0x00, 0x00, 0x00},
         7, reinterpret_cast<const void*>(&port_hook), "port");
@@ -1760,14 +1759,14 @@ DWORD install_checked(HMODULE module) {
         const UINT mb = GetPrivateProfileIntW(L"load", L"prefetch_mb", 1024, ini.c_str());
         ::sb::SetRamPrefetchBudget(mb);
     }
-    if (std::memcmp(reinterpret_cast<void*>(image + assign_rva), assign_bytes, sizeof(assign_bytes)) != 0) {
+    if (!eu4build::code_matches(image, assign_rva, assign_bytes, sizeof(assign_bytes))) {
         log("REFUSED: string assign bytes differ; no bytes changed");
         installation_status.store(-4);
         return 4;
     }
-    assign_fn = reinterpret_cast<AssignFn>(image + assign_rva);
-    original_blocks = reinterpret_cast<BlocksFn>(image + blocks_rva);
-    original_subst = reinterpret_cast<SubstFn>(image + subst_rva);
+    assign_fn = reinterpret_cast<AssignFn>(image + eu4build::rva(assign_rva));
+    original_blocks = reinterpret_cast<BlocksFn>(image + eu4build::rva(blocks_rva));
+    original_subst = reinterpret_cast<SubstFn>(image + eu4build::rva(subst_rva));
     if (blocks_stats.mode != Mode::off &&
         !hook_call(blocks_call_rva, blocks_rva, reinterpret_cast<const void*>(&blocks_hook), "blocks")) {
         blocks_stats.mode = Mode::off;
@@ -1819,13 +1818,13 @@ DWORD install_checked(HMODULE module) {
         save_parallel = Mode::off;
     }
     if (token_stats.mode != Mode::off) {
-        original_lookup = reinterpret_cast<LookupFn>(image + token_lookup_rva);
+        original_lookup = reinterpret_cast<LookupFn>(image + eu4build::rva(token_lookup_rva));
         // the call passes the dictionary as lea rcx,[rip -> 0x2326720]
-        const auto* lea = reinterpret_cast<const std::uint8_t*>(image + token_call_rva - 7);
+        const auto* lea = reinterpret_cast<const std::uint8_t*>(image + eu4build::rva(token_call_rva) - 7);
         std::int32_t disp = 0;
         std::memcpy(&disp, lea + 3, 4);
         if (lea[0] != 0x48 || lea[1] != 0x8D || lea[2] != 0x0D ||
-            image + token_call_rva + disp != image + token_dict_rva ||
+            image + eu4build::rva(token_call_rva) + disp != image + eu4build::rva(token_dict_rva) ||
             !hook_call(token_call_rva, token_lookup_rva, reinterpret_cast<const void*>(&token_hook), "token")) {
             log("token REFUSED: dictionary operand differs");
             token_stats.mode = Mode::off;

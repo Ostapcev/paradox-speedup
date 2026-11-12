@@ -31,7 +31,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:16"
+   "eu4_load_patch/src/provfree.inc:17"
   ]
  },
  "0x8f0e0": {
@@ -55,7 +55,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:17"
+   "eu4_load_patch/src/provfree.inc:18"
   ]
  },
  "0x947f0": {
@@ -72,7 +72,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:15"
+   "eu4_load_patch/src/provfree.inc:16"
   ]
  },
  "0x95050": {
@@ -113,7 +113,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:14",
+   "eu4_load_patch/src/provfree.inc:15",
    "eu4_menu_patch/src/eu4_menu_patch.cpp:340",
    "eu4_save_patch/src/eu4_save_patch.cpp:59"
   ]
@@ -465,7 +465,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1010"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1009"
   ]
  },
  "0x2043a0": {
@@ -473,7 +473,7 @@
   "how": "changed function 100%",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1011"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1010"
   ]
  },
  "0x210000": {
@@ -505,7 +505,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1337"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1335"
   ]
  },
  "0x2ee4e6": {
@@ -659,7 +659,7 @@
   "section": ".text",
   "uses": [
    "eu4_load_patch/eu4_load_patch.ini:18",
-   "eu4_load_patch/src/provview.inc:11"
+   "eu4_load_patch/src/provview.inc:12"
   ]
  },
  "0x2ffcb7": {
@@ -667,7 +667,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provview.inc:13"
+   "eu4_load_patch/src/provview.inc:14"
   ]
  },
  "0x3003b0": {
@@ -675,7 +675,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provview.inc:12"
+   "eu4_load_patch/src/provview.inc:13"
   ]
  },
  "0x3007bf": {
@@ -683,7 +683,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provview.inc:14"
+   "eu4_load_patch/src/provview.inc:15"
   ]
  },
  "0x30080a": {
@@ -691,7 +691,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provview.inc:15"
+   "eu4_load_patch/src/provview.inc:16"
   ]
  },
  "0x300959": {
@@ -699,7 +699,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provview.inc:16"
+   "eu4_load_patch/src/provview.inc:17"
   ]
  },
  "0x302ee0": {
@@ -739,7 +739,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:19"
+   "eu4_load_patch/src/provfree.inc:20"
   ]
  },
  "0x329f9a": {
@@ -747,7 +747,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:217"
+   "eu4_load_patch/src/provfree.inc:218"
   ]
  },
  "0x329fb9": {
@@ -755,7 +755,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:236"
+   "eu4_load_patch/src/provfree.inc:240"
   ]
  },
  "0x329fdf": {
@@ -763,7 +763,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:218"
+   "eu4_load_patch/src/provfree.inc:219"
   ]
  },
  "0x329ff5": {
@@ -771,7 +771,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:236"
+   "eu4_load_patch/src/provfree.inc:240"
   ]
  },
  "0x32a01b": {
@@ -779,7 +779,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:219"
+   "eu4_load_patch/src/provfree.inc:220"
   ]
  },
  "0x32a057": {
@@ -787,7 +787,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:220"
+   "eu4_load_patch/src/provfree.inc:221"
   ]
  },
  "0x32a06d": {
@@ -795,7 +795,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:237"
+   "eu4_load_patch/src/provfree.inc:241"
   ]
  },
  "0x32a090": {
@@ -803,7 +803,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:221"
+   "eu4_load_patch/src/provfree.inc:222"
   ]
  },
  "0x32a0d0": {
@@ -811,7 +811,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:222"
+   "eu4_load_patch/src/provfree.inc:223"
   ]
  },
  "0x32a150": {
@@ -819,7 +819,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:18"
+   "eu4_load_patch/src/provfree.inc:19"
   ]
  },
  "0x32a16b": {
@@ -827,7 +827,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:212"
+   "eu4_load_patch/src/provfree.inc:213"
   ]
  },
  "0x32a1bf": {
@@ -835,7 +835,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:213"
+   "eu4_load_patch/src/provfree.inc:214"
   ]
  },
  "0x32a1cf": {
@@ -843,8 +843,8 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:214",
-   "eu4_load_patch/src/provfree.inc:237"
+   "eu4_load_patch/src/provfree.inc:215",
+   "eu4_load_patch/src/provfree.inc:241"
   ]
  },
  "0x32a23f": {
@@ -852,7 +852,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:215"
+   "eu4_load_patch/src/provfree.inc:216"
   ]
  },
  "0x34a887": {
@@ -884,7 +884,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1604"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1603"
   ]
  },
  "0x350b80": {
@@ -893,7 +893,7 @@
   "section": ".text",
   "uses": [
    "eu4_load_patch/eu4_load_patch.ini:17",
-   "eu4_load_patch/src/eu4_load_patch.cpp:1603"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1602"
   ]
  },
  "0x3520d0": {
@@ -909,7 +909,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1335"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1333"
   ]
  },
  "0x3526b0": {
@@ -917,7 +917,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1336"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1334"
   ]
  },
  "0x35272e": {
@@ -925,7 +925,15 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1344"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1342"
+  ]
+ },
+ "0x352736": {
+  "gog": "0x352606",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:range_scale_rva+8"
   ]
  },
  "0x3527d5": {
@@ -933,7 +941,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1345"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1343"
   ]
  },
  "0x352899": {
@@ -941,7 +949,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1346"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1344"
   ]
  },
  "0x353f76": {
@@ -1006,7 +1014,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1339"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1337"
   ]
  },
  "0x4109f0": {
@@ -1158,7 +1166,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1013"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1012"
   ]
  },
  "0x5cdfc0": {
@@ -1206,7 +1214,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:825"
+   "eu4_load_patch/src/eu4_load_patch.cpp:824"
   ]
  },
  "0x723120": {
@@ -1223,7 +1231,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1012"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1011"
   ]
  },
  "0x75170c": {
@@ -1448,7 +1456,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1341"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1339"
   ]
  },
  "0x7a5880": {
@@ -1481,7 +1489,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1342"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1340"
   ]
  },
  "0x7acec0": {
@@ -1489,7 +1497,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1340"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1338"
   ]
  },
  "0x7b29eb": {
@@ -1513,7 +1521,15 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1150"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1149"
+  ]
+ },
+ "0x7e7cde": {
+  "gog": "0x7e704e",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:history_add_rva+14"
   ]
  },
  "0x7e7d0e": {
@@ -1521,7 +1537,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1151"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1150"
   ]
  },
  "0x7e8470": {
@@ -1641,7 +1657,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1338"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1336"
   ]
  },
  "0x890d00": {
@@ -2034,13 +2050,21 @@
    "eu4_country_patch/src/eu4_country_patch.cpp:938"
   ]
  },
+ "0x9f38d1": {
+  "gog": "0x9f28b1",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provreuse.inc:provreuse_verify_call_rva-3"
+  ]
+ },
  "0x9f38d4": {
   "gog": "0x9f28b4",
   "how": "instruction",
   "section": ".text",
   "uses": [
    "eu4_country_patch/src/eu4_country_patch.cpp:939",
-   "eu4_load_patch/src/provreuse.inc:143"
+   "eu4_load_patch/src/provreuse.inc:144"
   ]
  },
  "0x9f9500": {
@@ -2049,7 +2073,7 @@
   "section": ".text",
   "uses": [
    "eu4_country_patch/src/eu4_country_patch.cpp:941",
-   "eu4_load_patch/src/provreuse.inc:144"
+   "eu4_load_patch/src/provreuse.inc:145"
   ]
  },
  "0x9f956a": {
@@ -2057,7 +2081,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provreuse.inc:12"
+   "eu4_load_patch/src/provreuse.inc:13"
   ]
  },
  "0x9f9571": {
@@ -2065,8 +2089,8 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1807",
-   "eu4_load_patch/src/provreuse.inc:11"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1806",
+   "eu4_load_patch/src/provreuse.inc:12"
   ]
  },
  "0x9f95d0": {
@@ -2075,7 +2099,7 @@
   "section": ".text",
   "uses": [
    "eu4_country_patch/src/eu4_country_patch.cpp:943",
-   "eu4_load_patch/src/provfree.inc:13"
+   "eu4_load_patch/src/provfree.inc:14"
   ]
  },
  "0x9f95f3": {
@@ -2083,7 +2107,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:204"
+   "eu4_load_patch/src/provfree.inc:205"
   ]
  },
  "0x9f95ff": {
@@ -2091,7 +2115,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:238"
+   "eu4_load_patch/src/provfree.inc:242"
   ]
  },
  "0x9f960b": {
@@ -2099,7 +2123,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:205"
+   "eu4_load_patch/src/provfree.inc:206"
   ]
  },
  "0x9f962b": {
@@ -2107,7 +2131,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:206"
+   "eu4_load_patch/src/provfree.inc:207"
   ]
  },
  "0x9f9667": {
@@ -2115,7 +2139,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:207"
+   "eu4_load_patch/src/provfree.inc:208"
   ]
  },
  "0x9f9675": {
@@ -2123,7 +2147,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:238"
+   "eu4_load_patch/src/provfree.inc:242"
   ]
  },
  "0x9f97f6": {
@@ -2131,7 +2155,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:208"
+   "eu4_load_patch/src/provfree.inc:209"
   ]
  },
  "0x9f9809": {
@@ -2139,7 +2163,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:209"
+   "eu4_load_patch/src/provfree.inc:210"
   ]
  },
  "0x9f981c": {
@@ -2147,7 +2171,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/provfree.inc:210"
+   "eu4_load_patch/src/provfree.inc:211"
   ]
  },
  "0x9fa090": {
@@ -2428,7 +2452,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1276"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1274"
   ]
  },
  "0xd7ae4e": {
@@ -2436,7 +2460,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1316"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1314"
   ]
  },
  "0xd84826": {
@@ -2444,7 +2468,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1277"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1275"
   ]
  },
  "0xda69e5": {
@@ -2452,7 +2476,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1148"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1147"
   ]
  },
  "0xda6a1d": {
@@ -2460,7 +2484,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1149"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1148"
   ]
  },
  "0xdb08c0": {
@@ -2660,7 +2684,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1315"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1313"
   ]
  },
  "0x11337c1": {
@@ -2668,7 +2692,7 @@
   "how": "instruction",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1278"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1276"
   ]
  },
  "0x1248740": {
@@ -2933,7 +2957,7 @@
   "how": "changed function 99%",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:1343"
+   "eu4_load_patch/src/eu4_load_patch.cpp:1341"
   ]
  },
  "0x14b36c0": {
@@ -3006,7 +3030,7 @@
   "section": ".text",
   "uses": [
    "eu4_load_patch/eu4_load_patch.ini:19",
-   "eu4_load_patch/src/save_compress.inc:16"
+   "eu4_load_patch/src/save_compress.inc:17"
   ]
  },
  "0x15cce80": {
@@ -3126,7 +3150,7 @@
   "how": "changed function 96%",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:824"
+   "eu4_load_patch/src/eu4_load_patch.cpp:823"
   ]
  },
  "0x1710a70": {
@@ -3182,7 +3206,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/save_compress.inc:18"
+   "eu4_load_patch/src/save_compress.inc:19"
   ]
  },
  "0x181fb90": {
@@ -3190,7 +3214,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/save_compress.inc:19"
+   "eu4_load_patch/src/save_compress.inc:20"
   ]
  },
  "0x181fc70": {
@@ -3198,7 +3222,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/save_compress.inc:17"
+   "eu4_load_patch/src/save_compress.inc:18"
   ]
  },
  "0x19f8310": {
@@ -3215,6 +3239,14 @@
   "section": ".text",
   "uses": [
    "eu4_save_patch/src/pipe.inc:28"
+  ]
+ },
+ "0x19fb7f4": {
+  "gog": "0x19e5474",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:verifypath_return_rva-4"
   ]
  },
  "0x19fb7f8": {
@@ -3238,7 +3270,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:612"
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:613"
   ]
  },
  "0x1a073f0": {
@@ -3246,7 +3278,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:610"
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:611"
   ]
  },
  "0x1a07580": {
@@ -3254,7 +3286,7 @@
   "how": "function",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:611"
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:612"
   ]
  },
  "0x1a08470": {
@@ -3262,9 +3294,9 @@
   "how": "changed function 95%",
   "section": ".text",
   "uses": [
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:605",
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:609",
-   "eu4_load_patch/src/save_compress.inc:20"
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:606",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:610",
+   "eu4_load_patch/src/save_compress.inc:21"
   ]
  },
  "0x1a332d4": {
@@ -3372,9 +3404,9 @@
   "how": "vtable slot",
   "section": ".rdata",
   "uses": [
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:613",
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:618",
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:625"
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:614",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:619",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:626"
   ]
  },
  "0x1c1d8d0": {
@@ -3382,8 +3414,8 @@
   "how": "vtable slot",
   "section": ".rdata",
   "uses": [
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:617",
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:624"
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:618",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:625"
   ]
  },
  "0x1c1d900": {
@@ -3391,7 +3423,7 @@
   "how": "vtable slot",
   "section": ".rdata",
   "uses": [
-   "eu4_load_patch/src/bellows/ram_prefetch.cpp:622"
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:623"
   ]
  },
  "0x1c33e18": {
@@ -3708,7 +3740,7 @@
   "how": "reference",
   "section": ".data",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:826"
+   "eu4_load_patch/src/eu4_load_patch.cpp:825"
   ]
  },
  "0x233d850": {
@@ -3846,7 +3878,7 @@
   "how": "reference",
   "section": ".data",
   "uses": [
-   "eu4_load_patch/src/eu4_load_patch.cpp:827"
+   "eu4_load_patch/src/eu4_load_patch.cpp:826"
   ]
  },
  "0x242bd80": {

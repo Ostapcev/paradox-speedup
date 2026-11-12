@@ -117,6 +117,11 @@ inline bool code_matches(std::uintptr_t image, std::uintptr_t steam_rva,
             const Entry* e = find(steam_rva);
             if (!e) return false;
             const auto skip = steam_rva - e->steam;
+            if (e->length == 0 && skip == 0) {
+                // data (constant tables, strings): same contents, shifted address
+                return std::memcmp(reinterpret_cast<const void*>(image + e->gog), steam_bytes,
+                    size) == 0;
+            }
             if (skip + size > e->length) return false;
             return std::memcmp(reinterpret_cast<const void*>(image + e->gog + skip),
                 e->bytes + skip, size) == 0;

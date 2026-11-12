@@ -43,6 +43,7 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -602,27 +603,27 @@ bool InstallRamPrefetch(std::uintptr_t image, const std::wstring& plugin_dir, Mo
     // eu4.exe 1.37.5 Steam: tinfl_decompress 0x1A08470; ZIP archiver table 0x1C1D890 slots
     // +0x30 openArchive (0x1A073F0), +0x40 openRead (0x1A07580), +0x70 closeArchive (0x1A073B0).
     static const std::uint8_t tinfl_bytes[] = {0x48, 0x89, 0x5C, 0x24, 0x20, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56, 0x41, 0x57};
-    if (std::memcmp(reinterpret_cast<const void*>(image + 0x1A08470), tinfl_bytes, sizeof(tinfl_bytes)) != 0) {
+    if (!eu4build::code_matches(image, 0x1A08470, tinfl_bytes, sizeof(tinfl_bytes))) {
         Log(ANVIL_LOG_WARNING, "ram_prefetch REFUSED: tinfl bytes differ");
         return false;
     }
-    g_tinfl = reinterpret_cast<TinflFn>(image + 0x1A08470);
-    g_openArchivePrev = reinterpret_cast<OpenArchiveFn>(image + 0x1A073F0);
-    g_openReadPrev = reinterpret_cast<OpenReadFn>(image + 0x1A07580);
-    g_closeArchivePrev = reinterpret_cast<CloseArchiveFn>(image + 0x1A073B0);
-    if (!SwapSlot(image + 0x1C1D8C0, reinterpret_cast<void*>(g_openArchivePrev), reinterpret_cast<void*>(&SB_ZipOpenArchive))) {
+    g_tinfl = reinterpret_cast<TinflFn>(image + eu4build::rva(0x1A08470));
+    g_openArchivePrev = reinterpret_cast<OpenArchiveFn>(image + eu4build::rva(0x1A073F0));
+    g_openReadPrev = reinterpret_cast<OpenReadFn>(image + eu4build::rva(0x1A07580));
+    g_closeArchivePrev = reinterpret_cast<CloseArchiveFn>(image + eu4build::rva(0x1A073B0));
+    if (!SwapSlot(image + eu4build::rva(0x1C1D8C0), reinterpret_cast<void*>(g_openArchivePrev), reinterpret_cast<void*>(&SB_ZipOpenArchive))) {
         Log(ANVIL_LOG_WARNING, "ram_prefetch REFUSED: openArchive slot differs");
         return false;
     }
-    if (!SwapSlot(image + 0x1C1D8D0, reinterpret_cast<void*>(g_openReadPrev), reinterpret_cast<void*>(&SB_ZipOpenRead))) {
-        SwapSlot(image + 0x1C1D8C0, reinterpret_cast<void*>(&SB_ZipOpenArchive), reinterpret_cast<void*>(g_openArchivePrev));
+    if (!SwapSlot(image + eu4build::rva(0x1C1D8D0), reinterpret_cast<void*>(g_openReadPrev), reinterpret_cast<void*>(&SB_ZipOpenRead))) {
+        SwapSlot(image + eu4build::rva(0x1C1D8C0), reinterpret_cast<void*>(&SB_ZipOpenArchive), reinterpret_cast<void*>(g_openArchivePrev));
         Log(ANVIL_LOG_WARNING, "ram_prefetch REFUSED: openRead slot differs");
         return false;
     }
-    if (!SwapSlot(image + 0x1C1D900, reinterpret_cast<void*>(g_closeArchivePrev), reinterpret_cast<void*>(&SB_ZipCloseArchive))) {
+    if (!SwapSlot(image + eu4build::rva(0x1C1D900), reinterpret_cast<void*>(g_closeArchivePrev), reinterpret_cast<void*>(&SB_ZipCloseArchive))) {
         // closeArchive only forgets the archive; without it entries may outlive it, so go back.
-        SwapSlot(image + 0x1C1D8D0, reinterpret_cast<void*>(&SB_ZipOpenRead), reinterpret_cast<void*>(g_openReadPrev));
-        SwapSlot(image + 0x1C1D8C0, reinterpret_cast<void*>(&SB_ZipOpenArchive), reinterpret_cast<void*>(g_openArchivePrev));
+        SwapSlot(image + eu4build::rva(0x1C1D8D0), reinterpret_cast<void*>(&SB_ZipOpenRead), reinterpret_cast<void*>(g_openReadPrev));
+        SwapSlot(image + eu4build::rva(0x1C1D8C0), reinterpret_cast<void*>(&SB_ZipOpenArchive), reinterpret_cast<void*>(g_openArchivePrev));
         Log(ANVIL_LOG_WARNING, "ram_prefetch REFUSED: closeArchive slot differs");
         return false;
     }

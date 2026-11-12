@@ -1,3 +1,4 @@
+#include "eu4_build.hpp"
 // ---- provreuse: keep the province modifier cache's buffers across CalculateModifier
 // 1409f9500 builds a default (empty) cache, move-assigns it into province+0x988 with 0x9F95D0
 // (freeing the old cache's strings and vectors) and then refills the cache in place
@@ -210,7 +211,7 @@ void snapshot(const unsigned char* c, Snapshot& out) {
 }
 
 void provreuse_verify_hook(void* province) {
-    auto calc = reinterpret_cast<CalcFn>(image + provreuse_calc_rva);
+    auto calc = reinterpret_cast<CalcFn>(image + eu4build::rva(provreuse_calc_rva));
     provreuse_bypass = provreuse_verify0;
     calc(province);
     provreuse_bypass = false;
@@ -268,14 +269,14 @@ void provreuse_report() {
 // needs the provfree layout checks and free functions (install_provfree with mode off for the hook)
 bool install_provreuse() {
     const std::uint8_t owner[] = {0x48, 0x8D, 0x8F, 0x88, 0x09, 0x00, 0x00, 0xE8};
-    if (std::memcmp(reinterpret_cast<const void*>(image + provreuse_owner_bytes_rva), owner, sizeof(owner)) != 0) {
+    if (!eu4build::code_matches(image, provreuse_owner_bytes_rva, owner, sizeof(owner))) {
         log("provreuse REFUSED: call site bytes differ");
         return false;
     }
-    provfree_next = reinterpret_cast<ProvAssignFn>(image + provfree_rva);
+    provfree_next = reinterpret_cast<ProvAssignFn>(image + eu4build::rva(provfree_rva));
     if (provreuse_verify) {
         const std::uint8_t verify_site[] = {0x49, 0x8B, 0xCD, 0xE8};  // mov rcx,r13; call
-        if (std::memcmp(reinterpret_cast<const void*>(image + provreuse_verify_call_rva - 3), verify_site, 4) != 0 ||
+        if (!eu4build::code_matches(image, provreuse_verify_call_rva - 3, verify_site, 4) ||
             !hook_call(provreuse_verify_call_rva, provreuse_calc_rva,
                 reinterpret_cast<const void*>(&provreuse_verify_hook), "provreuse verify")) {
             log("provreuse verify REFUSED");

@@ -1,3 +1,4 @@
+#include "eu4_build.hpp"
 // ---- provview: 0x2FFC60 without its copy of the province's modifier list (Bellows
 // province_modifier_view, MIT). 0x2FFC60(country, out, province, culture) copies the province's
 // modifier list (+0x998) without the placeholders 0x286 into a fresh sparse list only so that
@@ -78,16 +79,16 @@ bool install_provview() {
         {provview_post266_rva, {0x49, 0x8B, 0x88, 0x80, 0xE6, 0x00, 0x00}},
     };
     for (const auto& c : checks) {
-        if (std::memcmp(reinterpret_cast<const void*>(image + c.rva), c.bytes.begin(), c.bytes.size()) != 0) {
+        if (!eu4build::code_matches(image, c.rva, c.bytes.begin(), c.bytes.size())) {
             log("provview REFUSED: bytes differ at 0x%llx", static_cast<unsigned long long>(c.rva));
             return false;
         }
     }
-    provview_value = reinterpret_cast<ProvValueFn>(image + provview_value_rva);
-    provview_list = rd<std::uint32_t>(reinterpret_cast<const void*>(image + provview_list_rva), 3);
-    provview_registry = rip_target<const unsigned char*>(image + provview_registry_rva, 3, 7);
-    provview_post267 = rd<std::uint32_t>(reinterpret_cast<const void*>(image + provview_post267_rva), 3);
-    provview_post266 = rd<std::uint32_t>(reinterpret_cast<const void*>(image + provview_post266_rva), 3);
+    provview_value = reinterpret_cast<ProvValueFn>(image + eu4build::rva(provview_value_rva));
+    provview_list = rd<std::uint32_t>(reinterpret_cast<const void*>(image + eu4build::rva(provview_list_rva)), 3);
+    provview_registry = rip_target<const unsigned char*>(image + eu4build::rva(provview_registry_rva), 3, 7);
+    provview_post267 = rd<std::uint32_t>(reinterpret_cast<const void*>(image + eu4build::rva(provview_post267_rva)), 3);
+    provview_post266 = rd<std::uint32_t>(reinterpret_cast<const void*>(image + eu4build::rva(provview_post266_rva)), 3);
     void* next = hook_entry(provview_rva,
         {0x4C, 0x89, 0x4C, 0x24, 0x20, 0x48, 0x89, 0x54, 0x24, 0x10, 0x48, 0x89, 0x4C, 0x24, 0x08, 0x55, 0x53, 0x56, 0x57, 0x41, 0x54},
         5, reinterpret_cast<const void*>(&provview_hook), "provview");

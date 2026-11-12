@@ -1,3 +1,4 @@
+#include "eu4_build.hpp"
 // ---- save: compression of one ZIP member of a save (Bellows save_compress, MIT)
 // 0x153C790(writer, input, buffer, size, crc, level) deflates the whole input stream into the
 // archive writer: deflateInit2_(level, 8, -15, 9, 0); reads size/2 bytes at a time, deflate
@@ -429,15 +430,15 @@ bool install_save() {
         {save_member_rva + 0x111, {0x4C, 0x8D, 0x3D, 0x28, 0x54, 0x85, 0x00}},  // CRC table load
     };
     for (const auto& c : checks) {
-        if (std::memcmp(reinterpret_cast<const void*>(image + c.rva), c.bytes.begin(), c.bytes.size()) != 0) {
+        if (!eu4build::code_matches(image, c.rva, c.bytes.begin(), c.bytes.size())) {
             log("save REFUSED: bytes differ at 0x%llx", static_cast<unsigned long long>(c.rva));
             return false;
         }
     }
-    z_init2 = reinterpret_cast<ZInit2Fn>(image + save_init2_rva);
-    z_deflate = reinterpret_cast<ZDeflateFn>(image + save_deflate_rva);
-    z_end = reinterpret_cast<ZEndFn>(image + save_end_rva);
-    z_tinfl = reinterpret_cast<TinflFn>(image + save_tinfl_rva);
+    z_init2 = reinterpret_cast<ZInit2Fn>(image + eu4build::rva(save_init2_rva));
+    z_deflate = reinterpret_cast<ZDeflateFn>(image + eu4build::rva(save_deflate_rva));
+    z_end = reinterpret_cast<ZEndFn>(image + eu4build::rva(save_end_rva));
+    z_tinfl = reinterpret_cast<TinflFn>(image + eu4build::rva(save_tinfl_rva));
     for (auto& slot : capture_vtable) slot = reinterpret_cast<void*>(&capture_other);
     capture_vtable[0x50 / 8] = reinterpret_cast<void*>(&capture_write);
     void* next = hook_entry(save_member_rva,

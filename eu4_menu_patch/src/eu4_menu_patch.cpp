@@ -28,6 +28,8 @@
 #include <utility>
 #include <vector>
 
+#include "eu4_build.hpp"
+
 #include "map_snapshot.hpp"
 #include "menu_transition.hpp"
 
@@ -878,6 +880,13 @@ DWORD install_checked(HMODULE module) {
         return 0;
     }
     image = reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
+    if (eu4build::detect() != eu4build::Build::steam) {
+        // the main-loop object and the Steam lobby code differ in other builds
+        log("REFUSED: build=%s; only the Steam build of eu4.exe 1.37.5 is supported; no bytes changed",
+            eu4build::name());
+        installation_status.store(-4);
+        return 4;
+    }
     if (!check_all()) {
         installation_status.store(-4);
         return 4;

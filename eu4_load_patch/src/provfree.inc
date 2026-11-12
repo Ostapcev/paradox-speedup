@@ -1,3 +1,4 @@
+#include "eu4_build.hpp"
 // ---- provfree: the old province modifier cache freed off the main thread
 // Province CalculateModifier 0x9F9500 builds a fresh cache (default ctor 0x95C560, no heap)
 // and move-assigns it into province+0x988 with 0x9F95D0. The move frees the old cache's
@@ -222,27 +223,30 @@ bool install_provfree(bool hook_it = true) {
         {0x32A0D0, {0x48, 0x8D, 0xB3, 0x58, 0x01, 0x00, 0x00}},
     };
     for (const auto& e : expect) {
-        if (std::memcmp(reinterpret_cast<const void*>(image + e.rva), e.bytes.begin(), e.bytes.size()) != 0) {
+        if (!eu4build::code_matches(image, e.rva, e.bytes.begin(), e.bytes.size())) {
             log("provfree REFUSED: bytes differ at 0x%llx", static_cast<unsigned long long>(e.rva));
             return false;
         }
     }
     // the called free functions
-    auto call_target = [](std::uintptr_t at) {
+    // the call at Steam RVA `at` goes to Steam RVA `want` (both translated to the running build)
+    auto calls = [](std::uintptr_t at, std::uintptr_t want) {
+        const auto site = eu4build::rva(at), target = eu4build::rva(want);
+        if (!site || !target) return false;
         std::int32_t rel = 0;
-        std::memcpy(&rel, reinterpret_cast<const void*>(image + at + 1), 4);
-        return at + 5 + rel;
+        std::memcpy(&rel, reinterpret_cast<const void*>(image + site + 1), 4);
+        return site + 5 + rel == target;
     };
-    if (call_target(0x329FB9) != provfree_vec4_free_rva || call_target(0x329FF5) != provfree_strvec_free_rva ||
-        call_target(0x32A06D) != provfree_string_free_rva || call_target(0x32A1CF) != provfree_vec8_free_rva ||
-        call_target(0x9F95FF) != provfree_list_assign_rva || call_target(0x9F9675) != provfree_blist_assign_rva) {
+    if (!calls(0x329FB9, provfree_vec4_free_rva) || !calls(0x329FF5, provfree_strvec_free_rva) ||
+        !calls(0x32A06D, provfree_string_free_rva) || !calls(0x32A1CF, provfree_vec8_free_rva) ||
+        !calls(0x9F95FF, provfree_list_assign_rva) || !calls(0x9F9675, provfree_blist_assign_rva)) {
         log("provfree REFUSED: call targets differ");
         return false;
     }
-    free_string = reinterpret_cast<FreeFn>(image + provfree_string_free_rva);
-    free_strvec = reinterpret_cast<FreeFn>(image + provfree_strvec_free_rva);
-    free_vec8 = reinterpret_cast<FreeFn>(image + provfree_vec8_free_rva);
-    free_vec4 = reinterpret_cast<FreeFn>(image + provfree_vec4_free_rva);
+    free_string = reinterpret_cast<FreeFn>(image + eu4build::rva(provfree_string_free_rva));
+    free_strvec = reinterpret_cast<FreeFn>(image + eu4build::rva(provfree_strvec_free_rva));
+    free_vec8 = reinterpret_cast<FreeFn>(image + eu4build::rva(provfree_vec8_free_rva));
+    free_vec4 = reinterpret_cast<FreeFn>(image + eu4build::rva(provfree_vec4_free_rva));
     if (!hook_it) return true;  // provreuse: layout checks and free functions only
     if (provfree_stats.mode == Mode::on) {
         provfree_queue = new std::vector<FreeItem>();

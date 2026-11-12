@@ -79,6 +79,11 @@ def main():
     for m in re.finditer(r'\{\s*0x([0-9a-fA-F]{5,8}),\s*"([0-9a-f]{4,})"', code):
         arrays['sig_' + m.group(1)] = bytes.fromhex(m.group(2))
         checks.append(('0x' + m.group(1), 'sig_' + m.group(1), m.group(0)))
+    # check lists: {0xRVA, {0x48, 0x8D, ...}}
+    for m in re.finditer(r'\{\s*(0x[0-9a-fA-F]{5,8}|\w+_rva),\s*\{([0-9a-fA-Fx,\s]+)\}\s*\}', code):
+        key = 'list_%s_%d' % (m.group(1), m.start())
+        arrays[key] = bytes(int(x, 16) for x in re.findall(r'0x([0-9a-fA-F]{1,2})', m.group(2)))
+        checks.append((m.group(1), key, m.group(0)))
     # table-driven checks: {site_rva, site_bytes, ...} initializers
     checks += [(m.group(1), m.group(2), m.group(0)) for m in
                re.finditer(r'\{\s*(\w+_rva|0x[0-9a-fA-F]{5,8}),\s*(\w+_bytes)\b', code)]
