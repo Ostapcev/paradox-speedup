@@ -25,6 +25,7 @@
 #include <string>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -219,24 +220,22 @@ DWORD install_checked(HMODULE module) {
     }
 
     const auto image = reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
-    if (std::memcmp(reinterpret_cast<void*>(image + site1_rva), site1_bytes,
-            sizeof(site1_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + site2_rva), site2_bytes,
-            sizeof(site2_bytes)) != 0) {
+    if (!eu4build::code_matches(image, site1_rva, site1_bytes, sizeof(site1_bytes)) ||
+        !eu4build::code_matches(image, site2_rva, site2_bytes, sizeof(site2_bytes))) {
         log("REFUSED: bytes differ; no bytes changed");
         installation_status.store(-4);
         return 4;
     }
-    original_lookup = reinterpret_cast<LookupFn>(image + lookup_rva);
+    original_lookup = reinterpret_cast<LookupFn>(image + eu4build::rva(lookup_rva));
     const void* hook = mode == Mode::on ? reinterpret_cast<const void*>(&fast_hook) :
         reinterpret_cast<const void*>(&lookup_hook);
     char error[160]{};
     speedpatch::CallPatch first;
     speedpatch::CallPatch second;
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + call1_rva),
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(call1_rva)),
             reinterpret_cast<const void*>(original_lookup),
             hook, first, error, sizeof(error)) ||
-        !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + call2_rva),
+        !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(call2_rva)),
             reinterpret_cast<const void*>(original_lookup),
             hook, second, error, sizeof(error)) ||
         !speedpatch::commit_call(first, error, sizeof(error)) ||

@@ -17,7 +17,7 @@ def main() -> None:
     command = [ZIG, "c++", "-target", "x86_64-windows-gnu", "-std=c++17", "-O2", "-Wall",
                "-Wextra", "-Werror", "-shared", "-static",
                ROOT / "src" / "eu4_save_patch.cpp", ROOT / "src" / "call_patch.cpp",
-               "-I", ROOT / "src", "-o", BUILD / "eu4_save_patch.dll"]
+               "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "eu4_save_patch.dll"]
     print("+", " ".join(map(str, command)), flush=True)
     subprocess.run([str(value) for value in command], check=True, cwd=WORKSPACE)
     shutil.copy2(BUILD / "eu4_save_patch.dll", PLUGINS / "eu4_save_patch.dll")

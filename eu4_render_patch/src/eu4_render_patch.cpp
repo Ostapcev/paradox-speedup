@@ -30,6 +30,7 @@
 #include <string>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -389,14 +390,13 @@ bool install_alert_recheck_gate(char* error, std::size_t error_size) {
     constexpr std::uint8_t expected[] = {0x41, 0x3b, 0x9c, 0x24, 0xf8, 0x4a, 0x00, 0x00, 0x74,
         0x20, 0x49, 0x69, 0xc7, 0xa8, 0x00, 0x00, 0x00, 0x48, 0x83, 0x7c, 0x38, 0x20, 0x00, 0x75,
         0x11, 0x48, 0x8d, 0x8d, 0x60, 0x0c, 0x00, 0x00};
-    auto* region = reinterpret_cast<std::uint8_t*>(image + 0xdf5ec8);
-    if (std::memcmp(region, expected, sizeof(expected)) != 0) {
+    if (!eu4build::code_matches(image, 0xdf5ec8, expected, sizeof(expected))) {
         std::snprintf(error, error_size, "alert loop bytes differ");
         return false;
     }
-    auto* site = reinterpret_cast<std::uint8_t*>(image + 0xdf5ed2);
-    const auto resume = image + 0xdf5ed9;  // cmp qword [rax+rdi+0x20],0
-    const auto not_shown = image + 0xdf5ee1;  // lea rcx,[rbp+0xc60]; call; jmp next alert
+    auto* site = reinterpret_cast<std::uint8_t*>(image + eu4build::rva(0xdf5ed2));
+    const auto resume = image + eu4build::rva(0xdf5ed9);  // cmp qword [rax+rdi+0x20],0
+    const auto not_shown = image + eu4build::rva(0xdf5ee1);  // lea rcx,[rbp+0xc60]; call; jmp next alert
     auto* stub = allocate_stub_near(reinterpret_cast<std::uintptr_t>(site));
     if (!stub) {
         std::snprintf(error, error_size, "no memory near the alert loop");
@@ -571,7 +571,7 @@ using FindTextFn = std::uint64_t (*)(std::uint64_t, const char*);
 void mark_texts_in(std::uint64_t window) noexcept {
     const auto vtable = *reinterpret_cast<const std::uint64_t*>(window);
     const auto find_text = *reinterpret_cast<const FindTextFn*>(vtable + 0x98);
-    const auto box_vtable = image + textbox_vtable_rva;
+    const auto box_vtable = image + eu4build::rva(textbox_vtable_rva);
     for (const char* name : icon_text_names) {
         // the widget found by name (vtable 141d8fd10) keeps its text render object at +0x118;
         // that object (vtable 141da1d40) is what 1414dd350 draws
@@ -713,11 +713,11 @@ DWORD WINAPI reporter(void*) {
         Sleep(30000);
         const auto n = draws.load();
         const auto ms = draw_ticks.load() * 1000 / static_cast<std::uint64_t>(qpc_frequency);
-        const float* table = reinterpret_cast<const float*>(image + table_rva);
+        const float* table = reinterpret_cast<const float*>(image + eu4build::rva(table_rva));
         log("stats in_tick_frames=%llu in_tick_ms=%llu avg_us=%llu scale=%g table=%g,%g,%g,%g,%g",
             static_cast<unsigned long long>(n), static_cast<unsigned long long>(ms),
             static_cast<unsigned long long>(n ? ms * 1000 / n : 0),
-            static_cast<double>(*reinterpret_cast<const float*>(image + scale_rva)),
+            static_cast<double>(*reinterpret_cast<const float*>(image + eu4build::rva(scale_rva))),
             static_cast<double>(table[0]), static_cast<double>(table[1]),
             static_cast<double>(table[2]), static_cast<double>(table[3]),
             static_cast<double>(table[4]));
@@ -786,16 +786,17 @@ DWORD install_checked(HMODULE module) {
     }
 
     image = reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
-    if (std::memcmp(reinterpret_cast<void*>(image + gate_rva), gate_bytes,
-            sizeof(gate_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + draw_site_rva), draw_bytes,
-            sizeof(draw_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + table_rva), expected_table,
+    if (eu4build::detect() == eu4build::Build::unknown) {
+        log("REFUSED: unknown eu4.exe build (needs Steam or GOG 1.37.5); no bytes changed");
+        installation_status.store(-4);
+        return 4;
+    }
+    if (!eu4build::code_matches(image, gate_rva, gate_bytes, sizeof(gate_bytes)) ||
+        !eu4build::code_matches(image, draw_site_rva, draw_bytes, sizeof(draw_bytes)) ||
+        std::memcmp(reinterpret_cast<void*>(image + eu4build::rva(table_rva)), expected_table,
             sizeof(expected_table)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + scene_site_rva), scene_bytes,
-            sizeof(scene_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + tick_site_rva), tick_bytes,
-            sizeof(tick_bytes)) != 0) {
+        !eu4build::code_matches(image, scene_site_rva, scene_bytes, sizeof(scene_bytes)) ||
+        !eu4build::code_matches(image, tick_site_rva, tick_bytes, sizeof(tick_bytes))) {
         log("REFUSED: bytes differ; no bytes changed");
         installation_status.store(-4);
         return 4;
@@ -810,8 +811,8 @@ DWORD install_checked(HMODULE module) {
 
     char error[160]{};
     speedpatch::CallPatch draw;
-    original_draw = reinterpret_cast<DrawFn>(image + draw_function_rva);
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + draw_call_rva),
+    original_draw = reinterpret_cast<DrawFn>(image + eu4build::rva(draw_function_rva));
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(draw_call_rva)),
             reinterpret_cast<const void*>(original_draw),
             reinterpret_cast<const void*>(&draw_hook), draw, error, sizeof(error)) ||
         !speedpatch::commit_call(draw, error, sizeof(error))) {
@@ -823,12 +824,12 @@ DWORD install_checked(HMODULE module) {
 
     speedpatch::CallPatch scene;
     speedpatch::CallPatch tick;
-    original_scene = reinterpret_cast<SceneFn>(image + scene_function_rva);
-    original_tick = reinterpret_cast<TickFn>(image + tick_function_rva);
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + scene_call_rva),
+    original_scene = reinterpret_cast<SceneFn>(image + eu4build::rva(scene_function_rva));
+    original_tick = reinterpret_cast<TickFn>(image + eu4build::rva(tick_function_rva));
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(scene_call_rva)),
             reinterpret_cast<const void*>(original_scene),
             reinterpret_cast<const void*>(&scene_hook), scene, error, sizeof(error)) ||
-        !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + tick_call_rva),
+        !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(tick_call_rva)),
             reinterpret_cast<const void*>(original_tick),
             reinterpret_cast<const void*>(&tick_hook), tick, error, sizeof(error)) ||
         !speedpatch::commit_call(tick, error, sizeof(error)) ||
@@ -860,11 +861,10 @@ DWORD install_checked(HMODULE module) {
     {
         speedpatch::CallPatch console;
         void* trampoline = nullptr;
-        game_assign = reinterpret_cast<AssignFn>(image + assign_rva);
-        if (std::memcmp(reinterpret_cast<void*>(image + assign_rva), assign_prologue,
-                sizeof(assign_prologue)) != 0) {
+        game_assign = reinterpret_cast<AssignFn>(image + eu4build::rva(assign_rva));
+        if (!eu4build::code_matches(image, assign_rva, assign_prologue, sizeof(assign_prologue))) {
             log("console fps_render REFUSED (string assign bytes differ)");
-        } else if (!speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + console_rva),
+        } else if (!speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(console_rva)),
                        console_prologue, reinterpret_cast<const void*>(&console_hook), console,
                        &trampoline, error, sizeof(error))) {
             log("console fps_render REFUSED (%s)", error);
@@ -885,10 +885,9 @@ DWORD install_checked(HMODULE module) {
         constexpr std::uint8_t map_bytes[] = {0x48, 0x8b, 0x88, 0x60, 0x03, 0x00, 0x00, 0xe8,
             0xd2, 0x14, 0x89, 0x00};
         speedpatch::CallPatch map;
-        original_map = reinterpret_cast<MapFn>(image + 0x10a6d00);
-        if (std::memcmp(reinterpret_cast<void*>(image + 0x815822), map_bytes,
-                sizeof(map_bytes)) != 0 ||
-            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + 0x815829),
+        original_map = reinterpret_cast<MapFn>(image + eu4build::rva(0x10a6d00));
+        if (!eu4build::code_matches(image, 0x815822, map_bytes, sizeof(map_bytes)) ||
+            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(0x815829)),
                 reinterpret_cast<const void*>(original_map),
                 reinterpret_cast<const void*>(&map_hook), map, error, sizeof(error)) ||
             !speedpatch::commit_call(map, error, sizeof(error))) {
@@ -907,10 +906,9 @@ DWORD install_checked(HMODULE module) {
         alert_interval_ticks = static_cast<std::int64_t>(
             static_cast<double>(alert_interval) * static_cast<double>(qpc_frequency));
         speedpatch::CallPatch alert;
-        original_alert = reinterpret_cast<AlertFn>(image + 0xdf5860);
-        if (std::memcmp(reinterpret_cast<void*>(image + 0x8153c2), alert_bytes,
-                sizeof(alert_bytes)) != 0 ||
-            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + 0x8153c9),
+        original_alert = reinterpret_cast<AlertFn>(image + eu4build::rva(0xdf5860));
+        if (!eu4build::code_matches(image, 0x8153c2, alert_bytes, sizeof(alert_bytes)) ||
+            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(0x8153c9)),
                 reinterpret_cast<const void*>(original_alert),
                 reinterpret_cast<const void*>(&alert_hook), alert, error, sizeof(error)) ||
             !speedpatch::commit_call(alert, error, sizeof(error))) {
@@ -938,12 +936,12 @@ DWORD install_checked(HMODULE module) {
                 static_cast<double>(icon_interval) * static_cast<double>(qpc_frequency));
             speedpatch::CallPatch pass;
             speedpatch::CallPatch province;
-            original_icon_pass = reinterpret_cast<IconPassFn>(image + 0x10a7a90);
-            original_icon_province = reinterpret_cast<IconProvinceFn>(image + 0x1321880);
-            if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + 0x10a6d6a),
+            original_icon_pass = reinterpret_cast<IconPassFn>(image + eu4build::rva(0x10a7a90));
+            original_icon_province = reinterpret_cast<IconProvinceFn>(image + eu4build::rva(0x1321880));
+            if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(0x10a6d6a)),
                     reinterpret_cast<const void*>(original_icon_pass),
                     reinterpret_cast<const void*>(&icon_pass_hook), pass, error, sizeof(error)) ||
-                !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + 0x10a7f82),
+                !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(0x10a7f82)),
                     reinterpret_cast<const void*>(original_icon_province),
                     reinterpret_cast<const void*>(&icon_province_hook), province, error,
                     sizeof(error)) ||
@@ -993,14 +991,14 @@ DWORD install_checked(HMODULE module) {
                 text_filter = KindFilter{};
                 log("map_icons_text_hide needs map_icons_interval > 0 (icon pass hook); off");
             } else {
-                auto* slot_ptr = reinterpret_cast<std::uint64_t*>(image + textbox_draw_slot_rva);
+                auto* slot_ptr = reinterpret_cast<std::uint64_t*>(image + eu4build::rva(textbox_draw_slot_rva));
                 DWORD old = 0;
-                if (*slot_ptr != image + textbox_draw_rva ||
+                if (*slot_ptr != image + eu4build::rva(textbox_draw_rva) ||
                     !VirtualProtect(slot_ptr, 8, PAGE_READWRITE, &old)) {
                     text_filter = KindFilter{};
                     log("map_icons_text_hide REFUSED (text box vtable differs)");
                 } else {
-                    original_text_draw = reinterpret_cast<TextDrawFn>(image + textbox_draw_rva);
+                    original_text_draw = reinterpret_cast<TextDrawFn>(image + eu4build::rva(textbox_draw_rva));
                     *slot_ptr = reinterpret_cast<std::uint64_t>(&text_draw_hook);
                     DWORD ignored = 0;
                     VirtualProtect(slot_ptr, 8, old, &ignored);
@@ -1015,10 +1013,10 @@ DWORD install_checked(HMODULE module) {
                 0x1337989, 0x1337e3f};
             constexpr int site_count = sizeof(place_sites) / sizeof(place_sites[0]);
             speedpatch::CallPatch place[site_count];
-            original_icon_place = reinterpret_cast<IconPlaceFn>(image + 0x132e300);
+            original_icon_place = reinterpret_cast<IconPlaceFn>(image + eu4build::rva(0x132e300));
             bool ok = true;
             for (int i = 0; i < site_count && ok; ++i) {
-                ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + place_sites[i]),
+                ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(place_sites[i])),
                     reinterpret_cast<const void*>(original_icon_place),
                     reinterpret_cast<const void*>(&icon_place_hook), place[i], error,
                     sizeof(error));
@@ -1045,7 +1043,7 @@ DWORD install_checked(HMODULE module) {
         GetPrivateProfileStringW(L"render", L"tick_interval", L"0.5", value, 32, ini.c_str());
         interval = std::wcstof(value, nullptr);
         if (!(interval > 0.0f && interval <= 10.0f)) interval = 0.5f;
-        auto* table = reinterpret_cast<float*>(image + table_rva);
+        auto* table = reinterpret_cast<float*>(image + eu4build::rva(table_rva));
         DWORD old_protection = 0;
         if (!VirtualProtect(table, sizeof(expected_table), PAGE_READWRITE, &old_protection)) {
             log("REFUSED: cannot make the table writable (in-tick frames still counted)");
@@ -1061,8 +1059,8 @@ DWORD install_checked(HMODULE module) {
     HANDLE thread = CreateThread(nullptr, 0, reporter, nullptr, 0, nullptr);
     if (thread) CloseHandle(thread);
     installation_status.store(mode == Mode::throttle ? 1 : 2);
-    log("initialized version=0.6.0-experimental mode=%s tick_interval=%g frame_interval=%g "
-        "running_frame_interval=%g skip_map_update=%d",
+    log("initialized version=0.6.0-experimental build=%s mode=%s tick_interval=%g "
+        "frame_interval=%g running_frame_interval=%g skip_map_update=%d", eu4build::name(),
         mode == Mode::throttle ? "throttle" : "count",
         static_cast<double>(interval), static_cast<double>(frame_interval),
         static_cast<double>(running_interval_ticks) / static_cast<double>(qpc_frequency),

@@ -20,7 +20,7 @@ def main() -> None:
                ROOT / "src" / "bellows" / "shim.cpp", ROOT / "src" / "bellows" / "ram_prefetch.cpp",
                ROOT / "src" / "bellows" / "open_warmup.cpp", ROOT / "src" / "bellows" / "access_profile.cpp",
                ROOT / "src" / "bellows" / "zip_reader.cpp",
-               "-I", ROOT / "src", "-o", BUILD / "eu4_load_patch.dll", "-lole32", "-lshell32"]
+               "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "eu4_load_patch.dll", "-lole32", "-lshell32"]
     print("+", " ".join(map(str, command)), flush=True)
     subprocess.run([str(value) for value in command], check=True, cwd=WORKSPACE)
     shutil.copy2(BUILD / "eu4_load_patch.dll", PLUGINS / "eu4_load_patch.dll")

@@ -12,6 +12,7 @@
 !/eu4_ai_serial/
 !/eu4_sampler/
 !/eu4_bench/
+!/eu4_port/
 
 # build output and local data inside the plugin folders
 build/
@@ -36,3 +37,4 @@ vendor/
 *.dmp
 *.eu4
 *.zip
+/eu4_port/data/functions.json

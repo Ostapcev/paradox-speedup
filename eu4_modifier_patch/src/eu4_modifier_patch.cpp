@@ -226,6 +226,7 @@ void* profile_merge(void* destination, void* source, const void* caller,
 
 void merge_report() noexcept;
 #include "merge_part.inc"
+#include "eu4_build.hpp"
 
 void* add_hook(void* destination, void* source, const void* caller) {
     if (merge_mode != MergeMode::off) return merge_hook(destination, source);
@@ -421,7 +422,7 @@ DWORD install_checked(HMODULE module) {
     auto prepare = [&](std::size_t index, std::uintptr_t rva,
         const modifierpatch::EntryBytes& expected, std::size_t size, const void* hook,
         modifierpatch::CallerArgument argument = modifierpatch::CallerArgument::third) {
-        return modifierpatch::prepare_function(reinterpret_cast<std::uint8_t*>(image + rva),
+        return modifierpatch::prepare_function(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(rva)),
             expected, size, hook, patches[index], error, sizeof(error), argument);
     };
     auto discard_all = [&]() {
@@ -454,16 +455,16 @@ DWORD install_checked(HMODULE module) {
     if (prepared && diagnostic_hooks) prepared = prepare(9, modifierpatch::country_cache_rebuild_rva,
         country_cache_rebuild, 11, reinterpret_cast<const void*>(&country_cache_rebuild_hook));
     if (prepared && optimization_enabled) {
-        modifierpatch::add_search_found_target = reinterpret_cast<void*>(image + 0x8EA57E);
-        modifierpatch::add_search_not_found_target = reinterpret_cast<void*>(image + 0x8EA4F4);
-        modifierpatch::subtract_search_found_target = reinterpret_cast<void*>(image + 0x8EA88E);
-        modifierpatch::subtract_search_not_found_target = reinterpret_cast<void*>(image + 0x8EA805);
+        modifierpatch::add_search_found_target = reinterpret_cast<void*>(image + eu4build::rva(0x8EA57E));
+        modifierpatch::add_search_not_found_target = reinterpret_cast<void*>(image + eu4build::rva(0x8EA4F4));
+        modifierpatch::subtract_search_found_target = reinterpret_cast<void*>(image + eu4build::rva(0x8EA88E));
+        modifierpatch::subtract_search_not_found_target = reinterpret_cast<void*>(image + eu4build::rva(0x8EA805));
         prepared = modifierpatch::prepare_search(
-            reinterpret_cast<std::uint8_t*>(image + modifierpatch::add_search_rva),
+            reinterpret_cast<std::uint8_t*>(image + eu4build::rva(modifierpatch::add_search_rva)),
             add_search, 20, reinterpret_cast<const void*>(&modifierpatch::add_search_relay),
             search_patches[0], error, sizeof(error));
         if (prepared) prepared = modifierpatch::prepare_search(
-            reinterpret_cast<std::uint8_t*>(image + modifierpatch::subtract_search_rva),
+            reinterpret_cast<std::uint8_t*>(image + eu4build::rva(modifierpatch::subtract_search_rva)),
             subtract_search, 20, reinterpret_cast<const void*>(&modifierpatch::subtract_search_relay),
             search_patches[1], error, sizeof(error));
     }

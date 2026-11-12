@@ -8,6 +8,8 @@
 #include <cstring>
 #include <vector>
 
+#include "eu4_build.hpp"
+
 namespace modifierpatch {
 namespace {
 
@@ -15,7 +17,7 @@ template <std::size_t N>
 bool expect(std::uintptr_t image, std::uintptr_t rva,
     const std::array<std::uint8_t, N>& expected, ProfileResult& result,
     const char* error) noexcept {
-    if (std::memcmp(reinterpret_cast<const void*>(image + rva), expected.data(), N) != 0) {
+    if (!eu4build::code_matches(image, rva, expected.data(), N)) {
         result.error = error;
         return false;
     }
@@ -42,7 +44,8 @@ ProfileResult check_eu4_image(std::uintptr_t image) noexcept {
     const auto* optional = reinterpret_cast<const IMAGE_OPTIONAL_HEADER64*>(image + nt + 24);
     if (*signature != IMAGE_NT_SIGNATURE || file->Machine != IMAGE_FILE_MACHINE_AMD64 ||
         (file->Characteristics & IMAGE_FILE_DLL) || file->SizeOfOptionalHeader < sizeof(*optional) ||
-        optional->Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC || optional->SizeOfImage != 0x25E0000) {
+        optional->Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC ||
+        eu4build::detect_at(image) == eu4build::Build::unknown) {
         result.error = "not the expected Windows x64 EU4 image layout";
         return result;
     }
@@ -53,7 +56,7 @@ ProfileResult check_eu4_image(std::uintptr_t image) noexcept {
     bool text_found = false;
     for (unsigned index = 0; index < file->NumberOfSections; ++index) {
         const auto& section = sections[index];
-        if (section.VirtualAddress == 0x1000 && section.Misc.VirtualSize >= 0x1B64D78 &&
+        if (section.VirtualAddress == 0x1000 && section.Misc.VirtualSize >= 0x1B4DEB8 &&
             (section.Characteristics & IMAGE_SCN_MEM_EXECUTE) &&
             (section.Characteristics & IMAGE_SCN_MEM_READ)) {
             text_found = true;

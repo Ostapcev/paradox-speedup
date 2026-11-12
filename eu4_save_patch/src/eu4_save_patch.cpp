@@ -32,6 +32,7 @@
 #include <vector>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -468,12 +469,12 @@ void log_stats(const char* when) {
 }
 
 std::uint8_t* gamestate_now() {
-    return *reinterpret_cast<std::uint8_t**>(image + gamestate_rva);
+    return *reinterpret_cast<std::uint8_t**>(image + eu4build::rva(gamestate_rva));
 }
 
 // ---- hooks
 void province_hook(void* province, void* writer) {
-    if (reinterpret_cast<std::uintptr_t>(__builtin_return_address(0)) != image + province_return_rva) {
+    if (reinterpret_cast<std::uintptr_t>(__builtin_return_address(0)) != image + eu4build::rva(province_return_rva)) {
         block_write(province, writer);
         return;
     }
@@ -858,20 +859,18 @@ void install_format(const std::wstring& ini) {
         _wcsicmp(value, L"shadow") == 0 ? FormatMode::shadow :
         _wcsicmp(value, L"count") == 0 ? FormatMode::count : FormatMode::off;
     if (format_mode == FormatMode::off) return;
-    if (std::memcmp(reinterpret_cast<void*>(image + sprintf_rva), sprintf_bytes,
-            sizeof(sprintf_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + snprintf_rva), snprintf_bytes,
-            sizeof(snprintf_bytes)) != 0) {
+    if (!eu4build::code_matches(image, sprintf_rva, sprintf_bytes, sizeof(sprintf_bytes)) ||
+        !eu4build::code_matches(image, snprintf_rva, snprintf_bytes, sizeof(snprintf_bytes))) {
         format_mode = FormatMode::off;
         log("format REFUSED: printf wrapper bytes differ");
         return;
     }
-    vsprintf_core = reinterpret_cast<CoreFn>(image + vsprintf_core_rva);
-    printf_options = reinterpret_cast<OptionsFn>(image + printf_options_rva);
-    original_save = reinterpret_cast<SaveFn>(image + save_function_rva);
+    vsprintf_core = reinterpret_cast<CoreFn>(image + eu4build::rva(vsprintf_core_rva));
+    printf_options = reinterpret_cast<OptionsFn>(image + eu4build::rva(printf_options_rva));
+    original_save = reinterpret_cast<SaveFn>(image + eu4build::rva(save_function_rva));
     char error[160]{};
     speedpatch::CallPatch save;
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + save_call_rva),
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(save_call_rva)),
             reinterpret_cast<const void*>(original_save),
             reinterpret_cast<const void*>(&save_hook), save, error, sizeof(error)) ||
         !speedpatch::commit_call(save, error, sizeof(error))) {
@@ -880,8 +879,8 @@ void install_format(const std::wstring& ini) {
         log("format REFUSED: %s", error);
         return;
     }
-    if (!write_jump(image + sprintf_rva, reinterpret_cast<const void*>(&sprintf_hook)) ||
-        !write_jump(image + snprintf_rva, reinterpret_cast<const void*>(&snprintf_hook))) {
+    if (!write_jump(image + eu4build::rva(sprintf_rva), reinterpret_cast<const void*>(&sprintf_hook)) ||
+        !write_jump(image + eu4build::rva(snprintf_rva), reinterpret_cast<const void*>(&snprintf_hook))) {
         log("format: VirtualProtect failed %lu (save timing only)", GetLastError());
         format_mode = FormatMode::count;
     }
@@ -921,20 +920,19 @@ DWORD install_checked(HMODULE module) {
         installation_status.store(3);
         return 0;
     }
-    auto** slot = reinterpret_cast<void**>(image + province_slot_rva);
-    block_write = reinterpret_cast<BlockWriteFn>(image + block_write_rva);
+    auto** slot = reinterpret_cast<void**>(image + eu4build::rva(province_slot_rva));
+    block_write = reinterpret_cast<BlockWriteFn>(image + eu4build::rva(block_write_rva));
     if (*slot != reinterpret_cast<void*>(block_write) ||
-        std::memcmp(reinterpret_cast<void*>(image + country_site_rva), country_bytes,
-            sizeof(country_bytes)) != 0 ||
-        *reinterpret_cast<void**>(image + writer_vtable_rva) !=
-            reinterpret_cast<void*>(image + 0x1707960)) {
+        !eu4build::code_matches(image, country_site_rva, country_bytes, sizeof(country_bytes)) ||
+        *reinterpret_cast<void**>(image + eu4build::rva(writer_vtable_rva)) !=
+            reinterpret_cast<void*>(image + eu4build::rva(0x1707960))) {
         log("REFUSED: bytes differ; no bytes changed");
         installation_status.store(-4);
         return 4;
     }
-    country_write = reinterpret_cast<CountryWriteFn>(image + country_write_rva);
-    string_from_cstr = reinterpret_cast<StringFn>(image + string_from_cstr_rva);
-    string_free = reinterpret_cast<StringFreeFn>(image + string_free_rva);
+    country_write = reinterpret_cast<CountryWriteFn>(image + eu4build::rva(country_write_rva));
+    string_from_cstr = reinterpret_cast<StringFn>(image + eu4build::rva(string_from_cstr_rva));
+    string_free = reinterpret_cast<StringFreeFn>(image + eu4build::rva(string_free_rva));
     init_rec_vtable();
 
     SYSTEM_INFO info{};
@@ -958,7 +956,7 @@ DWORD install_checked(HMODULE module) {
     }
     char error[160]{};
     speedpatch::CallPatch country;
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + country_call_rva),
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(country_call_rva)),
             reinterpret_cast<const void*>(country_write),
             reinterpret_cast<const void*>(&country_hook), country, error, sizeof(error)) ||
         !speedpatch::commit_call(country, error, sizeof(error))) {

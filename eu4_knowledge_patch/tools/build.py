@@ -38,17 +38,17 @@ def main() -> None:
                   ROOT / "src" / "parallel_patch.cpp",
                   ROOT / "src" / "scheduler_wait.S",
                   SPEED_PATCH / "src" / "call_patch.cpp",
-                  "-I", ROOT / "src", "-I", SPEED_PATCH / "src",
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-I", SPEED_PATCH / "src",
                   "-o", BUILD / "eu4_knowledge_patch.dll", "-lbcrypt"])
     run(common + ["-static", "-municode", ROOT / "tools" / "check_executable.cpp",
-                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "knowledge_patch_check.exe", "-lbcrypt"])
     run(common + ["-static", ROOT / "tests" / "equivalence_tests.cpp",
-                  "-I", ROOT / "src", "-o", BUILD / "equivalence_tests.exe"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "equivalence_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "two_phase_tests.cpp",
-                  "-I", ROOT / "src", "-o", BUILD / "two_phase_tests.exe"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "two_phase_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "parallel_pool_tests.cpp",
-                  ROOT / "src" / "parallel_pool.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "parallel_pool.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "parallel_pool_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "shadow_hook_tests.cpp",
                   ROOT / "src" / "shadow_hook.S", ROOT / "tests" / "wrapper_fixture.S",
@@ -56,16 +56,16 @@ def main() -> None:
     run(common + ["-static", ROOT / "tests" / "optimized_loop_tests.cpp",
                   ROOT / "src" / "optimized_loops.S",
                   ROOT / "src" / "optimized_loop_patch.cpp",
-                  ROOT / "tests" / "optimized_fixture.S", "-I", ROOT / "src",
+                  ROOT / "tests" / "optimized_fixture.S", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "optimized_loop_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "parallel_loop_tests.cpp",
                   ROOT / "src" / "parallel_loops.S", ROOT / "src" / "parallel_patch.cpp",
-                  ROOT / "tests" / "parallel_fixture.S", "-I", ROOT / "src",
+                  ROOT / "tests" / "parallel_fixture.S", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "parallel_loop_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "scheduler_wait_tests.cpp",
                   ROOT / "src" / "scheduler_wait.cpp", ROOT / "src" / "scheduler_wait.S",
                   ROOT / "src" / "parallel_patch.cpp", ROOT / "tests" / "scheduler_fixture.S",
-                  "-I", ROOT / "src", "-o", BUILD / "scheduler_wait_tests.exe"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "scheduler_wait_tests.exe"])
     run(common + ["-static", SPEED_PATCH / "tests" / "hook_tests.cpp",
                   SPEED_PATCH / "src" / "call_patch.cpp", "-I", SPEED_PATCH / "src",
                   "-o", BUILD / "call_patch_tests.exe"])

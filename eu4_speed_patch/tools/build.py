@@ -31,12 +31,12 @@ def main() -> None:
                   ROOT / "src" / "eu4_speed_patch.cpp",
                   ROOT / "src" / "call_patch.cpp",
                   ROOT / "src" / "profile.cpp",
-                  "-I", ROOT / "src", "-o", BUILD / "eu4_speed_patch.dll", "-lbcrypt"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "eu4_speed_patch.dll", "-lbcrypt"])
     run(common + ["-static", "-municode", ROOT / "tools" / "check_executable.cpp",
-                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "speed_patch_check.exe", "-lbcrypt"])
     run(common + ["-static", ROOT / "tests" / "hook_tests.cpp",
-                  ROOT / "src" / "call_patch.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "call_patch.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "hook_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "load_tests.cpp",
                   "-o", BUILD / "load_tests.exe"])

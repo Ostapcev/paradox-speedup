@@ -1,3 +1,4 @@
+#include "eu4_build.hpp"
 // ---- pipe: save checksum and file write run behind the serializer (pipe=off|verify|on)
 //
 // Uncompressed save (1405ce5f0): the serializer 1414e3f00 (call 0x5CE8E2) writes the whole
@@ -16,6 +17,7 @@ enum class PipeMode { off, verify, on };
 PipeMode pipe_mode = PipeMode::off;
 
 constexpr std::uintptr_t serialize_call_rva = 0x5CE8E2;
+constexpr std::uintptr_t serialize_site_rva = 0x5CE8DD;  // serialize_call_rva - 5
 constexpr std::uintptr_t serialize_rva = 0x14E3F00;
 constexpr std::uint8_t serialize_site[] = {0x48, 0x8d, 0x4c, 0x24, 0x60, 0xe8};  // lea rcx,[rsp+60h]; call
 constexpr std::uintptr_t mem_vtable_rva = 0x1DC0358;
@@ -183,8 +185,8 @@ std::uint64_t serialize_hook(void* writer, void* gamestate, void* a3, void* a4) 
     if (h && GetCurrentThreadId() == save_thread && pipe_rd<std::uint8_t>(h, 0x10) == 0) {
         void* file = pipe_rd<void*>(h, 8);
         const auto* vec = pipe_rd<const std::uint64_t*>(writer, 0x38);
-        if (file && pipe_rd<std::uintptr_t>(file, 0) == image + file_vtable_rva &&
-            pipe_rd<std::uintptr_t>(writer, 0) == image + mem_vtable_rva &&
+        if (file && pipe_rd<std::uintptr_t>(file, 0) == image + eu4build::rva(file_vtable_rva) &&
+            pipe_rd<std::uintptr_t>(writer, 0) == image + eu4build::rva(mem_vtable_rva) &&
             pipe_rd<const void*>(writer, 0x40) && pipe_rd<int>(writer, 0x48) == 0 &&
             pipe_rd<int>(writer, 0x4c) == 0 && pipe_rd<int>(writer, 0x50) > (kPipeMargin + kPipeChunk) &&
             vec && vec[0] == vec[1]) {
@@ -301,9 +303,11 @@ void pipe_report(double save_ms) {
     pipe_tail_ms = 0;
 }
 
+// slot_rva is already in the running build (mem_slot/file_slot translate the vtable)
 bool patch_slot(std::uintptr_t slot_rva, std::uintptr_t expect_rva, const void* hook) {
+    if (slot_rva < 0x1000) return false;  // vtable not in the address table
     auto** slot = reinterpret_cast<void**>(image + slot_rva);
-    if (*slot != reinterpret_cast<void*>(image + expect_rva)) return false;
+    if (*slot != reinterpret_cast<void*>(image + eu4build::rva(expect_rva))) return false;
     DWORD old = 0;
     if (!VirtualProtect(slot, sizeof(void*), PAGE_READWRITE, &old)) return false;
     *slot = const_cast<void*>(hook);
@@ -322,22 +326,22 @@ void install_pipe(const std::wstring& ini) {
         pipe_mode = PipeMode::off;
         return;
     }
-    const auto mem_slot = [](std::size_t at) { return mem_vtable_rva + at; };
-    const auto file_slot = [](std::size_t at) { return file_vtable_rva + at; };
-    if (std::memcmp(reinterpret_cast<void*>(image + serialize_call_rva - 5), serialize_site, sizeof(serialize_site)) != 0 ||
-        pipe_rd<std::uintptr_t>(reinterpret_cast<void*>(image + mem_slot(0x98)), 0) != image + checksum_rva ||
-        pipe_rd<std::uintptr_t>(reinterpret_cast<void*>(image + mem_slot(0x70)), 0) != image + mem_rewind_rva ||
-        pipe_rd<std::uintptr_t>(reinterpret_cast<void*>(image + file_slot(0x50)), 0) != image + file_write_rva) {
+    const auto mem_slot = [](std::size_t at) { return eu4build::rva(mem_vtable_rva) + at; };
+    const auto file_slot = [](std::size_t at) { return eu4build::rva(file_vtable_rva) + at; };
+    if (!eu4build::code_matches(image, serialize_site_rva, serialize_site, sizeof(serialize_site)) ||
+        pipe_rd<std::uintptr_t>(reinterpret_cast<void*>(image + mem_slot(0x98)), 0) != image + eu4build::rva(checksum_rva) ||
+        pipe_rd<std::uintptr_t>(reinterpret_cast<void*>(image + mem_slot(0x70)), 0) != image + eu4build::rva(mem_rewind_rva) ||
+        pipe_rd<std::uintptr_t>(reinterpret_cast<void*>(image + file_slot(0x50)), 0) != image + eu4build::rva(file_write_rva)) {
         log("pipe REFUSED: bytes differ");
         pipe_mode = PipeMode::off;
         return;
     }
-    original_serialize = reinterpret_cast<SerializeFn>(image + serialize_rva);
-    original_checksum = reinterpret_cast<ChecksumFn>(image + checksum_rva);
-    mem_rewind = reinterpret_cast<RewindFn>(image + mem_rewind_rva);
-    original_file_write = reinterpret_cast<FileWriteFn>(image + file_write_rva);
-    physfs_write = reinterpret_cast<PhysWriteFn>(image + physfs_write_rva);
-    physfs_seek = reinterpret_cast<PhysSeekFn>(image + physfs_seek_rva);
+    original_serialize = reinterpret_cast<SerializeFn>(image + eu4build::rva(serialize_rva));
+    original_checksum = reinterpret_cast<ChecksumFn>(image + eu4build::rva(checksum_rva));
+    mem_rewind = reinterpret_cast<RewindFn>(image + eu4build::rva(mem_rewind_rva));
+    original_file_write = reinterpret_cast<FileWriteFn>(image + eu4build::rva(file_write_rva));
+    physfs_write = reinterpret_cast<PhysWriteFn>(image + eu4build::rva(physfs_write_rva));
+    physfs_seek = reinterpret_cast<PhysSeekFn>(image + eu4build::rva(physfs_seek_rva));
     pipe_start_event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
     pipe_done_event = CreateEventW(nullptr, FALSE, FALSE, nullptr);
     HANDLE thread = pipe_start_event && pipe_done_event ? CreateThread(nullptr, 0, pipe_thread, nullptr, 0, nullptr) : nullptr;
@@ -349,7 +353,7 @@ void install_pipe(const std::wstring& ini) {
     CloseHandle(thread);
     char error[160]{};
     speedpatch::CallPatch call;
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + serialize_call_rva),
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(serialize_call_rva)),
             reinterpret_cast<const void*>(original_serialize),
             reinterpret_cast<const void*>(&serialize_hook), call, error, sizeof(error))) {
         speedpatch::discard_call(call);

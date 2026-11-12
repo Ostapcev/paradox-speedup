@@ -31,6 +31,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cwchar>
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -412,7 +413,7 @@ LONG install(HMODULE module) noexcept {
         {msize_rva, msize_bytes, reinterpret_cast<const void*>(&hook_msize)},
     };
     for (const Site& site : sites) {
-        if (std::memcmp(reinterpret_cast<void*>(image + site.rva), site.bytes, 12) != 0) {
+        if (!eu4build::code_matches(image, site.rva, site.bytes, 12)) {
             log("REFUSED: bytes differ at rva %llx; no bytes changed",
                 static_cast<unsigned long long>(site.rva));
             return -4;
@@ -424,7 +425,7 @@ LONG install(HMODULE module) noexcept {
     if (max_small > class_limit) max_small = class_limit;
     const bool direct = GetPrivateProfileIntW(L"alloc", L"direct", 1, ini) != 0;
     for (int c = 0; c < class_count; ++c) batch_table[c] = batch_of(c);
-    const std::uint64_t crt_heap = *reinterpret_cast<std::uint64_t*>(image + 0x233d850);
+    const std::uint64_t crt_heap = *reinterpret_cast<std::uint64_t*>(image + eu4build::rva(0x233d850));
     heap = GetProcessHeap();
     tls_index = TlsAlloc();
     if (tls_index == TLS_OUT_OF_INDEXES) {
@@ -444,9 +445,9 @@ LONG install(HMODULE module) noexcept {
         classes[c].committed = classes[c].cursor;
         classes[c].limit = classes[c].cursor + (std::size_t{1} << region_shift);
     }
-    crt_errno = reinterpret_cast<int* (*)()>(image + errno_rva);
+    crt_errno = reinterpret_cast<int* (*)()>(image + eu4build::rva(errno_rva));
     for (const Site& site : sites) {
-        if (!write_jump(reinterpret_cast<std::uint8_t*>(image + site.rva), site.hook)) {
+        if (!write_jump(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(site.rva)), site.hook)) {
             log("FAILED: VirtualProtect at rva %llx (partially installed!)",
                 static_cast<unsigned long long>(site.rva));
             return -7;
@@ -469,18 +470,18 @@ LONG install(HMODULE module) noexcept {
             {0x17394f0, delete1_bytes, reinterpret_cast<const void*>(&hook_operator_delete)},
             {0x175da20, delete2_bytes, reinterpret_cast<const void*>(&hook_operator_delete)},
         };
-        throw_bad_alloc = reinterpret_cast<NoReturnFn>(image + 0x1504030);
-        throw_bad_length = reinterpret_cast<NoReturnFn>(image + 0x95050);
+        throw_bad_alloc = reinterpret_cast<NoReturnFn>(image + eu4build::rva(0x1504030));
+        throw_bad_length = reinterpret_cast<NoReturnFn>(image + eu4build::rva(0x95050));
         bool same = true;
         for (const Site& site : direct_list) {
             same = same &&
-                std::memcmp(reinterpret_cast<void*>(image + site.rva), site.bytes, 12) == 0;
+                eu4build::code_matches(image, site.rva, site.bytes, 12);
         }
         if (!same) {
             log("direct new/delete REFUSED: bytes differ (malloc/free hooks stay)");
         } else {
             for (const Site& site : direct_list) {
-                if (!write_jump(reinterpret_cast<std::uint8_t*>(image + site.rva), site.hook)) {
+                if (!write_jump(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(site.rva)), site.hook)) {
                     break;
                 }
                 ++direct_sites;

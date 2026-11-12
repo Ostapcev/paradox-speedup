@@ -1,0 +1,3795 @@
+{
+ "0x10000": {
+  "gog": null,
+  "how": null,
+  "section": ".text",
+  "uses": [
+   "eu4_det_patch/src/eu4_det_patch.cpp:25",
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:98",
+   "eu4_save_patch/src/pipe.inc:81",
+   "eu4_save_patch/src/pipe.inc:83"
+  ]
+ },
+ "0x3ffff": {
+  "gog": "0x3ffff",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/merge_part.inc:186"
+  ]
+ },
+ "0x6bdd1": {
+  "gog": "0x6bdd1",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_pops_patch/src/eu4_pops_patch.cpp:24"
+  ]
+ },
+ "0x8eac0": {
+  "gog": "0x8eaf0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:16"
+  ]
+ },
+ "0x8f0e0": {
+  "gog": "0x8f110",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/merge_part.inc:30"
+  ]
+ },
+ "0x92fa0": {
+  "gog": "0x92fd0",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:551"
+  ]
+ },
+ "0x943e0": {
+  "gog": "0x94410",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:17"
+  ]
+ },
+ "0x947f0": {
+  "gog": "0x94820",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:645",
+   "eu4_trigger_patch/src/profile.hpp:15"
+  ]
+ },
+ "0x94e60": {
+  "gog": "0x94e90",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:15"
+  ]
+ },
+ "0x95050": {
+  "gog": "0x95080",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:474"
+  ]
+ },
+ "0x950b0": {
+  "gog": "0x950e0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:468"
+  ]
+ },
+ "0x95110": {
+  "gog": "0x95140",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:112",
+   "eu4_render_patch/src/eu4_render_patch.cpp:238"
+  ]
+ },
+ "0x95240": {
+  "gog": "0x95270",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:57"
+  ]
+ },
+ "0x95660": {
+  "gog": "0x95690",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:14",
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:340",
+   "eu4_save_patch/src/eu4_save_patch.cpp:58"
+  ]
+ },
+ "0x96080": {
+  "gog": "0x960b0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:345"
+  ]
+ },
+ "0xcfd70": {
+  "gog": "0xcfda0",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1600"
+  ]
+ },
+ "0xdf210": {
+  "gog": "0xdf240",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:32"
+  ]
+ },
+ "0xdf320": {
+  "gog": "0xdf350",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:416",
+   "eu4_ai_serial/src/tree_walk.cpp:421"
+  ]
+ },
+ "0xdfde0": {
+  "gog": "0xdfe10",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:644"
+  ]
+ },
+ "0xe46d0": {
+  "gog": "0xe4700",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:113"
+  ]
+ },
+ "0xe4710": {
+  "gog": "0xe4740",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:113"
+  ]
+ },
+ "0xe4890": {
+  "gog": "0xe48c0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:20"
+  ]
+ },
+ "0xeb74c": {
+  "gog": "0xeb77c",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_speed_patch/src/profile.hpp:9"
+  ]
+ },
+ "0xebb5f": {
+  "gog": "0xebb8f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_speed_patch/src/profile.hpp:11"
+  ]
+ },
+ "0x100000": {
+  "gog": "0x100030",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:176",
+   "eu4_knowledge_patch/src/profile.cpp:52",
+   "eu4_modifier_patch/src/measurement.cpp:59",
+   "eu4_modifier_patch/src/measurement.cpp:59",
+   "eu4_modifier_patch/src/profile.cpp:37",
+   "eu4_speed_patch/src/profile.cpp:60",
+   "eu4_trigger_patch/src/profile.cpp:50"
+  ]
+ },
+ "0x1022b0": {
+  "gog": "0x1022e0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:28",
+   "eu4_speed_patch/src/profile.hpp:12"
+  ]
+ },
+ "0x10671e": {
+  "gog": "0x10674e",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:28"
+  ]
+ },
+ "0x106c3d": {
+  "gog": "0x106c6d",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:28"
+  ]
+ },
+ "0x107194": {
+  "gog": "0x1071c4",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:28"
+  ]
+ },
+ "0x10a035": {
+  "gog": "0x10a065",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:28"
+  ]
+ },
+ "0x10a0f7": {
+  "gog": "0x10a127",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:28"
+  ]
+ },
+ "0x10bdb0": {
+  "gog": "0x10bde0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_speed_patch/src/profile.hpp:10"
+  ]
+ },
+ "0x148940": {
+  "gog": "0x148970",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:113"
+  ]
+ },
+ "0x14a160": {
+  "gog": "0x14a190",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:113"
+  ]
+ },
+ "0x14a1d0": {
+  "gog": "0x14a200",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:113"
+  ]
+ },
+ "0x14b622": {
+  "gog": "0x14b652",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:21"
+  ]
+ },
+ "0x14b675": {
+  "gog": "0x14b6a5",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:22"
+  ]
+ },
+ "0x15c230": {
+  "gog": "0x15c260",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:548"
+  ]
+ },
+ "0x1797d0": {
+  "gog": "0x179800",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:429",
+   "eu4_ai_serial/src/tree_walk.cpp:436"
+  ]
+ },
+ "0x1797e5": {
+  "gog": "0x179815",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:431"
+  ]
+ },
+ "0x1798a0": {
+  "gog": "0x1798d0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:43",
+   "eu4_ai_serial/src/tree_walk.cpp:435"
+  ]
+ },
+ "0x179e90": {
+  "gog": "0x179ec0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:44"
+  ]
+ },
+ "0x179eb3": {
+  "gog": "0x179ee3",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:27"
+  ]
+ },
+ "0x179ee4": {
+  "gog": "0x179f14",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:25",
+   "eu4_knowledge_patch/src/scheduler_wait.S:5",
+   "eu4_knowledge_patch/src/scheduler_wait.S:26"
+  ]
+ },
+ "0x179ef1": {
+  "gog": "0x179f21",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:26",
+   "eu4_knowledge_patch/src/scheduler_wait.S:26"
+  ]
+ },
+ "0x18f040": {
+  "gog": "0x18f070",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1848"
+  ]
+ },
+ "0x195750": {
+  "gog": "0x195780",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:30"
+  ]
+ },
+ "0x198d13": {
+  "gog": "0x198d43",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/province_score_cache.cpp:32"
+  ]
+ },
+ "0x198d27": {
+  "gog": "0x198d57",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/province_score_cache.cpp:25"
+  ]
+ },
+ "0x1998f0": {
+  "gog": "0x199920",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/province_score_cache.cpp:26",
+   "eu4_ai_serial/eu4_ai_serial.ini:16"
+  ]
+ },
+ "0x1a6988": {
+  "gog": "0x1a69b8",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:33"
+  ]
+ },
+ "0x1f9210": {
+  "gog": "0x1f91e0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:642"
+  ]
+ },
+ "0x202691": {
+  "gog": "0x202651",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1010"
+  ]
+ },
+ "0x2043a0": {
+  "gog": "0x204360",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1011"
+  ]
+ },
+ "0x210000": {
+  "gog": "0x20ffc0",
+  "how": "changed function 98%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:342"
+  ]
+ },
+ "0x2110c0": {
+  "gog": "0x211080",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:339"
+  ]
+ },
+ "0x2a27db": {
+  "gog": "0x2a278b",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1963"
+  ]
+ },
+ "0x2d2520": {
+  "gog": "0x2d24d0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1337"
+  ]
+ },
+ "0x2ee4e6": {
+  "gog": "0x2ee496",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:57"
+  ]
+ },
+ "0x2ee502": {
+  "gog": "0x2ee4b2",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:57"
+  ]
+ },
+ "0x2ee51e": {
+  "gog": "0x2ee4ce",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:57"
+  ]
+ },
+ "0x2f6032": {
+  "gog": "0x2f5fe2",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1226"
+  ]
+ },
+ "0x2f6041": {
+  "gog": "0x2f5ff1",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1224"
+  ]
+ },
+ "0x2f60bd": {
+  "gog": "0x2f606d",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1226"
+  ]
+ },
+ "0x2f60d4": {
+  "gog": "0x2f6084",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1224"
+  ]
+ },
+ "0x2f63dd": {
+  "gog": "0x2f638d",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1420"
+  ]
+ },
+ "0x2f7943": {
+  "gog": "0x2f78f3",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1592"
+  ]
+ },
+ "0x2f7959": {
+  "gog": "0x2f7909",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1593"
+  ]
+ },
+ "0x2f7c38": {
+  "gog": "0x2f7be8",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1846"
+  ]
+ },
+ "0x2f9c50": {
+  "gog": "0x2f9c00",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/eu4_country_patch.ini:15",
+   "eu4_country_patch/src/eu4_country_patch.cpp:1223"
+  ]
+ },
+ "0x2f9c8a": {
+  "gog": "0x2f9c3a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1232"
+  ]
+ },
+ "0x2fc810": {
+  "gog": "0x2fc7c0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:11"
+  ]
+ },
+ "0x2ffc60": {
+  "gog": "0x2ffc10",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/eu4_load_patch.ini:18",
+   "eu4_load_patch/src/provview.inc:11"
+  ]
+ },
+ "0x2ffcb7": {
+  "gog": "0x2ffc67",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provview.inc:13"
+  ]
+ },
+ "0x3003b0": {
+  "gog": "0x300360",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provview.inc:12"
+  ]
+ },
+ "0x3007bf": {
+  "gog": "0x30076f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provview.inc:14"
+  ]
+ },
+ "0x30080a": {
+  "gog": "0x3007ba",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provview.inc:15"
+  ]
+ },
+ "0x300959": {
+  "gog": "0x300909",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provview.inc:16"
+  ]
+ },
+ "0x302ee0": {
+  "gog": "0x302e90",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1594"
+  ]
+ },
+ "0x30309b": {
+  "gog": "0x30304b",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1596"
+  ]
+ },
+ "0x303b40": {
+  "gog": "0x303af0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1595"
+  ]
+ },
+ "0x303c51": {
+  "gog": "0x303c01",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1597"
+  ]
+ },
+ "0x329f70": {
+  "gog": "0x329f00",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:19"
+  ]
+ },
+ "0x329f9a": {
+  "gog": "0x329f2a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:217"
+  ]
+ },
+ "0x329fb9": {
+  "gog": "0x329f49",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:236"
+  ]
+ },
+ "0x329fdf": {
+  "gog": "0x329f6f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:218"
+  ]
+ },
+ "0x329ff5": {
+  "gog": "0x329f85",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:236"
+  ]
+ },
+ "0x32a01b": {
+  "gog": "0x329fab",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:219"
+  ]
+ },
+ "0x32a057": {
+  "gog": "0x329fe7",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:220"
+  ]
+ },
+ "0x32a06d": {
+  "gog": "0x329ffd",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:237"
+  ]
+ },
+ "0x32a090": {
+  "gog": "0x32a020",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:221"
+  ]
+ },
+ "0x32a0d0": {
+  "gog": "0x32a060",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:222"
+  ]
+ },
+ "0x32a150": {
+  "gog": "0x32a0e0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:18"
+  ]
+ },
+ "0x32a16b": {
+  "gog": "0x32a0fb",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:212"
+  ]
+ },
+ "0x32a1bf": {
+  "gog": "0x32a14f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:213"
+  ]
+ },
+ "0x32a1cf": {
+  "gog": "0x32a15f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:214",
+   "eu4_load_patch/src/provfree.inc:237"
+  ]
+ },
+ "0x32a23f": {
+  "gog": "0x32a1cf",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:215"
+  ]
+ },
+ "0x34a88c": {
+  "gog": "0x34a75c",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1849"
+  ]
+ },
+ "0x34af20": {
+  "gog": "0x34adf0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1851"
+  ]
+ },
+ "0x350a20": {
+  "gog": "0x3508f0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1604"
+  ]
+ },
+ "0x350b80": {
+  "gog": "0x350a50",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/eu4_load_patch.ini:17",
+   "eu4_load_patch/src/eu4_load_patch.cpp:1603"
+  ]
+ },
+ "0x3520d0": {
+  "gog": "0x351fa0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:71"
+  ]
+ },
+ "0x35214c": {
+  "gog": "0x35201c",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1335"
+  ]
+ },
+ "0x3526b0": {
+  "gog": "0x352580",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1336"
+  ]
+ },
+ "0x35272e": {
+  "gog": "0x3525fe",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1344"
+  ]
+ },
+ "0x3527d5": {
+  "gog": "0x3526a5",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1345"
+  ]
+ },
+ "0x352899": {
+  "gog": "0x352769",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1346"
+  ]
+ },
+ "0x353f76": {
+  "gog": "0x353e46",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:69"
+  ]
+ },
+ "0x3747b0": {
+  "gog": "0x374680",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/country_ratio_cache.cpp:23",
+   "eu4_ai_serial/eu4_ai_serial.ini:14"
+  ]
+ },
+ "0x37c931": {
+  "gog": "0x37c801",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:50"
+  ]
+ },
+ "0x37c937": {
+  "gog": "0x37c807",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:53"
+  ]
+ },
+ "0x3b4eb6": {
+  "gog": "0x3b4d86",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/country_ratio_cache.cpp:28"
+  ]
+ },
+ "0x3b4ec4": {
+  "gog": "0x3b4d94",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/country_ratio_cache.cpp:22"
+  ]
+ },
+ "0x3d7c00": {
+  "gog": "0x3d7ad0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:230"
+  ]
+ },
+ "0x3f14a0": {
+  "gog": "0x3f1370",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1339"
+  ]
+ },
+ "0x4109f0": {
+  "gog": "0x4108c0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1422"
+  ]
+ },
+ "0x410b0d": {
+  "gog": "0x4109dd",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1423"
+  ]
+ },
+ "0x4112e2": {
+  "gog": "0x4111b2",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1423"
+  ]
+ },
+ "0x416ef0": {
+  "gog": "0x416dc0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:42"
+  ]
+ },
+ "0x440da0": {
+  "gog": "0x440c70",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:641"
+  ]
+ },
+ "0x442baf": {
+  "gog": "0x442a7f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:639"
+  ]
+ },
+ "0x468430": {
+  "gog": "0x468300",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:352"
+  ]
+ },
+ "0x470af0": {
+  "gog": "0x4709c0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:335"
+  ]
+ },
+ "0x470b30": {
+  "gog": "0x470a00",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:335"
+  ]
+ },
+ "0x4b4fb4": {
+  "gog": "0x4b4e84",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_det_patch/src/eu4_det_patch.cpp:73"
+  ]
+ },
+ "0x4e50aa": {
+  "gog": "0x4e4f7a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1963"
+  ]
+ },
+ "0x4e6622": {
+  "gog": "0x4e64f2",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1963"
+  ]
+ },
+ "0x501c24": {
+  "gog": "0x501af4",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1963"
+  ]
+ },
+ "0x50da39": {
+  "gog": "0x50d909",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1963"
+  ]
+ },
+ "0x53f230": {
+  "gog": "0x53f100",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1964"
+  ]
+ },
+ "0x54014c": {
+  "gog": "0x54001c",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1964"
+  ]
+ },
+ "0x54175e": {
+  "gog": "0x54162e",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1964"
+  ]
+ },
+ "0x5cc160": {
+  "gog": "0x5cbc30",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:337"
+  ]
+ },
+ "0x5cdc60": {
+  "gog": "0x5cd730",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1013"
+  ]
+ },
+ "0x5cdfc0": {
+  "gog": "0x5cda90",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:546"
+  ]
+ },
+ "0x5ce5f0": {
+  "gog": "0x5ce0c0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:547"
+  ]
+ },
+ "0x5ce8dd": {
+  "gog": "0x5ce3ad",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:20"
+  ]
+ },
+ "0x5ce8e2": {
+  "gog": "0x5ce3b2",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:19"
+  ]
+ },
+ "0x5d1670": {
+  "gog": "0x5d1140",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:339"
+  ]
+ },
+ "0x6e4880": {
+  "gog": "0x6e4350",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:825"
+  ]
+ },
+ "0x723120": {
+  "gog": "0x7223f0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/eu4_country_patch.ini:3",
+   "eu4_country_patch/src/eu4_country_patch.cpp:54"
+  ]
+ },
+ "0x74b93d": {
+  "gog": "0x74ab3d",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1012"
+  ]
+ },
+ "0x75170c": {
+  "gog": "0x7508cc",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:50"
+  ]
+ },
+ "0x75178a": {
+  "gog": "0x75094a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:52"
+  ]
+ },
+ "0x751795": {
+  "gog": "0x750955",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:55"
+  ]
+ },
+ "0x758430": {
+  "gog": "0x7575f0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:60"
+  ]
+ },
+ "0x758bc3": {
+  "gog": "0x757d83",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:123",
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:608"
+  ]
+ },
+ "0x75b0d0": {
+  "gog": "0x75a290",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:48"
+  ]
+ },
+ "0x75b2d0": {
+  "gog": "0x75a490",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:79"
+  ]
+ },
+ "0x75b38c": {
+  "gog": "0x75a54c",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:73"
+  ]
+ },
+ "0x75c0c2": {
+  "gog": "0x75b282",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:45"
+  ]
+ },
+ "0x75c0c5": {
+  "gog": "0x75b285",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:47"
+  ]
+ },
+ "0x75c137": {
+  "gog": "0x75b2f7",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:77"
+  ]
+ },
+ "0x75d690": {
+  "gog": "0x75c850",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:122"
+  ]
+ },
+ "0x75d9eb": {
+  "gog": "0x75cbab",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:935"
+  ]
+ },
+ "0x769f59": {
+  "gog": "0x769119",
+  "how": "changed function 98%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:40"
+  ]
+ },
+ "0x769fad": {
+  "gog": "0x76916d",
+  "how": "changed function 98%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:44"
+  ]
+ },
+ "0x769fb2": {
+  "gog": "0x769172",
+  "how": "changed function 98%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:47"
+  ]
+ },
+ "0x77d8a0": {
+  "gog": "0x77cba0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:630"
+  ]
+ },
+ "0x77d958": {
+  "gog": "0x77cc58",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:62"
+  ]
+ },
+ "0x77d9a4": {
+  "gog": "0x77cca4",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:63"
+  ]
+ },
+ "0x77d9b0": {
+  "gog": "0x77ccb0",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:45"
+  ]
+ },
+ "0x77d9d8": {
+  "gog": "0x77ccd8",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:64"
+  ]
+ },
+ "0x77d9e9": {
+  "gog": "0x77cce9",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:65"
+  ]
+ },
+ "0x77d9ee": {
+  "gog": "0x77ccee",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:46"
+  ]
+ },
+ "0x786150": {
+  "gog": "0x785390",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:51"
+  ]
+ },
+ "0x78617c": {
+  "gog": "0x7853bc",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:417"
+  ]
+ },
+ "0x78f250": {
+  "gog": "0x78e490",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:344"
+  ]
+ },
+ "0x798dc0": {
+  "gog": "0x798130",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1341"
+  ]
+ },
+ "0x7a5880": {
+  "gog": "0x7a4bf0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:85"
+  ]
+ },
+ "0x7a5ae0": {
+  "gog": "0x7a4e50",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:85"
+  ]
+ },
+ "0x7a6020": {
+  "gog": "0x7a5390",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_gov_patch/eu4_gov_patch.ini:2",
+   "eu4_gov_patch/src/eu4_gov_patch.cpp:43"
+  ]
+ },
+ "0x7a73c0": {
+  "gog": "0x7a6730",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1342"
+  ]
+ },
+ "0x7acec0": {
+  "gog": "0x7ac230",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1340"
+  ]
+ },
+ "0x7b29eb": {
+  "gog": "0x7b1d5b",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:82"
+  ]
+ },
+ "0x7b29fa": {
+  "gog": "0x7b1d6a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:82"
+  ]
+ },
+ "0x7e7cd0": {
+  "gog": "0x7e7040",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1150"
+  ]
+ },
+ "0x7e7d0e": {
+  "gog": "0x7e707e",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1151"
+  ]
+ },
+ "0x7e8470": {
+  "gog": "0x7e77e0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:342"
+  ]
+ },
+ "0x7e9b70": {
+  "gog": "0x7e8ee0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:342"
+  ]
+ },
+ "0x803270": {
+  "gog": "0x8025f0",
+  "how": "changed function 76%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:346"
+  ]
+ },
+ "0x80fee0": {
+  "gog": "0x80f240",
+  "how": "changed function 94%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:337"
+  ]
+ },
+ "0x8153c2": {
+  "gog": null,
+  "how": null,
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:910"
+  ]
+ },
+ "0x8153c9": {
+  "gog": "0x814729",
+  "how": "changed function 90%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:911"
+  ]
+ },
+ "0x815822": {
+  "gog": "0x814b82",
+  "how": "changed function 90%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:889"
+  ]
+ },
+ "0x815829": {
+  "gog": "0x814b89",
+  "how": "changed function 90%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:890"
+  ]
+ },
+ "0x815919": {
+  "gog": "0x814c79",
+  "how": "changed function 90%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:52"
+  ]
+ },
+ "0x81591c": {
+  "gog": "0x814c7c",
+  "how": "changed function 90%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:54"
+  ]
+ },
+ "0x815cae": {
+  "gog": "0x81500e",
+  "how": "changed function 90%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:329"
+  ]
+ },
+ "0x8165f2": {
+  "gog": null,
+  "how": null,
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:329"
+  ]
+ },
+ "0x8183b0": {
+  "gog": "0x817710",
+  "how": "changed function 95%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:55"
+  ]
+ },
+ "0x81af10": {
+  "gog": "0x81a270",
+  "how": "changed function 90%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:346"
+  ]
+ },
+ "0x88a390": {
+  "gog": "0x8895c0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1338"
+  ]
+ },
+ "0x890d00": {
+  "gog": "0x88ff30",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:351"
+  ]
+ },
+ "0x8ea2d0": {
+  "gog": "0x8e9500",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:72",
+   "eu4_modifier_patch/src/profile.hpp:17"
+  ]
+ },
+ "0x8ea420": {
+  "gog": "0x8e9650",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/merge_part.inc:28",
+   "eu4_modifier_patch/src/profile.hpp:9"
+  ]
+ },
+ "0x8ea4e0": {
+  "gog": "0x8e9710",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/profile.hpp:11"
+  ]
+ },
+ "0x8ea4f4": {
+  "gog": "0x8e9724",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/eu4_modifier_patch.cpp:459"
+  ]
+ },
+ "0x8ea57e": {
+  "gog": "0x8e97ae",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/eu4_modifier_patch.cpp:458"
+  ]
+ },
+ "0x8ea730": {
+  "gog": "0x8e9960",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/profile.hpp:10"
+  ]
+ },
+ "0x8ea7f1": {
+  "gog": "0x8e9a21",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/profile.hpp:12"
+  ]
+ },
+ "0x8ea805": {
+  "gog": "0x8e9a35",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/eu4_modifier_patch.cpp:461"
+  ]
+ },
+ "0x8ea88e": {
+  "gog": "0x8e9abe",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/eu4_modifier_patch.cpp:460"
+  ]
+ },
+ "0x8ea920": {
+  "gog": "0x8e9b50",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:72",
+   "eu4_modifier_patch/src/profile.hpp:18"
+  ]
+ },
+ "0x8fcc00": {
+  "gog": "0x8fbe30",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1424"
+  ]
+ },
+ "0x902860": {
+  "gog": "0x901a90",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1425"
+  ]
+ },
+ "0x939ef0": {
+  "gog": "0x939120",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:73",
+   "eu4_modifier_patch/src/profile.hpp:20"
+  ]
+ },
+ "0x93ae10": {
+  "gog": "0x93a040",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:73",
+   "eu4_modifier_patch/src/profile.hpp:19"
+  ]
+ },
+ "0x93c790": {
+  "gog": "0x93b9c0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/eu4_country_patch.ini:10",
+   "eu4_country_patch/src/eu4_country_patch.cpp:60"
+  ]
+ },
+ "0x93ca70": {
+  "gog": "0x93bca0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/eu4_country_patch.ini:10",
+   "eu4_country_patch/src/eu4_country_patch.cpp:60",
+   "eu4_country_patch/src/eu4_country_patch.cpp:60"
+  ]
+ },
+ "0x93d130": {
+  "gog": "0x93c360",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:72",
+   "eu4_modifier_patch/src/profile.hpp:14"
+  ]
+ },
+ "0x93fe30": {
+  "gog": "0x93f060",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:9"
+  ]
+ },
+ "0x93ff47": {
+  "gog": "0x93f177",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:10",
+   "eu4_knowledge_patch/src/shadow_hook.S:5"
+  ]
+ },
+ "0x941dc7": {
+  "gog": "0x940ff7",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/parallel_loops.S:5",
+   "eu4_knowledge_patch/src/parallel_loops.S:48",
+   "eu4_knowledge_patch/src/profile.hpp:20"
+  ]
+ },
+ "0x941dde": {
+  "gog": "0x94100e",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/parallel_loops.S:48",
+   "eu4_knowledge_patch/src/profile.hpp:21"
+  ]
+ },
+ "0x941e80": {
+  "gog": "0x9410b0",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/knowledge_hook.S:5",
+   "eu4_knowledge_patch/src/profile.hpp:12"
+  ]
+ },
+ "0x941e8b": {
+  "gog": "0x9410bb",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:13"
+  ]
+ },
+ "0x941e98": {
+  "gog": "0x9410c8",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:14"
+  ]
+ },
+ "0x941e9b": {
+  "gog": "0x9410cb",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:15"
+  ]
+ },
+ "0x941ec0": {
+  "gog": "0x9410f0",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:16"
+  ]
+ },
+ "0x941eca": {
+  "gog": "0x9410fa",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:17"
+  ]
+ },
+ "0x941eda": {
+  "gog": "0x94110a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:18"
+  ]
+ },
+ "0x941edf": {
+  "gog": "0x94110f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:19"
+  ]
+ },
+ "0x941fd7": {
+  "gog": "0x941207",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.hpp:22"
+  ]
+ },
+ "0x942047": {
+  "gog": "0x941277",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/parallel_loops.S:98",
+   "eu4_knowledge_patch/src/parallel_loops.S:111",
+   "eu4_knowledge_patch/src/parallel_loops.S:126",
+   "eu4_knowledge_patch/src/profile.hpp:23"
+  ]
+ },
+ "0x942050": {
+  "gog": "0x941280",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/parallel_loops.S:126",
+   "eu4_knowledge_patch/src/profile.hpp:24"
+  ]
+ },
+ "0x95c560": {
+  "gog": "0x95b790",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:941"
+  ]
+ },
+ "0x960330": {
+  "gog": "0x95f560",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:944"
+  ]
+ },
+ "0x96c520": {
+  "gog": "0x96b750",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:27",
+   "eu4_ai_serial/src/search_memo.cpp:29"
+  ]
+ },
+ "0x96f860": {
+  "gog": "0x96ea90",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1167"
+  ]
+ },
+ "0x974d00": {
+  "gog": "0x973ce0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:16"
+  ]
+ },
+ "0x97fa13": {
+  "gog": "0x97e9f3",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:8",
+   "eu4_trigger_patch/src/trigger_hooks.S:4",
+   "eu4_trigger_patch/src/trigger_hooks.S:19"
+  ]
+ },
+ "0x97fa1a": {
+  "gog": "0x97e9fa",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:9"
+  ]
+ },
+ "0x97fa21": {
+  "gog": "0x97ea01",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/trigger_hooks.S:18"
+  ]
+ },
+ "0x97fab2": {
+  "gog": "0x97ea92",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:10"
+  ]
+ },
+ "0x97fb97": {
+  "gog": "0x97eb77",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:11"
+  ]
+ },
+ "0x97fc5f": {
+  "gog": "0x97ec3f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:12",
+   "eu4_trigger_patch/src/trigger_hooks.S:92"
+  ]
+ },
+ "0x9d58c0": {
+  "gog": "0x9d48a0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:943"
+  ]
+ },
+ "0x9f35c0": {
+  "gog": "0x9f25a0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:937"
+  ]
+ },
+ "0x9f38d4": {
+  "gog": "0x9f28b4",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:938",
+   "eu4_load_patch/src/provreuse.inc:143"
+  ]
+ },
+ "0x9f9500": {
+  "gog": "0x9f84e0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:940",
+   "eu4_load_patch/src/provreuse.inc:144"
+  ]
+ },
+ "0x9f956a": {
+  "gog": "0x9f854a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provreuse.inc:12"
+  ]
+ },
+ "0x9f9571": {
+  "gog": "0x9f8551",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1807",
+   "eu4_load_patch/src/provreuse.inc:11"
+  ]
+ },
+ "0x9f95d0": {
+  "gog": "0x9f85b0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:942",
+   "eu4_load_patch/src/provfree.inc:13"
+  ]
+ },
+ "0x9f95f3": {
+  "gog": "0x9f85d3",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:204"
+  ]
+ },
+ "0x9f95ff": {
+  "gog": "0x9f85df",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:238"
+  ]
+ },
+ "0x9f960b": {
+  "gog": "0x9f85eb",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:205"
+  ]
+ },
+ "0x9f962b": {
+  "gog": "0x9f860b",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:206"
+  ]
+ },
+ "0x9f9667": {
+  "gog": "0x9f8647",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:207"
+  ]
+ },
+ "0x9f9675": {
+  "gog": "0x9f8655",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:238"
+  ]
+ },
+ "0x9f97f6": {
+  "gog": "0x9f87d6",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:208"
+  ]
+ },
+ "0x9f9809": {
+  "gog": "0x9f87e9",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:209"
+  ]
+ },
+ "0x9f981c": {
+  "gog": "0x9f87fc",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/provfree.inc:210"
+  ]
+ },
+ "0x9fa090": {
+  "gog": "0x9f9070",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1599"
+  ]
+ },
+ "0x9fa230": {
+  "gog": "0x9f9210",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1598"
+  ]
+ },
+ "0x9fabe0": {
+  "gog": "0x9f9bc0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:241",
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:248"
+  ]
+ },
+ "0xa1d330": {
+  "gog": "0xa1c310",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:259"
+  ]
+ },
+ "0xa273a0": {
+  "gog": "0xa26380",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:44"
+  ]
+ },
+ "0xa5e130": {
+  "gog": "0xa5d0f0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1962"
+  ]
+ },
+ "0xa5f729": {
+  "gog": "0xa5e6e9",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1964"
+  ]
+ },
+ "0xa61900": {
+  "gog": "0xa608c0",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/eu4_country_patch.ini:28"
+  ]
+ },
+ "0xa619e7": {
+  "gog": "0xa609a7",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1964"
+  ]
+ },
+ "0xa61aed": {
+  "gog": "0xa60aad",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1964"
+  ]
+ },
+ "0xacaf40": {
+  "gog": "0xac9ad0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:14"
+  ]
+ },
+ "0xad0880": {
+  "gog": "0xacf410",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_det_patch/src/eu4_det_patch.cpp:151"
+  ]
+ },
+ "0xae7230": {
+  "gog": "0xae5c50",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:72",
+   "eu4_modifier_patch/src/profile.hpp:15"
+  ]
+ },
+ "0xaebeb0": {
+  "gog": "0xaea8d0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:72",
+   "eu4_modifier_patch/src/profile.hpp:16"
+  ]
+ },
+ "0xb795d7": {
+  "gog": "0xb77d77",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:57"
+  ]
+ },
+ "0xb795da": {
+  "gog": "0xb77d7a",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:59"
+  ]
+ },
+ "0xb7bdf0": {
+  "gog": "0xb7a590",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:75"
+  ]
+ },
+ "0xb89520": {
+  "gog": "0xb87cd0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:350"
+  ]
+ },
+ "0xb89560": {
+  "gog": "0xb87d10",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:350"
+  ]
+ },
+ "0xb89690": {
+  "gog": "0xb87e40",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:351"
+  ]
+ },
+ "0xb98200": {
+  "gog": "0xb969b0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:643",
+   "eu4_trigger_patch/src/profile.hpp:13"
+  ]
+ },
+ "0xd1398c": {
+  "gog": "0xd1213c",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_gov_patch/src/eu4_gov_patch.cpp:35"
+  ]
+ },
+ "0xd13992": {
+  "gog": "0xd12142",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_gov_patch/src/eu4_gov_patch.cpp:38"
+  ]
+ },
+ "0xd13b12": {
+  "gog": "0xd122c2",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_gov_patch/src/eu4_gov_patch.cpp:39"
+  ]
+ },
+ "0xd13b18": {
+  "gog": "0xd122c8",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_gov_patch/src/eu4_gov_patch.cpp:42"
+  ]
+ },
+ "0xd2f410": {
+  "gog": "0xd2dbc0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:49"
+  ]
+ },
+ "0xd40790": {
+  "gog": "0xd3ef40",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:34"
+  ]
+ },
+ "0xd40ae0": {
+  "gog": "0xd3f290",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:32",
+   "eu4_ai_serial/src/unit_flag_cache.cpp:22",
+   "eu4_ai_serial/eu4_ai_serial.ini:9"
+  ]
+ },
+ "0xd45289": {
+  "gog": "0xd43a39",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/unit_flag_cache.cpp:27"
+  ]
+ },
+ "0xd45291": {
+  "gog": "0xd43a41",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:31",
+   "eu4_ai_serial/src/unit_flag_cache.cpp:21"
+  ]
+ },
+ "0xd454d0": {
+  "gog": "0xd43c80",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:45"
+  ]
+ },
+ "0xd4556e": {
+  "gog": "0xd43d1e",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/search_memo.cpp:45"
+  ]
+ },
+ "0xd54600": {
+  "gog": "0xd52db0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/function_stats.cpp:72",
+   "eu4_modifier_patch/src/profile.hpp:13"
+  ]
+ },
+ "0xd7aad0": {
+  "gog": "0xd79280",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1276"
+  ]
+ },
+ "0xd7ae4e": {
+  "gog": "0xd795fe",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1316"
+  ]
+ },
+ "0xd84826": {
+  "gog": "0xd82fd6",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1277"
+  ]
+ },
+ "0xda69e5": {
+  "gog": "0xda5195",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1148"
+  ]
+ },
+ "0xda6a1d": {
+  "gog": "0xda51cd",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1149"
+  ]
+ },
+ "0xdb08c0": {
+  "gog": "0xdaf040",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:107"
+  ]
+ },
+ "0xdb090e": {
+  "gog": "0xdaf08e",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:109"
+  ]
+ },
+ "0xdb0967": {
+  "gog": "0xdaf0e7",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:110"
+  ]
+ },
+ "0xdb1410": {
+  "gog": "0xdafb90",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:108"
+  ]
+ },
+ "0xdb1800": {
+  "gog": "0xdaff80",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:111"
+  ]
+ },
+ "0xdf5860": {
+  "gog": "0xdf3fb0",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:909"
+  ]
+ },
+ "0xdf5ec8": {
+  "gog": "0xdf4618",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:393"
+  ]
+ },
+ "0xdf5ed2": {
+  "gog": "0xdf4622",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:397"
+  ]
+ },
+ "0xdf5ed9": {
+  "gog": "0xdf4629",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:398"
+  ]
+ },
+ "0xdf5ee1": {
+  "gog": "0xdf4631",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:399"
+  ]
+ },
+ "0xdffcf0": {
+  "gog": "0xdfe440",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:338"
+  ]
+ },
+ "0x1000000": {
+  "gog": "0xffe810",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/measurement.cpp:28"
+  ]
+ },
+ "0x10a0735": {
+  "gog": "0x109ef35",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:347"
+  ]
+ },
+ "0x10a6d00": {
+  "gog": "0x10a5500",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:888"
+  ]
+ },
+ "0x10a6d6a": {
+  "gog": "0x10a556a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:941"
+  ]
+ },
+ "0x10a7a90": {
+  "gog": "0x10a6290",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:939"
+  ]
+ },
+ "0x10a7f82": {
+  "gog": "0x10a6782",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:944"
+  ]
+ },
+ "0x10d23c0": {
+  "gog": "0x10d0bc0",
+  "how": "changed function 82%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:341"
+  ]
+ },
+ "0x10d2e80": {
+  "gog": "0x10d1670",
+  "how": "changed function 92%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:331"
+  ]
+ },
+ "0x10d5bc0": {
+  "gog": "0x10d43a0",
+  "how": "changed function 98%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:332"
+  ]
+ },
+ "0x10eb5c0": {
+  "gog": "0x10e9bb0",
+  "how": "changed function 96%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:343"
+  ]
+ },
+ "0x10f0510": {
+  "gog": "0x10ee4c0",
+  "how": "changed function 96%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:343"
+  ]
+ },
+ "0x111dfd7": {
+  "gog": "0x1118b87",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:330"
+  ]
+ },
+ "0x111e000": {
+  "gog": "0x1118bb0",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:330"
+  ]
+ },
+ "0x1133713": {
+  "gog": "0x112da83",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1315"
+  ]
+ },
+ "0x11337c1": {
+  "gog": "0x112db31",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1278"
+  ]
+ },
+ "0x1248740": {
+  "gog": "0x1242a90",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:334",
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:338"
+  ]
+ },
+ "0x12e4650": {
+  "gog": "0x12de7b0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:41"
+  ]
+ },
+ "0x1321880": {
+  "gog": "0x131b9e0",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:940"
+  ]
+ },
+ "0x1328885": {
+  "gog": "0x13229e5",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1009"
+  ]
+ },
+ "0x13289d1": {
+  "gog": "0x1322b31",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1009"
+  ]
+ },
+ "0x1328be7": {
+  "gog": "0x1322d47",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1009"
+  ]
+ },
+ "0x1329ba0": {
+  "gog": "0x1323d00",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:344"
+  ]
+ },
+ "0x1329fda": {
+  "gog": "0x132413a",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1009"
+  ]
+ },
+ "0x132a2f4": {
+  "gog": "0x1324454",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1010"
+  ]
+ },
+ "0x132a6e8": {
+  "gog": "0x1324848",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1010"
+  ]
+ },
+ "0x132a9a6": {
+  "gog": "0x1324b06",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1010"
+  ]
+ },
+ "0x132aef5": {
+  "gog": "0x1325055",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1010"
+  ]
+ },
+ "0x132e300": {
+  "gog": "0x1328460",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1016"
+  ]
+ },
+ "0x132e94a": {
+  "gog": "0x1328aaa",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1010"
+  ]
+ },
+ "0x132ec8a": {
+  "gog": "0x1328dea",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1010"
+  ]
+ },
+ "0x132ef9a": {
+  "gog": "0x13290fa",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1010"
+  ]
+ },
+ "0x132f28f": {
+  "gog": "0x13293ef",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1011"
+  ]
+ },
+ "0x132f835": {
+  "gog": "0x1329995",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1011"
+  ]
+ },
+ "0x132fb4f": {
+  "gog": "0x1329caf",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1011"
+  ]
+ },
+ "0x132fec4": {
+  "gog": "0x132a024",
+  "how": "changed function 98%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1011"
+  ]
+ },
+ "0x13303a4": {
+  "gog": "0x132a504",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1011"
+  ]
+ },
+ "0x133077d": {
+  "gog": "0x132a8dd",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1011"
+  ]
+ },
+ "0x1330c15": {
+  "gog": "0x132ad75",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1011"
+  ]
+ },
+ "0x133157e": {
+  "gog": "0x132b6de",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1012"
+  ]
+ },
+ "0x1331bd4": {
+  "gog": "0x132bd34",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1012"
+  ]
+ },
+ "0x1331e47": {
+  "gog": "0x132bfa7",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1012"
+  ]
+ },
+ "0x1332205": {
+  "gog": "0x132c365",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1012"
+  ]
+ },
+ "0x133524c": {
+  "gog": "0x132f3ac",
+  "how": "changed function 100%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1012"
+  ]
+ },
+ "0x133662f": {
+  "gog": "0x133078f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1012"
+  ]
+ },
+ "0x1337101": {
+  "gog": "0x1331261",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1012"
+  ]
+ },
+ "0x1337989": {
+  "gog": "0x1331ae9",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1013"
+  ]
+ },
+ "0x1337e3f": {
+  "gog": "0x1331f9f",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:1013"
+  ]
+ },
+ "0x14321fc": {
+  "gog": "0x142c19c",
+  "how": "changed function 99%",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:1343"
+  ]
+ },
+ "0x14b36c0": {
+  "gog": "0x14ad520",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:43"
+  ]
+ },
+ "0x14c2530": {
+  "gog": "0x14bc390",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:341"
+  ]
+ },
+ "0x14c25a0": {
+  "gog": "0x14bc400",
+  "how": "changed function 96%",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:48"
+  ]
+ },
+ "0x14e3f00": {
+  "gog": "0x14dda70",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:21"
+  ]
+ },
+ "0x14e8904": {
+  "gog": "0x14e2474",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:348"
+  ]
+ },
+ "0x14e9030": {
+  "gog": "0x14e2ba0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:347"
+  ]
+ },
+ "0x14e9e16": {
+  "gog": "0x14e3986",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:348"
+  ]
+ },
+ "0x1504030": {
+  "gog": "0x14fdba0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:473"
+  ]
+ },
+ "0x153c790": {
+  "gog": "0x1533690",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/eu4_load_patch.ini:19",
+   "eu4_load_patch/src/save_compress.inc:16"
+  ]
+ },
+ "0x15cce80": {
+  "gog": "0x15c39a0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:320"
+  ]
+ },
+ "0x15f3f20": {
+  "gog": "0x15ea9d0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:497"
+  ]
+ },
+ "0x1657e40": {
+  "gog": "0x16f9530",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:549"
+  ]
+ },
+ "0x1658a80": {
+  "gog": "0x15dd770",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:333"
+  ]
+ },
+ "0x1658cb0": {
+  "gog": null,
+  "how": null,
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:336"
+  ]
+ },
+ "0x1658d50": {
+  "gog": null,
+  "how": null,
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:336"
+  ]
+ },
+ "0x165b0c0": {
+  "gog": null,
+  "how": null,
+  "section": ".text",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:336"
+  ]
+ },
+ "0x16faae0": {
+  "gog": "0x16e4930",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:35"
+  ]
+ },
+ "0x16fb1c0": {
+  "gog": "0x16e5010",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:36"
+  ]
+ },
+ "0x16fd849": {
+  "gog": "0x16e7699",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:37"
+  ]
+ },
+ "0x16ffd10": {
+  "gog": "0x16e9b60",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:39"
+  ]
+ },
+ "0x1700010": {
+  "gog": "0x16e9e60",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:40"
+  ]
+ },
+ "0x1707960": {
+  "gog": "0x16f1580",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:928"
+  ]
+ },
+ "0x1707a20": {
+  "gog": "0x16f1640",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:56"
+  ]
+ },
+ "0x170ea12": {
+  "gog": "0x16f8632",
+  "how": "changed function 96%",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:824"
+  ]
+ },
+ "0x1710a70": {
+  "gog": "0x16fa6f0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:27"
+  ]
+ },
+ "0x171f010": {
+  "gog": "0x1708c90",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:25"
+  ]
+ },
+ "0x171f3f0": {
+  "gog": "0x1709070",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:24"
+  ]
+ },
+ "0x1721320": {
+  "gog": "0x170afa0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:236"
+  ]
+ },
+ "0x17394f0": {
+  "gog": "0x1723170",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:470"
+  ]
+ },
+ "0x175da20": {
+  "gog": "0x17476a0",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:471"
+  ]
+ },
+ "0x181f210": {
+  "gog": "0x1808e90",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/save_compress.inc:18"
+  ]
+ },
+ "0x181fb90": {
+  "gog": "0x1809810",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/save_compress.inc:19"
+  ]
+ },
+ "0x181fc70": {
+  "gog": "0x18098f0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/save_compress.inc:17"
+  ]
+ },
+ "0x19f8310": {
+  "gog": "0x19e1f90",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:29"
+  ]
+ },
+ "0x19f8e60": {
+  "gog": "0x19e2ae0",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:28"
+  ]
+ },
+ "0x19fb7f8": {
+  "gog": "0x19e5478",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:591"
+  ]
+ },
+ "0x1a07080": {
+  "gog": "0x19f0d00",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:590"
+  ]
+ },
+ "0x1a073b0": {
+  "gog": "0x19f1030",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:612"
+  ]
+ },
+ "0x1a073f0": {
+  "gog": "0x19f1070",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:610"
+  ]
+ },
+ "0x1a07580": {
+  "gog": "0x19f1200",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:611"
+  ]
+ },
+ "0x1a08470": {
+  "gog": "0x19f20f0",
+  "how": "changed function 95%",
+  "section": ".text",
+  "uses": [
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:605",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:609",
+   "eu4_load_patch/src/save_compress.inc:20"
+  ]
+ },
+ "0x1a332d4": {
+  "gog": "0x1a1cf54",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:437",
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:469",
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:340",
+   "eu4_modifier_patch/src/merge_part.inc:29"
+  ]
+ },
+ "0x1a461c4": {
+  "gog": "0x1a2fe44",
+  "how": "byte pattern",
+  "section": ".text",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:550"
+  ]
+ },
+ "0x1a583d8": {
+  "gog": "0x1a42058",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:43"
+  ]
+ },
+ "0x1a6833c": {
+  "gog": "0x1a51f8c",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:38"
+  ]
+ },
+ "0x1a6837c": {
+  "gog": "0x1a51fcc",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:39"
+  ]
+ },
+ "0x1a6989c": {
+  "gog": "0x1a534ec",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:40"
+  ]
+ },
+ "0x1a6dd98": {
+  "gog": "0x1a579e8",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:41"
+  ]
+ },
+ "0x1a706f4": {
+  "gog": "0x1a5a344",
+  "how": "function",
+  "section": ".text",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:42"
+  ]
+ },
+ "0x1ac7e77": {
+  "gog": "0x1ab1ad7",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:431"
+  ]
+ },
+ "0x1b4deb8": {
+  "gog": "0x1b373f8",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_modifier_patch/src/profile.cpp:59"
+  ]
+ },
+ "0x1b64d78": {
+  "gog": "0x1b4df08",
+  "how": "instruction",
+  "section": ".text",
+  "uses": [
+   "eu4_knowledge_patch/src/profile.cpp:73",
+   "eu4_speed_patch/src/profile.cpp:81"
+  ]
+ },
+ "0x1c1d808": {
+  "gog": "0x1c065c8",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:589"
+  ]
+ },
+ "0x1c1d8c0": {
+  "gog": "0x1c06680",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:613",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:618",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:625"
+  ]
+ },
+ "0x1c1d8d0": {
+  "gog": "0x1c06690",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:617",
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:624"
+  ]
+ },
+ "0x1c1d900": {
+  "gog": "0x1c066c0",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_load_patch/src/bellows/ram_prefetch.cpp:622"
+  ]
+ },
+ "0x1c33e18": {
+  "gog": "0x1c1cbe8",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:49"
+  ]
+ },
+ "0x1c3af78": {
+  "gog": "0x1c23cf8",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:31"
+  ]
+ },
+ "0x1c3af98": {
+  "gog": "0x1c23d18",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/path_cache.cpp:30"
+  ]
+ },
+ "0x1c3afa0": {
+  "gog": "0x1c23d20",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1166"
+  ]
+ },
+ "0x1c3b030": {
+  "gog": "0x1c23db0",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:16"
+  ]
+ },
+ "0x1c3cda0": {
+  "gog": "0x1c25b20",
+  "how": "vtable slot (neighbours)",
+  "section": ".rdata",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1166"
+  ]
+ },
+ "0x1c3cdb8": {
+  "gog": "0x1c25b38",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:24",
+   "eu4_ai_serial/src/tree_walk.cpp:111",
+   "eu4_ai_serial/src/tree_walk.cpp:111"
+  ]
+ },
+ "0x1c3ce10": {
+  "gog": "0x1c25b90",
+  "how": "vtable slot (neighbours)",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:16"
+  ]
+ },
+ "0x1c3d3c0": {
+  "gog": "0x1c26140",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:16"
+  ]
+ },
+ "0x1c3df78": {
+  "gog": "0x1c26cf8",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:16"
+  ]
+ },
+ "0x1c3e9e0": {
+  "gog": "0x1c27760",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:112",
+   "eu4_ai_serial/src/tree_walk.cpp:112",
+   "eu4_ai_serial/src/tree_walk.cpp:112"
+  ]
+ },
+ "0x1c3edd8": {
+  "gog": "0x1c27b58",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c3f140": {
+  "gog": "0x1c27ec0",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c3f6b8": {
+  "gog": "0x1c28438",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c40090": {
+  "gog": "0x1c28e10",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c40490": {
+  "gog": "0x1c29210",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c408c8": {
+  "gog": "0x1c29648",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c41660": {
+  "gog": "0x1c2a3e8",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:438"
+  ]
+ },
+ "0x1c41ac0": {
+  "gog": null,
+  "how": null,
+  "section": ".rdata",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:1166"
+  ]
+ },
+ "0x1c42e20": {
+  "gog": "0x1c2bbd0",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c43160": {
+  "gog": null,
+  "how": null,
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:17"
+  ]
+ },
+ "0x1c436e8": {
+  "gog": "0x1c2c498",
+  "how": "between references",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/tree_probe.cpp:18"
+  ]
+ },
+ "0x1cafc38": {
+  "gog": "0x1c98868",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_ai_serial/src/eu4_ai_serial.cpp:50"
+  ]
+ },
+ "0x1cd6648": {
+  "gog": "0x1cbf108",
+  "how": "vtable slot (neighbours)",
+  "section": ".rdata",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:48"
+  ]
+ },
+ "0x1d5a8e8": {
+  "gog": "0x1d43338",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:331"
+  ]
+ },
+ "0x1d5a8f8": {
+  "gog": "0x1d43348",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:332"
+  ]
+ },
+ "0x1d6c620": {
+  "gog": "0x1d54df0",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:334"
+  ]
+ },
+ "0x1d9c998": {
+  "gog": "0x1d84d60",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:319"
+  ]
+ },
+ "0x1da1d40": {
+  "gog": "0x1d8a0f0",
+  "how": "reference",
+  "section": ".rdata",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:495"
+  ]
+ },
+ "0x1da1d98": {
+  "gog": "0x1d8a148",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:496"
+  ]
+ },
+ "0x1da6d38": {
+  "gog": null,
+  "how": null,
+  "section": ".rdata",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:333"
+  ]
+ },
+ "0x1dbf7d8": {
+  "gog": "0x1da60f8",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_save_patch/src/eu4_save_patch.cpp:59"
+  ]
+ },
+ "0x1dbfa98": {
+  "gog": "0x1da63d0",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_save_patch/src/pipe.inc:26"
+  ]
+ },
+ "0x1dc0358": {
+  "gog": "0x1da6c70",
+  "how": "vtable slot",
+  "section": ".rdata",
+  "uses": [
+   "eu4_det_patch/src/eu4_det_patch.cpp:136",
+   "eu4_save_patch/src/pipe.inc:23"
+  ]
+ },
+ "0x1fb0000": {
+  "gog": "0x1f94000",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_det_patch/src/eu4_det_patch.cpp:73"
+  ]
+ },
+ "0x1fd1ab8": {
+  "gog": "0x1fb5ab8",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:423"
+  ]
+ },
+ "0x1fd5fa8": {
+  "gog": "0x1fb9fa8",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:422"
+  ]
+ },
+ "0x2014b50": {
+  "gog": "0x1ff8b50",
+  "how": "between references",
+  "section": ".data",
+  "uses": [
+   "eu4_load_patch/src/bellows/zip_reader.cpp:14"
+  ]
+ },
+ "0x2326720": {
+  "gog": "0x230a700",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:826"
+  ]
+ },
+ "0x233d850": {
+  "gog": "0x23216d0",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_alloc_patch/src/eu4_alloc_patch.cpp:428"
+  ]
+ },
+ "0x233d8a4": {
+  "gog": "0x2321724",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:646",
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:171"
+  ]
+ },
+ "0x233d8d0": {
+  "gog": "0x2321750",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_ai_serial/src/tree_walk.cpp:25",
+   "eu4_country_patch/src/eu4_country_patch.cpp:647",
+   "eu4_country_patch/src/eu4_country_patch.cpp:1225"
+  ]
+ },
+ "0x233d8d8": {
+  "gog": "0x2321758",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:646",
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:172"
+  ]
+ },
+ "0x233d8dc": {
+  "gog": "0x232175c",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:646",
+   "eu4_knowledge_patch/src/eu4_knowledge_patch.cpp:172"
+  ]
+ },
+ "0x233d911": {
+  "gog": "0x2321791",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:352"
+  ]
+ },
+ "0x233fe50": {
+  "gog": "0x2323cd8",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:66"
+  ]
+ },
+ "0x233fe58": {
+  "gog": "0x2323cd0",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:65"
+  ]
+ },
+ "0x233fe78": {
+  "gog": "0x2323cf8",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_country_patch/src/eu4_country_patch.cpp:64",
+   "eu4_country_patch/src/eu4_country_patch.cpp:945",
+   "eu4_det_patch/src/eu4_det_patch.cpp:23",
+   "eu4_knowledge_patch/src/profile.hpp:28",
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:349",
+   "eu4_save_patch/src/eu4_save_patch.cpp:41"
+  ]
+ },
+ "0x233fea0": {
+  "gog": "0x2323d18",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:349"
+  ]
+ },
+ "0x233fed8": {
+  "gog": "0x2323d58",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:349"
+  ]
+ },
+ "0x2340010": {
+  "gog": "0x2323e90",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_menu_patch/src/eu4_menu_patch.cpp:350"
+  ]
+ },
+ "0x23494b0": {
+  "gog": "0x232d334",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_det_patch/src/eu4_det_patch.cpp:160"
+  ]
+ },
+ "0x23494b4": {
+  "gog": "0x232d330",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_det_patch/src/eu4_det_patch.cpp:159"
+  ]
+ },
+ "0x2357b20": {
+  "gog": "0x2331998",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_loc_patch/src/eu4_loc_patch.cpp:38"
+  ]
+ },
+ "0x242b8a0": {
+  "gog": "0x240f718",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_load_patch/src/eu4_load_patch.cpp:827"
+  ]
+ },
+ "0x242bd80": {
+  "gog": "0x240fbf8",
+  "how": "reference",
+  "section": ".data",
+  "uses": [
+   "eu4_trigger_patch/src/profile.hpp:17"
+  ]
+ },
+ "0x245b070": {
+  "gog": "0x243e9c0",
+  "how": "between references",
+  "section": ".data",
+  "uses": [
+   "eu4_render_patch/src/eu4_render_patch.cpp:50"
+  ]
+ }
+}

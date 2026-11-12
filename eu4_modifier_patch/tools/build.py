@@ -35,32 +35,33 @@ def main() -> None:
                   ROOT / "src" / "profile.cpp",
                   ROOT / "src" / "search.cpp",
                   ROOT / "src" / "search_relay.S",
-                  "-I", ROOT / "src", "-o", BUILD / "eu4_modifier_patch.dll", "-lbcrypt"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "eu4_modifier_patch.dll", "-lbcrypt"])
     run(common + ["-static", "-municode", ROOT / "tools" / "check_executable.cpp",
-                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "modifier_patch_check.exe", "-lbcrypt"])
     run(common + ["-static", ROOT / "tests" / "function_patch_tests.cpp",
                   ROOT / "src" / "function_patch.cpp", ROOT / "tests" / "function_fixture.S",
-                  "-I", ROOT / "src", "-o", BUILD / "function_patch_tests.exe"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "function_patch_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "measurement_tests.cpp",
-                  ROOT / "src" / "measurement.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "measurement.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "measurement_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "caller_stats_tests.cpp",
-                  ROOT / "src" / "caller_stats.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "caller_stats.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "caller_stats_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "function_stats_tests.cpp",
-                  ROOT / "src" / "function_stats.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "function_stats.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "function_stats_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "search_tests.cpp",
                   ROOT / "src" / "function_patch.cpp", ROOT / "src" / "search.cpp",
                   ROOT / "src" / "search_relay.S", ROOT / "tests" / "search_fixture.S",
-                  "-I", ROOT / "src", "-o", BUILD / "search_tests.exe"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "search_tests.exe"])
 
     for name in ("function_patch_tests.exe", "measurement_tests.exe", "caller_stats_tests.exe",
                  "function_stats_tests.exe", "search_tests.exe"): 
         run([BUILD / name])
     run([sys.executable, ROOT / "tests" / "lightweight_path_tests.py"])
-    run([BUILD / "modifier_patch_check.exe", WORKSPACE / "Europa Universalis IV" / "eu4.exe"])
+    # the offline check needs the Steam exe (the test copy may hold the GOG build)
+    run([BUILD / "modifier_patch_check.exe", WORKSPACE / "eu4_kit" / "binary" / "eu4.exe"])
 
     for name in ("eu4_modifier_patch.dll", "eu4_modifier_patch.ini"):
         source = BUILD / name if name.endswith(".dll") else ROOT / name

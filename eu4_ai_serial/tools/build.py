@@ -17,7 +17,7 @@ def main() -> None:
     command = [ZIG, "c++", "-target", "x86_64-windows-gnu", "-std=c++17", "-O2", "-Wall",
                "-Wextra", "-Werror", "-shared", "-static",
                ROOT / "src" / "eu4_ai_serial.cpp", ROOT / "src" / "call_patch.cpp", ROOT / "src" / "heavy_sampler.cpp", ROOT / "src" / "unit_flag_cache.cpp", ROOT / "src" / "search_memo.cpp", ROOT / "src" / "country_ratio_cache.cpp", ROOT / "src" / "province_score_cache.cpp", ROOT / "src" / "path_cache.cpp", ROOT / "src" / "tree_probe.cpp", ROOT / "src" / "tree_walk.cpp",
-               "-I", ROOT / "src", "-o", BUILD / "eu4_ai_serial.dll"]
+               "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "eu4_ai_serial.dll"]
     print("+", " ".join(map(str, command)), flush=True)
     subprocess.run([str(value) for value in command], check=True, cwd=WORKSPACE)
     shutil.copy2(BUILD / "eu4_ai_serial.dll", PLUGINS / "eu4_ai_serial.dll")

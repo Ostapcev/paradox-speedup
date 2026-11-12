@@ -1,3 +1,4 @@
+#include "eu4_build.hpp"
 // ---- merge: modifier list merge with an index (port of Bellows modifier_merge, MIT, Happy Dwarf Team)
 // Included into eu4_modifier_patch.cpp inside its anonymous namespace. The entry hook of
 // 0x8EA420 is this plugin's add_hook; original_add (its trampoline) is the game's function.
@@ -245,16 +246,15 @@ bool alloc_hooked(std::uintptr_t entry_address) {
 }
 
 bool check_merge(std::uintptr_t image) {
-    if (std::memcmp(reinterpret_cast<void*>(image + merge_rva), merge_bytes, sizeof(merge_bytes)) != 0 ||
-        (std::memcmp(reinterpret_cast<void*>(image + merge_new_rva), merge_new_bytes, sizeof(merge_new_bytes)) != 0 &&
-            !alloc_hooked(image + merge_new_rva)) ||
-        std::memcmp(reinterpret_cast<void*>(image + merge_emplace_rva), merge_emplace_bytes,
-            sizeof(merge_emplace_bytes)) != 0) {
+    if (!eu4build::code_matches(image, merge_rva, merge_bytes, sizeof(merge_bytes)) ||
+        (!eu4build::code_matches(image, merge_new_rva, merge_new_bytes, sizeof(merge_new_bytes)) &&
+            !alloc_hooked(image + eu4build::rva(merge_new_rva))) ||
+        !eu4build::code_matches(image, merge_emplace_rva, merge_emplace_bytes, sizeof(merge_emplace_bytes))) {
         log("merge REFUSED: bytes differ");
         return false;
     }
-    merge_new = reinterpret_cast<void* (*)(std::size_t)>(image + merge_new_rva);
-    merge_emplace = reinterpret_cast<void* (*)(void*, void*, void**)>(image + merge_emplace_rva);
+    merge_new = reinterpret_cast<void* (*)(std::size_t)>(image + eu4build::rva(merge_new_rva));
+    merge_emplace = reinterpret_cast<void* (*)(void*, void*, void**)>(image + eu4build::rva(merge_emplace_rva));
     return true;
 }
 

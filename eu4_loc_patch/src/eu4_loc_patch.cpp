@@ -20,6 +20,7 @@
 #include <vector>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -100,7 +101,7 @@ template <class T> inline T*& vec_cap(std::uint8_t* table, int offset) {
     return *reinterpret_cast<T**>(table + offset + 16);
 }
 inline std::uint8_t* string_buffer() {
-    return *reinterpret_cast<std::uint8_t**>(image + string_buffer_rva);
+    return *reinterpret_cast<std::uint8_t**>(image + eu4build::rva(string_buffer_rva));
 }
 
 // ---- per-table index of table+0x38: (hash, file) -> first position
@@ -449,21 +450,20 @@ DWORD install_checked(HMODULE module) {
     LARGE_INTEGER frequency{};
     QueryPerformanceFrequency(&frequency);
     qpc_frequency = frequency.QuadPart > 0 ? frequency.QuadPart : 1;
-    lower_bound_fn = reinterpret_cast<LowerBoundFn>(image + lower_bound_rva);
-    grow38 = reinterpret_cast<GrowFn>(image + grow38_rva);
-    grow20 = reinterpret_cast<GrowFn>(image + grow20_rva);
-    resize_fn = reinterpret_cast<ResizeFn>(image + resize_rva);
-    report_fn = reinterpret_cast<ReportFn>(image + report_rva);
-    original_finalize = reinterpret_cast<FinalizeFn>(image + finalize_rva);
-    if (std::memcmp(reinterpret_cast<void*>(image + add_dup_rva), add_dup_bytes,
-            sizeof(add_dup_bytes)) != 0) {
+    lower_bound_fn = reinterpret_cast<LowerBoundFn>(image + eu4build::rva(lower_bound_rva));
+    grow38 = reinterpret_cast<GrowFn>(image + eu4build::rva(grow38_rva));
+    grow20 = reinterpret_cast<GrowFn>(image + eu4build::rva(grow20_rva));
+    resize_fn = reinterpret_cast<ResizeFn>(image + eu4build::rva(resize_rva));
+    report_fn = reinterpret_cast<ReportFn>(image + eu4build::rva(report_rva));
+    original_finalize = reinterpret_cast<FinalizeFn>(image + eu4build::rva(finalize_rva));
+    if (!eu4build::code_matches(image, add_dup_rva, add_dup_bytes, sizeof(add_dup_bytes))) {
         log("REFUSED: add_dup bytes differ; no bytes changed");
         installation_status.store(-4);
         return 4;
     }
     char error[160]{};
     speedpatch::CallPatch finalize;
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + finalize_call_rva),
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(finalize_call_rva)),
             reinterpret_cast<const void*>(original_finalize),
             reinterpret_cast<const void*>(&finalize_hook), finalize, error, sizeof(error)) ||
         !speedpatch::commit_call(finalize, error, sizeof(error))) {
@@ -473,7 +473,7 @@ DWORD install_checked(HMODULE module) {
         return 5;
     }
     if (mode != Mode::off &&
-        !write_jump(image + add_dup_rva, reinterpret_cast<const void*>(&add_dup_hook))) {
+        !write_jump(image + eu4build::rva(add_dup_rva), reinterpret_cast<const void*>(&add_dup_hook))) {
         log("add_dup: VirtualProtect failed %lu (checksum only)", GetLastError());
         mode = Mode::off;
     }

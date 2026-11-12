@@ -35,20 +35,20 @@ def main() -> None:
                   ROOT / "src" / "parallel_patch.cpp",
                   ROOT / "src" / "profile.cpp",
                   SPEED / "src" / "call_patch.cpp",
-                  "-I", ROOT / "src", "-I", SPEED / "src",
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-I", SPEED / "src",
                   "-o", BUILD / "eu4_trigger_patch.dll"])
     run(common + ["-static", "-municode", ROOT / "tools" / "check_executable.cpp",
-                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "profile.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "trigger_patch_check.exe"])
     run(common + ["-static", ROOT / "tests" / "trigger_batch_tests.cpp",
                   ROOT / "src" / "trigger_batch.cpp", ROOT / "src" / "parallel_pool.cpp",
-                  "-I", ROOT / "src", "-o", BUILD / "trigger_batch_tests.exe"])
+                  "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include", "-o", BUILD / "trigger_batch_tests.exe"])
     run(common + ["-static", ROOT / "tests" / "trigger_hook_tests.cpp",
                   ROOT / "src" / "trigger_hooks.S", ROOT / "src" / "parallel_patch.cpp",
-                  ROOT / "tests" / "entry_fixture.S", "-I", ROOT / "src",
+                  ROOT / "tests" / "entry_fixture.S", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "trigger_hook_tests.exe"])
     run(common + ["-static", KNOWLEDGE / "tests" / "parallel_pool_tests.cpp",
-                  ROOT / "src" / "parallel_pool.cpp", "-I", ROOT / "src",
+                  ROOT / "src" / "parallel_pool.cpp", "-I", ROOT / "src", "-I", WORKSPACE / "eu4_port" / "include",
                   "-o", BUILD / "parallel_pool_tests.exe"])
     run(common + ["-static", KNOWLEDGE / "tests" / "parallel_loop_tests.cpp",
                   KNOWLEDGE / "src" / "parallel_loops.S", ROOT / "src" / "parallel_patch.cpp",
