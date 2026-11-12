@@ -210,6 +210,21 @@ def scan(m, root, out):
                 if m.section(m.a, v) is None:
                     continue
                 found.setdefault(v, []).append('%s:%d' % (rel, n))
+    # addresses written as NAME +/- N (or NAME[i] +/- N) inside eu4build calls
+    for f in sorted(files):
+        rel = os.path.relpath(f, root).replace('\\', '/')
+        text = re.sub(r'//[^\n]*', '', open(f, encoding='utf-8', errors='ignore').read())
+        scalars = {k: int(v, 16) for k, v in
+                   re.findall(r'std::uintptr_t (\w+) = 0x([0-9a-fA-F]+)', text)}
+        arrays = {k: [int(x, 16) for x in re.findall(r'0x([0-9a-fA-F]+)', body)] for k, body in
+                  re.findall(r'std::uintptr_t (\w+)\[\w*\] = \{([^}]*)\}', text)}
+        for name, idx, sign, d in re.findall(
+                r'(?:code_matches\(\s*\w+,\s*|eu4build::rva\()\s*(?:\w+::)?(\w+)(\[\w+\])?\s*([+-])\s*(0x[0-9a-fA-F]+|\d+)', text):
+            vals = arrays.get(name, []) if idx else ([scalars[name]] if name in scalars else [])
+            for v in vals:
+                v += int(d, 0) * (1 if sign == '+' else -1)
+                if m.section(m.a, v) == '.text':
+                    found.setdefault(v, []).append('%s:%s%s%s%s' % (rel, name, idx, sign, d))
     res = {}
     for v, uses in sorted(found.items()):
         r = m.map(v)

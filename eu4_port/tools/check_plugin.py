@@ -44,8 +44,10 @@ def main():
     code = re.sub(r'//[^\n]*', '', text)
     consts = {m.group(1): int(m.group(2), 16)
               for m in re.finditer(r'constexpr std::uintptr_t (\w+) = 0x([0-9a-fA-F]+)', code)}
+    carrays = {k: [int(x, 16) for x in re.findall(r'0x([0-9a-fA-F]+)', body)] for k, body in
+               re.findall(r'std::uintptr_t (\w+)\[\w*\] = \{([^}]*)\}', code)}
     arrays = {}
-    for m in re.finditer(r'constexpr (?:std::uint8_t (\w+)\[\] = |std::array<std::uint8_t, \d+> (\w+)\s*)\{([^}]*)\}', code):
+    for m in re.finditer(r'(?:constexpr|static const|static constexpr) (?:std::uint8_t (\w+)\[\d*\] = |std::array<std::uint8_t, \d+> (\w+)\s*)\{([^}]*)\}', code):
         arrays[m.group(1) or m.group(2)] = bytes(int(x, 16) for x in re.findall(r'0x([0-9a-fA-F]{1,2})\b', m.group(3)))
     for m in []:
         arrays[m.group(1)] = bytes(int(x, 16) for x in re.findall(r'0x([0-9a-fA-F]{1,2})\b', m.group(2)))
@@ -60,6 +62,9 @@ def main():
         if m and m.group(1) in consts:
             d = int(m.group(3), 0)
             return consts[m.group(1)] + (d if m.group(2) == '+' else -d)
+        m = re.fullmatch(r'(\w+)\[(\d+)\]', tok)
+        if m and m.group(1) in carrays and int(m.group(2)) < len(carrays[m.group(1)]):
+            return carrays[m.group(1)][int(m.group(2))]
         m = re.fullmatch(r'\w+::(\w+)', tok)
         if m and m.group(1) in consts:
             return consts[m.group(1)]
@@ -67,15 +72,22 @@ def main():
 
     problems = 0
     checks = [(m.group(1), m.group(2), m.group(0)) for m in
-              re.finditer(r'code_matches\(\s*\w+,\s*([^,]+),\s*(\w+),\s*sizeof\(\w+\)\)', code)]
+              re.finditer(r'code_matches\(\s*\w+,\s*([^,]+),\s*([\w\[\]]+),\s*(?:sizeof\([\w\[\]]+\)|\d+)\)', code)]
     checks += [(m.group(1), m.group(2), m.group(0)) for m in
                re.finditer(r'\bexpect\(\s*image,\s*([^,]+),\s*(\w+),', code)]
+    # hex-string signatures: {0xRVA, "48895c24..", "what"}
+    for m in re.finditer(r'\{\s*0x([0-9a-fA-F]{5,8}),\s*"([0-9a-f]{4,})"', code):
+        arrays['sig_' + m.group(1)] = bytes.fromhex(m.group(2))
+        checks.append(('0x' + m.group(1), 'sig_' + m.group(1), m.group(0)))
     # table-driven checks: {site_rva, site_bytes, ...} initializers
     checks += [(m.group(1), m.group(2), m.group(0)) for m in
                re.finditer(r'\{\s*(\w+_rva|0x[0-9a-fA-F]{5,8}),\s*(\w+_bytes)\b', code)]
     for tok, name, whole in checks:
         x = value(tok)
         data = arrays.get(name)
+        mlen = re.search(r',\s*(\d+)\)$', whole)
+        if data is not None and mlen:
+            data = data[:int(mlen.group(1))]
         if x is None or data is None:
             print('?? cannot resolve', whole[:80])
             continue

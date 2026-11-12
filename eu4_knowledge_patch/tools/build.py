@@ -74,7 +74,8 @@ def main() -> None:
                  "shadow_hook_tests.exe", "optimized_loop_tests.exe",
                  "parallel_loop_tests.exe", "scheduler_wait_tests.exe", "call_patch_tests.exe"):
         run([BUILD / name])
-    run([BUILD / "knowledge_patch_check.exe", WORKSPACE / "Europa Universalis IV" / "eu4.exe"])
+    # the offline check needs the Steam exe (the test copy may hold the GOG build)
+    run([BUILD / "knowledge_patch_check.exe", WORKSPACE / "eu4_kit" / "binary" / "eu4.exe"])
 
     for name in ("eu4_knowledge_patch.dll", "eu4_knowledge_patch.ini"):
         source = BUILD / name if name.endswith(".dll") else ROOT / name

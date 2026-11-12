@@ -14,6 +14,7 @@
 #include <cstdio>
 #include <cstring>
 #include <vector>
+#include "eu4_build.hpp"
 
 namespace treewalk {
 namespace {
@@ -51,7 +52,7 @@ constexpr std::uint64_t probe_limit = 20000;
 
 void* country_of(void* root) {
     const auto index = *reinterpret_cast<const short*>(static_cast<std::uint8_t*>(root) + 0x2c);
-    auto* global = *reinterpret_cast<std::uint8_t**>(image + country_table_global_rva);
+    auto* global = *reinterpret_cast<std::uint8_t**>(image + eu4build::rva(country_table_global_rva));
     if (!global || index < 0) return nullptr;
     auto** table = *reinterpret_cast<void***>(global + 0x118);
     return table ? table[index] : nullptr;
@@ -103,13 +104,20 @@ std::atomic<std::uint64_t> structure_calls_in_batch{0}, batches{0}, batch_items{
     helper_items{0};
 
 struct Wrapped {
-    std::uintptr_t slot_rva;  // vtable slot
+    std::uintptr_t vtable_rva;  // Steam RVA of the vtable
+    std::uintptr_t offset;      // slot offset inside it
     void* original;
 };
 // army vtable 141c3cdb8 +0x190 (1400e46d0) +0x198 (1400e4710);
 // root vtable 141c3e9e0 +0x178 (140148940) +0x208 (14014a160) +0x210 (14014a1d0)
-Wrapped wrapped[5] = {{0x1c3cdb8 + 0x190, nullptr}, {0x1c3cdb8 + 0x198, nullptr},
-    {0x1c3e9e0 + 0x178, nullptr}, {0x1c3e9e0 + 0x208, nullptr}, {0x1c3e9e0 + 0x210, nullptr}};
+Wrapped wrapped[5] = {{0x1c3cdb8, 0x190, nullptr}, {0x1c3cdb8, 0x198, nullptr},
+    {0x1c3e9e0, 0x178, nullptr}, {0x1c3e9e0, 0x208, nullptr}, {0x1c3e9e0, 0x210, nullptr}};
+
+// Address of a wrapped slot in the running build (0 if the vtable is not in the table).
+std::uintptr_t slot_address(std::uintptr_t base, const Wrapped& w) {
+    const auto vtable = eu4build::rva(w.vtable_rva);
+    return vtable ? base + vtable + w.offset : 0;
+}
 const std::uintptr_t wrapped_expected[5] = {0xe46d0, 0xe4710, 0x148940, 0x14a160, 0x14a1d0};
 
 using Fn2 = std::uint64_t (*)(void*, void*);
@@ -404,8 +412,10 @@ bool install(std::uintptr_t base, Mode selected, int helpers, char* error,
     image = base;
     if (selected == Mode::parallel) {
         for (int i = 0; i < 5; ++i) {
-            auto** slot = reinterpret_cast<void**>(base + wrapped[i].slot_rva);
-            if (*slot != reinterpret_cast<void*>(base + wrapped_expected[i])) {
+            const auto at = slot_address(base, wrapped[i]);
+            const auto expected = eu4build::rva(wrapped_expected[i]);
+            if (!at || !expected ||
+                *reinterpret_cast<void**>(at) != reinterpret_cast<void*>(base + expected)) {
                 std::snprintf(error, error_size, "tree walk: vtable slot %d differs", i);
                 return false;
             }
@@ -413,29 +423,28 @@ bool install(std::uintptr_t base, Mode selected, int helpers, char* error,
         // ETS local() 1400df320 (calls tbb thread_get_id) and the two ETS objects
         static const std::uint8_t ets_start[] = {0x40, 0x53, 0x55, 0x57, 0x41, 0x54, 0x41, 0x56};
         static const std::uint8_t body_ets[] = {0x48, 0x8d, 0x0d, 0x25, 0xfe, 0x84, 0x01};
-        if (std::memcmp(reinterpret_cast<void*>(base + 0xdf320), ets_start, sizeof(ets_start)) ||
-            std::memcmp(reinterpret_cast<void*>(base + 0x78617c), body_ets, sizeof(body_ets))) {
+        if (!eu4build::code_matches(base, 0xdf320, ets_start, sizeof(ets_start)) ||
+            !eu4build::code_matches(base, 0x78617c, body_ets, sizeof(body_ets))) {
             std::snprintf(error, error_size, "tree walk: AI task context code differs");
             return false;
         }
-        ets_local = reinterpret_cast<EtsLocalFn>(base + 0xdf320);
-        ets_depth = reinterpret_cast<void*>(base + 0x1fd5fa8);
-        ets_sink = reinterpret_cast<void*>(base + 0x1fd1ab8);
+        ets_local = reinterpret_cast<EtsLocalFn>(base + eu4build::rva(0xdf320));
+        ets_depth = reinterpret_cast<void*>(base + eu4build::rva(0x1fd5fa8));
+        ets_sink = reinterpret_cast<void*>(base + eu4build::rva(0x1fd1ab8));
         InitializeCriticalSection(&structure_lock);
         // helpers < 0: run batches on the game's job system
         static const std::uint8_t ctx_dtor_start[] = {0x48, 0x89, 0x5c, 0x24, 0x08, 0x48, 0x89,
             0x74, 0x24, 0x10, 0x57};
         if (helpers < 0) {
-            if (std::memcmp(reinterpret_cast<void*>(base + 0x1797d0), ctx_dtor_start,
-                    sizeof(ctx_dtor_start)) != 0 ||
-                *reinterpret_cast<std::uint32_t*>(base + 0x1797e5) != 0x1ac7e77) {
+            if (!eu4build::code_matches(base, 0x1797d0, ctx_dtor_start, sizeof(ctx_dtor_start)) ||
+                *reinterpret_cast<std::uint32_t*>(base + eu4build::rva(0x1797e5)) != 0x1ac7e77) {
                 std::snprintf(error, error_size, "tree walk: job context code differs");
                 return false;
             }
-            game_submit = reinterpret_cast<GameSubmitFn>(base + 0x1798a0);
-            game_ctx_dtor = reinterpret_cast<GameDtorFn>(base + 0x1797d0);
-            game_new = reinterpret_cast<GameNewFn>(base + 0x1a332d4);
-            game_ctx_vtable = reinterpret_cast<void*>(base + 0x1c41660);
+            game_submit = reinterpret_cast<GameSubmitFn>(base + eu4build::rva(0x1798a0));
+            game_ctx_dtor = reinterpret_cast<GameDtorFn>(base + eu4build::rva(0x1797d0));
+            game_new = reinterpret_cast<GameNewFn>(base + eu4build::rva(0x1a332d4));
+            game_ctx_vtable = reinterpret_cast<void*>(base + eu4build::rva(0x1c41660));
             use_game_pool = true;
             helpers = 0;
         }
@@ -453,7 +462,7 @@ bool install(std::uintptr_t base, Mode selected, int helpers, char* error,
             }
         }
         for (int i = 0; i < 5; ++i) {
-            auto** slot = reinterpret_cast<void**>(base + wrapped[i].slot_rva);
+            auto** slot = reinterpret_cast<void**>(slot_address(base, wrapped[i]));
             wrapped[i].original = *slot;
             DWORD old = 0;
             VirtualProtect(slot, sizeof(void*), PAGE_READWRITE, &old);
@@ -461,8 +470,8 @@ bool install(std::uintptr_t base, Mode selected, int helpers, char* error,
             VirtualProtect(slot, sizeof(void*), old, &old);
         }
     }
-    army_vtable = base + army_vtable_rva;
-    auto* site = reinterpret_cast<std::uint8_t*>(base + site_rva);
+    army_vtable = base + eu4build::rva(army_vtable_rva);
+    auto* site = reinterpret_cast<std::uint8_t*>(base + eu4build::rva(site_rva));
     if (std::memcmp(site, expected, sizeof(expected)) != 0) {
         std::snprintf(error, error_size, "tree walk site bytes differ");
         return false;
@@ -477,7 +486,7 @@ bool install(std::uintptr_t base, Mode selected, int helpers, char* error,
     code[16] = 0xff; code[17] = 0xd0;                 // call rax
     code[18] = 0xe9;                                  // jmp resume
     const auto rel = static_cast<std::int32_t>(
-        (base + resume_rva) - (base + site_rva + 23));
+        (base + eu4build::rva(resume_rva)) - (base + eu4build::rva(site_rva + 23)));
     std::memcpy(code + 19, &rel, 4);
     DWORD old = 0;
     if (!VirtualProtect(site, sizeof(code), PAGE_EXECUTE_READWRITE, &old)) {

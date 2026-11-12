@@ -21,6 +21,7 @@
 #include "profile.hpp"
 #include "scheduler_wait.hpp"
 #include "two_phase.hpp"
+#include "eu4_build.hpp"
 
 extern "C" {
 void* knowledge_original_target = nullptr;
@@ -146,7 +147,7 @@ class RuntimeWorld {
 public:
     RuntimeWorld(std::uintptr_t image, const void* current) noexcept
         : current_(reinterpret_cast<std::uintptr_t>(current)) {
-        gamestate_ = read_memory<std::uintptr_t>(image + knowledgepatch::gamestate_pointer_rva);
+        gamestate_ = read_memory<std::uintptr_t>(image + eu4build::rva(knowledgepatch::gamestate_pointer_rva));
         province_base_ = read_memory<std::uintptr_t>(gamestate_ + 0x1CA8);
         countries_ = read_memory<std::uintptr_t>(gamestate_ + 0x1D08);
         country_count_ = read_memory<std::int32_t>(gamestate_ + 0x1D14);
@@ -163,7 +164,7 @@ public:
         const auto packed = read_memory<std::uint64_t>(country(index) + 0x20);
         const auto tag = static_cast<Tag>(packed >> 32);
         const auto is_special = [&](std::uintptr_t rva) {
-            return static_cast<std::int32_t>(tag) == read_memory<std::int32_t>(image_base + rva);
+            return static_cast<std::int32_t>(tag) == read_memory<std::int32_t>(image_base + eu4build::rva(rva));
         };
         // Exact filters at 0x9414aa..0x9414ef. The original never touches
         // provinces for skipped entries, so workers must not inspect them.
@@ -227,7 +228,7 @@ public:
     }
     Tag other_overlord_tag(std::size_t index) const noexcept {
         using Resolve = void* (*)(void* country, void* output, std::uint8_t recursive);
-        const auto resolve = reinterpret_cast<Resolve>(image_base + 0x3D7C00);
+        const auto resolve = reinterpret_cast<Resolve>(image_base + eu4build::rva(0x3D7C00));
         std::uint64_t packed = 0;
         resolve(reinterpret_cast<void*>(country(index)), &packed, 1);
         return static_cast<Tag>(packed >> 32);
@@ -238,14 +239,14 @@ public:
     }
     bool in_other_range(int id, std::size_t index) const noexcept {
         using Distance = bool (*)(void* province, void* capital, std::uint8_t recursive);
-        const auto distance = reinterpret_cast<Distance>(image_base + 0x9FABE0);
+        const auto distance = reinterpret_cast<Distance>(image_base + eu4build::rva(0x9FABE0));
         // 0x94151e: other+0x14b0, cached at rbp+0xa0 for 0x941f1c.
         const auto capital = read_memory<std::uintptr_t>(country(index) + 0x14B0);
         return distance(reinterpret_cast<void*>(province(id)), reinterpret_cast<void*>(capital), 1);
     }
     bool in_current_range(int id) const noexcept {
         using Distance = bool (*)(void* province, void* capital, std::uint8_t recursive);
-        const auto distance = reinterpret_cast<Distance>(image_base + 0x9FABE0);
+        const auto distance = reinterpret_cast<Distance>(image_base + eu4build::rva(0x9FABE0));
         const auto capital = read_memory<std::uintptr_t>(current_ + 0x14B0);
         return distance(reinterpret_cast<void*>(province(id)), reinterpret_cast<void*>(capital), 1);
     }
@@ -256,7 +257,7 @@ public:
     }
     bool colonial_visibility(int id) const noexcept {
         using Colonial = bool (*)(void* province, std::uint64_t current_packed_tag);
-        const auto colonial = reinterpret_cast<Colonial>(image_base + 0xA1D330);
+        const auto colonial = reinterpret_cast<Colonial>(image_base + eu4build::rva(0xA1D330));
         return colonial(reinterpret_cast<void*>(province(id)),
             read_memory<std::uint64_t>(current_ + 0x20));
     }
@@ -624,7 +625,7 @@ DWORD install_checked(HMODULE module) {
         compatibility.checked_sites);
 
     image_base = image;
-    knowledge_original_target = reinterpret_cast<void*>(image + knowledgepatch::shadow_target_rva);
+    knowledge_original_target = reinterpret_cast<void*>(image + eu4build::rva(knowledgepatch::shadow_target_rva));
     LARGE_INTEGER frequency{};
     QueryPerformanceFrequency(&frequency);
     qpc_frequency = frequency.QuadPart > 0 ? frequency.QuadPart : 1;
@@ -671,7 +672,7 @@ DWORD install_checked(HMODULE module) {
     bool prepared = true;
     if (selected_mode != Mode::disabled) {
         prepared = speedpatch::prepare_call(
-            reinterpret_cast<std::uint8_t*>(image + knowledgepatch::shadow_call_rva),
+            reinterpret_cast<std::uint8_t*>(image + eu4build::rva(knowledgepatch::shadow_call_rva)),
             knowledge_original_target, reinterpret_cast<const void*>(&knowledge_shadow_hook),
             shadow, error, sizeof(error));
     }
@@ -692,17 +693,17 @@ DWORD install_checked(HMODULE module) {
     if (prepared && selected_mode == Mode::optimized) {
         const auto tls_offset = static_cast<std::uint32_t>(0x1480 + tls_slot * 8);
         prepared = knowledgepatch::prepare_loop(
-            reinterpret_cast<std::uint8_t*>(image + knowledgepatch::core_loop_rva),
-            reinterpret_cast<const void*>(image + knowledgepatch::core_continuation_rva),
-            reinterpret_cast<const void*>(image + knowledgepatch::core_found_rva),
-            reinterpret_cast<const void*>(image + knowledgepatch::core_out_rva),
+            reinterpret_cast<std::uint8_t*>(image + eu4build::rva(knowledgepatch::core_loop_rva)),
+            reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::core_continuation_rva)),
+            reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::core_found_rva)),
+            reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::core_out_rva)),
             core_expected, sizeof(core_expected), core_image, tls_offset, core, error, sizeof(error));
         if (prepared) {
             prepared = knowledgepatch::prepare_loop(
-                reinterpret_cast<std::uint8_t*>(image + knowledgepatch::claim_loop_rva),
-                reinterpret_cast<const void*>(image + knowledgepatch::claim_continuation_rva),
-                reinterpret_cast<const void*>(image + knowledgepatch::claim_found_rva),
-                reinterpret_cast<const void*>(image + knowledgepatch::claim_out_rva),
+                reinterpret_cast<std::uint8_t*>(image + eu4build::rva(knowledgepatch::claim_loop_rva)),
+                reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::claim_continuation_rva)),
+                reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::claim_found_rva)),
+                reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::claim_out_rva)),
                 claim_expected, sizeof(claim_expected), claim_image, tls_offset, claim,
                 error, sizeof(error));
         }
@@ -727,21 +728,21 @@ DWORD install_checked(HMODULE module) {
         const auto tls_offset = static_cast<std::uint32_t>(0x1480 + tls_slot * 8);
         if (selected_mode == Mode::parallel) {
             prepared = knowledgepatch::prepare_parallel_patch(
-                reinterpret_cast<std::uint8_t*>(image + knowledgepatch::parallel_apply_rva),
-                reinterpret_cast<const void*>(image + knowledgepatch::parallel_apply_commit_rva),
-                reinterpret_cast<const void*>(image + knowledgepatch::parallel_apply_fallback_rva),
+                reinterpret_cast<std::uint8_t*>(image + eu4build::rva(knowledgepatch::parallel_apply_rva)),
+                reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::parallel_apply_commit_rva)),
+                reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::parallel_apply_fallback_rva)),
                 apply_expected, sizeof(apply_expected), apply_image, tls_offset,
                 parallel_apply, error, sizeof(error));
         } else {
             prepared = knowledgepatch::prepare_parallel_patch(
-                reinterpret_cast<std::uint8_t*>(image + knowledgepatch::parallel_apply_rva),
-                reinterpret_cast<const void*>(image + knowledgepatch::parallel_apply_fallback_rva),
+                reinterpret_cast<std::uint8_t*>(image + eu4build::rva(knowledgepatch::parallel_apply_rva)),
+                reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::parallel_apply_fallback_rva)),
                 nullptr, apply_expected, sizeof(apply_expected), timing_image, tls_offset,
                 parallel_apply, error, sizeof(error));
             if (prepared) {
                 prepared = knowledgepatch::prepare_parallel_patch(
-                    reinterpret_cast<std::uint8_t*>(image + knowledgepatch::parallel_verify_rva),
-                    reinterpret_cast<const void*>(image + knowledgepatch::parallel_verify_continuation_rva),
+                    reinterpret_cast<std::uint8_t*>(image + eu4build::rva(knowledgepatch::parallel_verify_rva)),
+                    reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::parallel_verify_continuation_rva)),
                     nullptr, verify_expected, sizeof(verify_expected), verify_image, tls_offset,
                     parallel_verify, error, sizeof(error));
             }
@@ -756,9 +757,9 @@ DWORD install_checked(HMODULE module) {
         knowledge_scheduler_wait_top_displacement};
     if (prepared && selected_scheduler == SchedulerMode::efficient) {
         prepared = knowledgepatch::prepare_parallel_patch(
-            reinterpret_cast<std::uint8_t*>(image + knowledgepatch::scheduler_wait_rva),
-            reinterpret_cast<const void*>(image + knowledgepatch::scheduler_wait_resume_rva),
-            reinterpret_cast<const void*>(image + knowledgepatch::scheduler_wait_top_rva),
+            reinterpret_cast<std::uint8_t*>(image + eu4build::rva(knowledgepatch::scheduler_wait_rva)),
+            reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::scheduler_wait_resume_rva)),
+            reinterpret_cast<const void*>(image + eu4build::rva(knowledgepatch::scheduler_wait_top_rva)),
             scheduler_expected, sizeof(scheduler_expected), scheduler_image, 0,
             scheduler_wait, error, sizeof(error));
     }

@@ -32,6 +32,7 @@
 #include "path_cache.hpp"
 #include "tree_probe.hpp"
 #include "tree_walk.hpp"
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -417,16 +418,25 @@ int hex_value(char symbol) noexcept {
 
 bool signatures_match(std::uintptr_t image, char* error, std::size_t error_size) noexcept {
     for (const auto& signature : signatures) {
-        const auto* code = reinterpret_cast<const std::uint8_t*>(image + signature.rva);
         const auto length = std::strlen(signature.bytes) / 2;
+        std::uint8_t expected[128]{};
+        if (length > sizeof(expected)) {
+            std::snprintf(error, error_size, "signature too long (%s)", signature.what);
+            return false;
+        }
         for (std::size_t i = 0; i < length; ++i) {
             const int high = hex_value(signature.bytes[i * 2]);
             const int low = hex_value(signature.bytes[i * 2 + 1]);
-            if (high < 0 || low < 0 || code[i] != static_cast<std::uint8_t>(high * 16 + low)) {
-                std::snprintf(error, error_size, "bytes differ at rva 0x%llx (%s)",
-                    static_cast<unsigned long long>(signature.rva + i), signature.what);
+            if (high < 0 || low < 0) {
+                std::snprintf(error, error_size, "bad signature (%s)", signature.what);
                 return false;
             }
+            expected[i] = static_cast<std::uint8_t>(high * 16 + low);
+        }
+        if (!eu4build::code_matches(image, signature.rva, expected, length)) {
+            std::snprintf(error, error_size, "bytes differ at rva 0x%llx (%s)",
+                static_cast<unsigned long long>(signature.rva), signature.what);
+            return false;
         }
     }
     return true;
@@ -541,8 +551,8 @@ DWORD install_checked(HMODULE module) {
         }
         log("tree_walk=%s", treewalk::mode_name());
     }
-    original_submit = reinterpret_cast<SubmitFn>(image + submit_function_rva);
-    original_wait = reinterpret_cast<WaitFn>(image + wait_function_rva);
+    original_submit = reinterpret_cast<SubmitFn>(image + eu4build::rva(submit_function_rva));
+    original_wait = reinterpret_cast<WaitFn>(image + eu4build::rva(wait_function_rva));
     LARGE_INTEGER frequency{};
     QueryPerformanceFrequency(&frequency);
     qpc_frequency = frequency.QuadPart > 0 ? frequency.QuadPart : 1;
@@ -550,12 +560,12 @@ DWORD install_checked(HMODULE module) {
     speedpatch::CallPatch submit;
     speedpatch::CallPatch wait;
     bool prepared = speedpatch::prepare_call(
-        reinterpret_cast<std::uint8_t*>(image + submit_call_rva),
+        reinterpret_cast<std::uint8_t*>(image + eu4build::rva(submit_call_rva)),
         reinterpret_cast<const void*>(original_submit),
         reinterpret_cast<const void*>(&submit_hook), submit, error, sizeof(error));
     if (prepared) {
         prepared = speedpatch::prepare_call(
-            reinterpret_cast<std::uint8_t*>(image + wait_call_rva),
+            reinterpret_cast<std::uint8_t*>(image + eu4build::rva(wait_call_rva)),
             reinterpret_cast<const void*>(original_wait),
             reinterpret_cast<const void*>(&wait_hook), wait, error, sizeof(error));
     }
@@ -572,15 +582,15 @@ DWORD install_checked(HMODULE module) {
             sample_heavy = heavy::start(directory + L"\\eu4_ai_serial_heavy_stacks.csv");
             log("heavy task sampler %s", sample_heavy ? "started" : "FAILED to start");
         }
-        auto* slot = reinterpret_cast<void**>(image + task_vtable_slot_rva);
-        if (*slot != reinterpret_cast<void*>(image + task_function_rva)) {
+        auto* slot = reinterpret_cast<void**>(image + eu4build::rva(task_vtable_slot_rva));
+        if (*slot != reinterpret_cast<void*>(image + eu4build::rva(task_function_rva))) {
             log("REFUSED: task vtable slot differs; no bytes changed");
             speedpatch::discard_call(submit);
             speedpatch::discard_call(wait);
             installation_status.store(-8);
             return 8;
         }
-        original_task = reinterpret_cast<TaskFn>(image + task_function_rva);
+        original_task = reinterpret_cast<TaskFn>(image + eu4build::rva(task_function_rva));
         DWORD old_protection = 0;
         if (!VirtualProtect(slot, sizeof(void*), PAGE_READWRITE, &old_protection)) {
             log("REFUSED: cannot make the task vtable slot writable");
@@ -598,8 +608,8 @@ DWORD install_checked(HMODULE module) {
     const UINT monthly_option = GetPrivateProfileIntW(L"ai", L"sample_monthly", 0,
         (directory + L"\\eu4_ai_serial.ini").c_str());
     if (monthly_option != 0) {
-        original_monthly = reinterpret_cast<MonthlyFn>(image + monthly_function_rva);
-        if (speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + monthly_call_rva),
+        original_monthly = reinterpret_cast<MonthlyFn>(image + eu4build::rva(monthly_function_rva));
+        if (speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(monthly_call_rva)),
                 reinterpret_cast<const void*>(original_monthly),
                 reinterpret_cast<const void*>(&monthly_hook), monthly, error, sizeof(error))) {
             sample_monthly = monthly_option == 1 &&

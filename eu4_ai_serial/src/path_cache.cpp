@@ -20,6 +20,7 @@
 #include <cstring>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 
 namespace pathcache {
 namespace {
@@ -200,14 +201,14 @@ speedpatch::CallPatch patches[site_count];
 
 bool install(std::uintptr_t image, Mode selected, char* error, std::size_t error_size) {
     if (selected == Mode::off) return true;
-    original = reinterpret_cast<PathFn>(image + function_rva);
-    push = reinterpret_cast<PushFn>(image + push_rva);
-    vt_base = image + policy_base_vtable_rva;
-    vt_flag = image + policy_flag_vtable_rva;
+    original = reinterpret_cast<PathFn>(image + eu4build::rva(function_rva));
+    push = reinterpret_cast<PushFn>(image + eu4build::rva(push_rva));
+    vt_base = image + eu4build::rva(policy_base_vtable_rva);
+    vt_flag = image + eu4build::rva(policy_flag_vtable_rva);
     mode = selected;
     int prepared = 0;
     for (; prepared < site_count; ++prepared) {
-        if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + site_rvas[prepared]),
+        if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(site_rvas[prepared])),
                 reinterpret_cast<const void*>(original), reinterpret_cast<const void*>(&hook),
                 patches[prepared], error, error_size)) {
             break;

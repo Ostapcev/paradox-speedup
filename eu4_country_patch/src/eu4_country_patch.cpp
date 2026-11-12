@@ -36,6 +36,7 @@
 #include <string>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 
 namespace {
 
@@ -342,8 +343,8 @@ void precompute(void* state) noexcept {
     const auto* s = static_cast<const std::uint8_t*>(state);
     country_array = *reinterpret_cast<void** const*>(s + 0x1d08);
     country_total = *reinterpret_cast<const int*>(s + 0x1d14);
-    const auto* list = *reinterpret_cast<std::uint8_t* const*>(image + estate_list_rva);
-    void* fallback = *reinterpret_cast<void* const*>(image + estate_default_rva);
+    const auto* list = *reinterpret_cast<std::uint8_t* const*>(image + eu4build::rva(estate_list_rva));
+    void* fallback = *reinterpret_cast<void* const*>(image + eu4build::rva(estate_default_rva));
     estate_count = 0;
     strength_gate = false;
     if (!country_array || country_total <= 0) return;
@@ -357,7 +358,7 @@ void precompute(void* state) noexcept {
             estate_count = count;
         }
     }
-    const auto* flags = *reinterpret_cast<const std::uint8_t* const*>(image + game_flags_rva);
+    const auto* flags = *reinterpret_cast<const std::uint8_t* const*>(image + eu4build::rva(game_flags_rva));
     strength_gate = strength_mode != Mode::off && flags && flags[0x7484] != 0;
     reform_gate = reform_mode != Mode::off && flags && flags[0x7484] != 0 && flags[0x7485] == 0;
     if (estate_count == 0 && !strength_gate && !reform_gate) return;
@@ -769,11 +770,11 @@ bool cb_prepare(std::uint8_t* country, std::uint8_t* scope_a, std::uint8_t* stat
     }
     if (cb_candidate_count == 0) return true;
     const std::uint64_t own = u64(country + 0x20);
-    const int special[3] = {*reinterpret_cast<const int*>(image + special_tag_rva[0]),
-        *reinterpret_cast<const int*>(image + special_tag_rva[1]),
-        *reinterpret_cast<const int*>(image + special_tag_rva[2])};
+    const int special[3] = {*reinterpret_cast<const int*>(image + eu4build::rva(special_tag_rva[0])),
+        *reinterpret_cast<const int*>(image + eu4build::rva(special_tag_rva[1])),
+        *reinterpret_cast<const int*>(image + eu4build::rva(special_tag_rva[2]))};
     auto* const* by_id = *reinterpret_cast<std::uint8_t* const* const*>(
-        *reinterpret_cast<std::uint8_t* const*>(image + country_by_id_rva) + 0x118);
+        *reinterpret_cast<std::uint8_t* const*>(image + eu4build::rva(country_by_id_rva)) + 0x118);
     auto* const* list = *reinterpret_cast<std::uint8_t* const* const*>(state + 0x1d08);
     const int count = *reinterpret_cast<const int*>(state + 0x1d14);
     const auto* exclusion = *reinterpret_cast<const int* const*>(country + 0x1548);
@@ -973,7 +974,7 @@ std::atomic<int> pm_logged{0};
 inline std::uint8_t* pm_slot(int i) noexcept { return pm_buffer + static_cast<std::size_t>(i) * pm_slot_size; }
 
 inline bool pm_game_allows() noexcept {
-    const auto* gs = *reinterpret_cast<std::uint8_t* const*>(image + gamestate_rva);
+    const auto* gs = *reinterpret_cast<std::uint8_t* const*>(image + eu4build::rva(gamestate_rva));
     return gs != nullptr && gs[0x7485] == 0 && gs[0x2520] != 0;
 }
 
@@ -1136,7 +1137,7 @@ void pm_calc_hook(void* province_ptr) {
 
 void pm_monthly_hook(void* province_ptr) {
     auto* province = static_cast<std::uint8_t*>(province_ptr);
-    auto* state = *reinterpret_cast<std::uint8_t**>(image + gamestate_rva);
+    auto* state = *reinterpret_cast<std::uint8_t**>(image + eu4build::rva(gamestate_rva));
     const bool on_main = main_thread != 0 && GetCurrentThreadId() == main_thread;
     if (on_main && state != nullptr) {
         const int count = *reinterpret_cast<const int*>(state + 0x1ce4);
@@ -1178,7 +1179,7 @@ std::uint64_t path_check_hook(void* self, void* unit, void* to3, void* from, voi
         ++ps_other;
         return original_path_check(self, unit, to3, from, to, adj, opts);
     }
-    const auto* gs = *reinterpret_cast<std::uint8_t* const*>(image + gamestate_rva);
+    const auto* gs = *reinterpret_cast<std::uint8_t* const*>(image + eu4build::rva(gamestate_rva));
     const int day = gs ? *reinterpret_cast<const int*>(gs + 0x1dd0) : 0;
     if (day != ps_day) {
         std::memset(ps_table, 0, sizeof(std::uint64_t) * ps_table_size);
@@ -1249,7 +1250,7 @@ extern "C" void relpf_hook_c(void* country, std::uint64_t key, const std::uint8_
     std::uint64_t done = 0;
     void* const* it = *reinterpret_cast<void* const* const*>(caller_rsp + 0x60);
     void* const* end = *reinterpret_cast<void* const* const*>(caller_rsp + 0x70);
-    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + relpf_global_rva);
+    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + eu4build::rva(relpf_global_rva));
     if (gs && it && end > it && end - it < (1 << 20)) {
         void* const* cbegin = *reinterpret_cast<void* const* const*>(gs + 0x118);
         const std::int16_t own = static_cast<std::int16_t>(
@@ -1532,7 +1533,7 @@ void merc_update_hook(void* country) {
         return;
     }
     const auto start = qpc_now();
-    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + game_flags_rva);
+    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + eu4build::rva(game_flags_rva));
     if (gs) {
         const int date = *reinterpret_cast<const int*>(gs + 0x1dd0);
         if (date != merc_date) {
@@ -1735,7 +1736,7 @@ void hist_batch(const std::uint8_t* gs) noexcept {
 }
 
 void hist_enter(void* country, int pass) noexcept {
-    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + game_flags_rva);
+    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + eu4build::rva(game_flags_rva));
     if (!gs) return;
     const int date = *reinterpret_cast<const int*>(gs + 0x1dd0);
     if (date != hist_date) {
@@ -1908,7 +1909,7 @@ void maint_strategy_hook(void* ai) {
         original_maint_strategy(ai);
         return;
     }
-    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + game_flags_rva);
+    const auto* gs = *reinterpret_cast<const std::uint8_t* const*>(image + eu4build::rva(game_flags_rva));
     if (gs) {
         const int date = *reinterpret_cast<const int*>(gs + 0x1dd0);
         if (date != maint_date) {
@@ -2173,21 +2174,16 @@ DWORD install_checked(HMODULE module) {
         return 0;
     }
     image = reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
-    if (std::memcmp(reinterpret_cast<void*>(image + phase_site_rva), phase_bytes,
-            sizeof(phase_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + estate_site_rva), estate_bytes,
-            sizeof(estate_bytes)) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + strength_call_rva[0]),
-            strength_site_bytes[0], 5) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + strength_call_rva[1]),
-            strength_site_bytes[1], 5) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + strength_call_rva[2]),
-            strength_site_bytes[2], 5) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + colony_call_rva), colony_bytes, 5) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + colony_begin_rva), colony_begin_bytes, 5) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + colony_phase_rva), colony_phase_bytes, 5) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + reform_call_rva[0]), reform_bytes[0], 5) != 0 ||
-        std::memcmp(reinterpret_cast<void*>(image + reform_call_rva[1]), reform_bytes[1], 5) != 0) {
+    if (!eu4build::code_matches(image, phase_site_rva, phase_bytes, sizeof(phase_bytes)) ||
+        !eu4build::code_matches(image, estate_site_rva, estate_bytes, sizeof(estate_bytes)) ||
+        !eu4build::code_matches(image, strength_call_rva[0], strength_site_bytes[0], 5) ||
+        !eu4build::code_matches(image, strength_call_rva[1], strength_site_bytes[1], 5) ||
+        !eu4build::code_matches(image, strength_call_rva[2], strength_site_bytes[2], 5) ||
+        !eu4build::code_matches(image, colony_call_rva, colony_bytes, 5) ||
+        !eu4build::code_matches(image, colony_begin_rva, colony_begin_bytes, 5) ||
+        !eu4build::code_matches(image, colony_phase_rva, colony_phase_bytes, 5) ||
+        !eu4build::code_matches(image, reform_call_rva[0], reform_bytes[0], 5) ||
+        !eu4build::code_matches(image, reform_call_rva[1], reform_bytes[1], 5)) {
         log("REFUSED: bytes differ; no bytes changed");
         installation_status.store(-4);
         return 4;
@@ -2219,15 +2215,15 @@ DWORD install_checked(HMODULE module) {
         }
     }
 
-    original_phase = reinterpret_cast<PhaseFn>(image + phase_function_rva);
-    original_estate = reinterpret_cast<EstateFn>(image + estate_function_rva);
+    original_phase = reinterpret_cast<PhaseFn>(image + eu4build::rva(phase_function_rva));
+    original_estate = reinterpret_cast<EstateFn>(image + eu4build::rva(estate_function_rva));
     for (int k = 0; k < 3; ++k) {
-        original_strength[k] = reinterpret_cast<StrengthFn>(image + strength_function_rva[k]);
+        original_strength[k] = reinterpret_cast<StrengthFn>(image + eu4build::rva(strength_function_rva[k]));
     }
     char error[160]{};
-    original_colony = reinterpret_cast<ColonyFn>(image + colony_function_rva);
-    original_timer = reinterpret_cast<TimerFn>(image + colony_begin_function_rva);
-    original_province_phase = reinterpret_cast<PhaseFn>(image + colony_phase_function_rva);
+    original_colony = reinterpret_cast<ColonyFn>(image + eu4build::rva(colony_function_rva));
+    original_timer = reinterpret_cast<TimerFn>(image + eu4build::rva(colony_begin_function_rva));
+    original_province_phase = reinterpret_cast<PhaseFn>(image + eu4build::rva(colony_phase_function_rva));
     if (colony_mode != Mode::off) {
         speedpatch::CallPatch patches[3];
         const std::uintptr_t sites[3] = {colony_phase_rva, colony_begin_rva, colony_call_rva};
@@ -2239,7 +2235,7 @@ DWORD install_checked(HMODULE module) {
             reinterpret_cast<const void*>(&colony_hook)};
         bool ok = true;
         for (int k = 0; k < 3 && ok; ++k) {
-            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + sites[k]),
+            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(sites[k])),
                 targets[k], hooks[k], patches[k], error, sizeof(error));
         }
         for (int k = 0; k < 3 && ok; ++k) {
@@ -2251,15 +2247,15 @@ DWORD install_checked(HMODULE module) {
             colony_mode = Mode::off;
         }
     }
-    original_reform[0] = reinterpret_cast<ReformFn>(image + reform_function_rva[0]);
-    original_reform[1] = reinterpret_cast<ReformFn>(image + reform_function_rva[1]);
+    original_reform[0] = reinterpret_cast<ReformFn>(image + eu4build::rva(reform_function_rva[0]));
+    original_reform[1] = reinterpret_cast<ReformFn>(image + eu4build::rva(reform_function_rva[1]));
     if (reform_mode != Mode::off) {
         speedpatch::CallPatch patches[2];
         const void* hooks[2] = {reinterpret_cast<const void*>(&reform_hook<0>),
             reinterpret_cast<const void*>(&reform_hook<1>)};
         bool ok = true;
         for (int k = 0; k < 2 && ok; ++k) {
-            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + reform_call_rva[k]),
+            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(reform_call_rva[k])),
                 reinterpret_cast<const void*>(original_reform[k]), hooks[k], patches[k], error,
                 sizeof(error));
         }
@@ -2275,12 +2271,11 @@ DWORD install_checked(HMODULE module) {
         pmpf_mode = Mode::off;
     }
     if (pmpf_mode != Mode::off) {
-        original_pm_monthly = reinterpret_cast<PmFn>(image + pm_monthly_rva);
+        original_pm_monthly = reinterpret_cast<PmFn>(image + eu4build::rva(pm_monthly_rva));
         speedpatch::CallPatch patch;
-        bool ok = std::memcmp(reinterpret_cast<void*>(image + pm_loop_call_rva - 3), pmpf_site_bytes,
-            sizeof(pmpf_site_bytes)) == 0;
+        bool ok = eu4build::code_matches(image, pm_loop_call_rva - 3, pmpf_site_bytes, sizeof(pmpf_site_bytes));
         if (!ok) std::snprintf(error, sizeof(error), "bytes differ");
-        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + pm_loop_call_rva),
+        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(pm_loop_call_rva)),
             reinterpret_cast<const void*>(original_pm_monthly),
             reinterpret_cast<const void*>(&pmpf_thunk), patch, error, sizeof(error));
         ok = ok && speedpatch::commit_call(patch, error, sizeof(error));
@@ -2291,17 +2286,14 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (relpf_mode != Mode::off) {
-        original_rel = reinterpret_cast<RelFn>(image + relpf_function_rva);
-        bool ok = std::memcmp(reinterpret_cast<void*>(image + relpf_bytes_rva[0]), relpf_bytes0,
-                sizeof(relpf_bytes0)) == 0 &&
-            std::memcmp(reinterpret_cast<void*>(image + relpf_bytes_rva[1]), relpf_bytes1,
-                sizeof(relpf_bytes1)) == 0 &&
-            std::memcmp(reinterpret_cast<void*>(image + relpf_check_rva), relpf_check_bytes,
-                sizeof(relpf_check_bytes)) == 0;
+        original_rel = reinterpret_cast<RelFn>(image + eu4build::rva(relpf_function_rva));
+        bool ok = eu4build::code_matches(image, relpf_bytes_rva[0], relpf_bytes0, sizeof(relpf_bytes0)) &&
+            eu4build::code_matches(image, relpf_bytes_rva[1], relpf_bytes1, sizeof(relpf_bytes1)) &&
+            eu4build::code_matches(image, relpf_check_rva, relpf_check_bytes, sizeof(relpf_check_bytes));
         if (!ok) std::snprintf(error, sizeof(error), "bytes differ");
         speedpatch::CallPatch patches[2];
         for (int k = 0; k < 2 && ok; ++k) {
-            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + relpf_call_rva[k]),
+            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(relpf_call_rva[k])),
                 reinterpret_cast<const void*>(original_rel),
                 reinterpret_cast<const void*>(&relpf_thunk), patches[k], error, sizeof(error));
         }
@@ -2313,18 +2305,17 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (merc_mode != Mode::off) {
-        original_merc_update = reinterpret_cast<MercUpdateFn>(image + merc_update_rva);
-        original_merc_check = reinterpret_cast<MercCheckFn>(image + merc_check_rva);
-        merc_db = reinterpret_cast<MercDbFn>(image + merc_db_rva);
-        bool ok = std::memcmp(reinterpret_cast<void*>(image + merc_update_call_rva - 3), merc_update_site,
-            sizeof(merc_update_site)) == 0;
+        original_merc_update = reinterpret_cast<MercUpdateFn>(image + eu4build::rva(merc_update_rva));
+        original_merc_check = reinterpret_cast<MercCheckFn>(image + eu4build::rva(merc_check_rva));
+        merc_db = reinterpret_cast<MercDbFn>(image + eu4build::rva(merc_db_rva));
+        bool ok = eu4build::code_matches(image, merc_update_call_rva - 3, merc_update_site, sizeof(merc_update_site));
         if (!ok) std::snprintf(error, sizeof(error), "bytes differ");
         speedpatch::CallPatch patches[3];
-        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + merc_update_call_rva),
+        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(merc_update_call_rva)),
             reinterpret_cast<const void*>(original_merc_update),
             reinterpret_cast<const void*>(&merc_update_hook), patches[0], error, sizeof(error));
         for (int k = 0; k < 2 && ok; ++k) {
-            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + merc_check_call_rva[k]),
+            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(merc_check_call_rva[k])),
                 reinterpret_cast<const void*>(original_merc_check),
                 reinterpret_cast<const void*>(&merc_check_hook), patches[k + 1], error, sizeof(error));
         }
@@ -2338,16 +2329,16 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (hist_mode != Mode::off) {
-        original_hist_a = reinterpret_cast<HistAFn>(image + hist_a_rva);
-        original_hist_b = reinterpret_cast<HistBFn>(image + hist_b_rva);
-        original_hist_walk = reinterpret_cast<HistWalkFn>(image + hist_walk_rva);
-        original_hist_find = reinterpret_cast<HistFindFn>(image + hist_find_rva);
-        hist_year = reinterpret_cast<HistYearFn>(image + hist_year_rva);
+        original_hist_a = reinterpret_cast<HistAFn>(image + eu4build::rva(hist_a_rva));
+        original_hist_b = reinterpret_cast<HistBFn>(image + eu4build::rva(hist_b_rva));
+        original_hist_walk = reinterpret_cast<HistWalkFn>(image + eu4build::rva(hist_walk_rva));
+        original_hist_find = reinterpret_cast<HistFindFn>(image + eu4build::rva(hist_find_rva));
+        hist_year = reinterpret_cast<HistYearFn>(image + eu4build::rva(hist_year_rva));
         hist_a_slab = new (std::nothrow) HistA[hist_slab];
         hist_b_slab = new (std::nothrow) HistB[hist_slab];
         bool ok = hist_a_slab && hist_b_slab &&
-            std::memcmp(reinterpret_cast<void*>(image + hist_a_call_rva - 3), hist_site, sizeof(hist_site)) == 0 &&
-            std::memcmp(reinterpret_cast<void*>(image + hist_b_call_rva - 3), hist_site, sizeof(hist_site)) == 0;
+            eu4build::code_matches(image, hist_a_call_rva - 3, hist_site, sizeof(hist_site)) &&
+            eu4build::code_matches(image, hist_b_call_rva - 3, hist_site, sizeof(hist_site));
         if (!ok) std::snprintf(error, sizeof(error), "bytes differ or no memory");
         speedpatch::CallPatch patches[4];
         const std::uintptr_t sites[4] = {hist_walk_call_rva, hist_find_call_rva, hist_a_call_rva, hist_b_call_rva};
@@ -2358,7 +2349,7 @@ DWORD install_checked(HMODULE module) {
             reinterpret_cast<const void*>(&hist_find_hook), reinterpret_cast<const void*>(&hist_a_hook),
             reinterpret_cast<const void*>(&hist_b_hook)};
         for (int k = 0; k < 4 && ok; ++k) {
-            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + sites[k]), targets[k], hooks[k],
+            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(sites[k])), targets[k], hooks[k],
                 patches[k], error, sizeof(error));
         }
         for (int k = 0; k < 4 && ok; ++k) ok = speedpatch::commit_call(patches[k], error, sizeof(error));
@@ -2369,18 +2360,16 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (maint_mode != Mode::off) {
-        original_maint_strategy = reinterpret_cast<MaintStrategyFn>(image + maint_strategy_rva);
-        original_maint_sum = reinterpret_cast<MaintSumFn>(image + maint_sum_rva);
-        bool ok = std::memcmp(reinterpret_cast<void*>(image + maint_strategy_call_rva - 8), maint_strategy_site,
-                      sizeof(maint_strategy_site)) == 0 &&
-            std::memcmp(reinterpret_cast<void*>(image + maint_sum_call_rva - 5), maint_sum_site,
-                sizeof(maint_sum_site)) == 0;
+        original_maint_strategy = reinterpret_cast<MaintStrategyFn>(image + eu4build::rva(maint_strategy_rva));
+        original_maint_sum = reinterpret_cast<MaintSumFn>(image + eu4build::rva(maint_sum_rva));
+        bool ok = eu4build::code_matches(image, maint_strategy_call_rva - 8, maint_strategy_site, sizeof(maint_strategy_site)) &&
+            eu4build::code_matches(image, maint_sum_call_rva - 5, maint_sum_site, sizeof(maint_sum_site));
         if (!ok) std::snprintf(error, sizeof(error), "bytes differ");
         speedpatch::CallPatch patches[2];
-        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + maint_sum_call_rva),
+        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(maint_sum_call_rva)),
             reinterpret_cast<const void*>(original_maint_sum), reinterpret_cast<const void*>(&maint_sum_hook),
             patches[0], error, sizeof(error));
-        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + maint_strategy_call_rva),
+        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(maint_strategy_call_rva)),
             reinterpret_cast<const void*>(original_maint_strategy),
             reinterpret_cast<const void*>(&maint_strategy_hook), patches[1], error, sizeof(error));
         for (int k = 0; k < 2 && ok; ++k) ok = speedpatch::commit_call(patches[k], error, sizeof(error));
@@ -2391,12 +2380,12 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (relguard_on) {
-        original_rel_remove = reinterpret_cast<RelRemoveFn>(image + relguard_target_rva);
+        original_rel_remove = reinterpret_cast<RelRemoveFn>(image + eu4build::rva(relguard_target_rva));
         constexpr int n = static_cast<int>(sizeof(relguard_calls) / sizeof(relguard_calls[0]));
         speedpatch::CallPatch patches[n];
         bool ok = true;
         for (int k = 0; k < n && ok; ++k) {
-            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + relguard_calls[k]),
+            ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(relguard_calls[k])),
                 reinterpret_cast<const void*>(original_rel_remove), reinterpret_cast<const void*>(&relguard_hook),
                 patches[k], error, sizeof(error));
         }
@@ -2408,12 +2397,13 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (ps_on) {
-        original_path_check = reinterpret_cast<PathCheckFn>(image + ps_function_rva);
+        original_path_check = reinterpret_cast<PathCheckFn>(image + eu4build::rva(ps_function_rva));
         ps_table = new (std::nothrow) std::uint64_t[ps_table_size]();
         int patched = 0;
         for (auto rva : ps_slots_rva) {
-            auto* slot = reinterpret_cast<std::uintptr_t*>(image + rva);
-            if (*slot != image + ps_function_rva) continue;
+            if (!eu4build::rva(rva)) continue;
+            auto* slot = reinterpret_cast<std::uintptr_t*>(image + eu4build::rva(rva));
+            if (*slot != image + eu4build::rva(ps_function_rva)) continue;
             DWORD old = 0, ignored = 0;
             if (!VirtualProtect(slot, 8, PAGE_READWRITE, &old)) continue;
             *slot = reinterpret_cast<std::uintptr_t>(&path_check_hook);
@@ -2423,20 +2413,20 @@ DWORD install_checked(HMODULE module) {
         log("pathstat slots patched=%d", patched);
     }
     if (pm_mode != Mode::off) {
-        original_pm_monthly = reinterpret_cast<PmFn>(image + pm_monthly_rva);
-        original_pm_calc = reinterpret_cast<PmFn>(image + pm_calc_rva);
-        pm_ctor = reinterpret_cast<PmCtorFn>(image + pm_ctor_rva);
-        pm_assign = reinterpret_cast<PmAssignFn>(image + pm_assign_rva);
-        pm_dtor = reinterpret_cast<PmFn>(image + pm_dtor_rva);
-        pm_compute = reinterpret_cast<PmFn>(image + pm_compute_rva);
+        original_pm_monthly = reinterpret_cast<PmFn>(image + eu4build::rva(pm_monthly_rva));
+        original_pm_calc = reinterpret_cast<PmFn>(image + eu4build::rva(pm_calc_rva));
+        pm_ctor = reinterpret_cast<PmCtorFn>(image + eu4build::rva(pm_ctor_rva));
+        pm_assign = reinterpret_cast<PmAssignFn>(image + eu4build::rva(pm_assign_rva));
+        pm_dtor = reinterpret_cast<PmFn>(image + eu4build::rva(pm_dtor_rva));
+        pm_compute = reinterpret_cast<PmFn>(image + eu4build::rva(pm_compute_rva));
         speedpatch::CallPatch loop_patch;
         speedpatch::CallPatch calc_patch;
-        bool ok = std::memcmp(reinterpret_cast<void*>(image + pm_loop_call_rva), pm_loop_bytes, 5) == 0 &&
-            std::memcmp(reinterpret_cast<void*>(image + pm_calc_call_rva), pm_calc_bytes, 5) == 0;
-        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + pm_calc_call_rva),
+        bool ok = eu4build::code_matches(image, pm_loop_call_rva, pm_loop_bytes, 5) &&
+            eu4build::code_matches(image, pm_calc_call_rva, pm_calc_bytes, 5);
+        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(pm_calc_call_rva)),
             reinterpret_cast<const void*>(original_pm_calc), reinterpret_cast<const void*>(&pm_calc_hook),
             calc_patch, error, sizeof(error));
-        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + pm_loop_call_rva),
+        ok = ok && speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(pm_loop_call_rva)),
             reinterpret_cast<const void*>(original_pm_monthly), reinterpret_cast<const void*>(&pm_monthly_hook),
             loop_patch, error, sizeof(error));
         ok = ok && speedpatch::commit_call(calc_patch, error, sizeof(error));
@@ -2449,14 +2439,14 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (cb_mode != Mode::off) {
-        original_cb = reinterpret_cast<CbFn>(image + cb_function_rva);
-        cb_db = reinterpret_cast<DbFn>(image + cb_db_rva);
-        trigger_and = reinterpret_cast<TriggerFn>(image + trigger_and_rva);
-        vector_push = reinterpret_cast<PushFn>(image + vector_push_rva);
-        scope_dtor = reinterpret_cast<ScopeDtorFn>(image + scope_dtor_rva);
+        original_cb = reinterpret_cast<CbFn>(image + eu4build::rva(cb_function_rva));
+        cb_db = reinterpret_cast<DbFn>(image + eu4build::rva(cb_db_rva));
+        trigger_and = reinterpret_cast<TriggerFn>(image + eu4build::rva(trigger_and_rva));
+        vector_push = reinterpret_cast<PushFn>(image + eu4build::rva(vector_push_rva));
+        scope_dtor = reinterpret_cast<ScopeDtorFn>(image + eu4build::rva(scope_dtor_rva));
         speedpatch::CallPatch patch;
-        if (std::memcmp(reinterpret_cast<void*>(image + cb_call_rva), cb_bytes, 5) != 0 ||
-            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + cb_call_rva),
+        if (!eu4build::code_matches(image, cb_call_rva, cb_bytes, 5) ||
+            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(cb_call_rva)),
                 reinterpret_cast<const void*>(original_cb), reinterpret_cast<const void*>(&cb_hook),
                 patch, error, sizeof(error)) ||
             !speedpatch::commit_call(patch, error, sizeof(error))) {
@@ -2472,7 +2462,7 @@ DWORD install_checked(HMODULE module) {
         bool ok = true;
         for (int k = 0; k < strength_kinds && ok; ++k) {
             ok = speedpatch::prepare_call(
-                reinterpret_cast<std::uint8_t*>(image + strength_call_rva[k]),
+                reinterpret_cast<std::uint8_t*>(image + eu4build::rva(strength_call_rva[k])),
                 reinterpret_cast<const void*>(original_strength[k]), hooks[k], patches[k],
                 error, sizeof(error));
         }
@@ -2488,10 +2478,10 @@ DWORD install_checked(HMODULE module) {
     speedpatch::CallPatch phase;
     speedpatch::CallPatch estate;
     if ((mode != Mode::off &&
-            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + estate_call_rva),
+            !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(estate_call_rva)),
                 reinterpret_cast<const void*>(original_estate),
                 reinterpret_cast<const void*>(&estate_hook), estate, error, sizeof(error))) ||
-        !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + phase_call_rva),
+        !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(phase_call_rva)),
             reinterpret_cast<const void*>(original_phase),
             reinterpret_cast<const void*>(&phase_hook), phase, error, sizeof(error)) ||
         (mode != Mode::off && !speedpatch::commit_call(estate, error, sizeof(error))) ||

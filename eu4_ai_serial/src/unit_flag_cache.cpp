@@ -14,6 +14,7 @@
 #include <cstring>
 
 #include "call_patch.hpp"
+#include "eu4_build.hpp"
 
 namespace flagcache {
 namespace {
@@ -97,21 +98,20 @@ std::uint8_t call(void* unit, std::uint32_t id, char flag, std::int64_t extra) {
 }
 
 bool install(std::uintptr_t image, Mode selected, char* error, std::size_t error_size, bool patch_site) {
-    original = reinterpret_cast<FlagFn>(image + function_rva);
+    original = reinterpret_cast<FlagFn>(image + eu4build::rva(function_rva));
     if (!patch_site) {
         mode = selected;
         return true;
     }
     if (selected == Mode::off) return true;
-    if (std::memcmp(reinterpret_cast<const void*>(image + expected_rva), expected,
-            sizeof(expected)) != 0) {
+    if (!eu4build::code_matches(image, expected_rva, expected, sizeof(expected))) {
         std::snprintf(error, error_size, "unit flag call site bytes differ (rva 0x%llx)",
             static_cast<unsigned long long>(expected_rva));
         return false;
     }
     mode = selected;
-    original = reinterpret_cast<FlagFn>(image + function_rva);
-    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + call_rva),
+    original = reinterpret_cast<FlagFn>(image + eu4build::rva(function_rva));
+    if (!speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(call_rva)),
             reinterpret_cast<const void*>(original), reinterpret_cast<const void*>(&hook),
             patch, error, error_size)) {
         return false;

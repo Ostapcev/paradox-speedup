@@ -79,6 +79,18 @@ inline const Entry* find(std::uintptr_t steam_rva) noexcept {
     return nullptr;
 }
 
+// RVA in the build of the image at `image` (for code that may run on a mapped file).
+inline std::uintptr_t rva_at(std::uintptr_t image, std::uintptr_t steam_rva) noexcept {
+    switch (detect_at(image)) {
+        case Build::steam: return steam_rva;
+        case Build::gog: {
+            const Entry* e = find(steam_rva);
+            return e ? e->gog + (steam_rva - e->steam) : 0;
+        }
+        default: return 0;
+    }
+}
+
 inline std::uintptr_t rva(std::uintptr_t steam_rva) noexcept {
     switch (detect()) {
         case Build::steam: return steam_rva;

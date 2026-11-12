@@ -21,6 +21,7 @@
 
 #include "call_patch.hpp"
 #include "unit_flag_cache.hpp"
+#include "eu4_build.hpp"
 
 namespace searchmemo {
 namespace {
@@ -237,30 +238,27 @@ speedpatch::CallPatch fort_patches[2];
 
 bool install(std::uintptr_t image, Mode selected, char* error, std::size_t error_size) {
     if (selected == Mode::off) return true;
-    if (std::memcmp(reinterpret_cast<const void*>(image + flag_call_rva - 8), flag_context,
-            sizeof(flag_context)) != 0 ||
-        std::memcmp(reinterpret_cast<const void*>(image + speed_call_rva - 8), speed_context,
-            sizeof(speed_context)) != 0 ||
-        std::memcmp(reinterpret_cast<const void*>(image + speed_call_rva + 5), speed_after,
-            sizeof(speed_after)) != 0) {
+    if (!eu4build::code_matches(image, flag_call_rva - 8, flag_context, sizeof(flag_context)) ||
+        !eu4build::code_matches(image, speed_call_rva - 8, speed_context, sizeof(speed_context)) ||
+        !eu4build::code_matches(image, speed_call_rva + 5, speed_after, sizeof(speed_after))) {
         std::snprintf(error, error_size, "search memo call site bytes differ");
         return false;
     }
     mode = selected;
-    flag_game = reinterpret_cast<FlagFn>(image + flag_rva);
-    speed_game = reinterpret_cast<SpeedFn>(image + speed_rva);
+    flag_game = reinterpret_cast<FlagFn>(image + eu4build::rva(flag_rva));
+    speed_game = reinterpret_cast<SpeedFn>(image + eu4build::rva(speed_rva));
     void* trampolines[3]{};
     bool ok =
-        speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + search_rva), prologue_r9,
+        speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(search_rva)), prologue_r9,
             reinterpret_cast<const void*>(&search_hook), patches[0], &trampolines[0], error, error_size) &&
-        speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + path_rva), prologue_r9,
+        speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(path_rva)), prologue_r9,
             reinterpret_cast<const void*>(&path_hook), patches[1], &trampolines[1], error, error_size) &&
-        speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + moves_rva), prologue_r9b,
+        speedpatch::prepare_entry(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(moves_rva)), prologue_r9b,
             reinterpret_cast<const void*>(&moves_hook), patches[2], &trampolines[2], error, error_size) &&
-        speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + flag_call_rva),
+        speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(flag_call_rva)),
             reinterpret_cast<const void*>(flag_game), reinterpret_cast<const void*>(&flag_hook),
             patches[3], error, error_size) &&
-        speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + speed_call_rva),
+        speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(speed_call_rva)),
             reinterpret_cast<const void*>(speed_game), reinterpret_cast<const void*>(&speed_hook),
             patches[4], error, error_size);
     if (ok) {
@@ -280,11 +278,11 @@ bool install(std::uintptr_t image, Mode selected, char* error, std::size_t error
         return false;
     }
     // the fort memo is optional: a refusal leaves the rest installed
-    fort_game = reinterpret_cast<FortFn>(image + fort_rva);
-    if (std::memcmp(reinterpret_cast<const void*>(image + fort_rva), fort_prologue, sizeof(fort_prologue)) == 0) {
+    fort_game = reinterpret_cast<FortFn>(image + eu4build::rva(fort_rva));
+    if (eu4build::code_matches(image, fort_rva, fort_prologue, sizeof(fort_prologue))) {
         bool fort_ok = true;
         for (int i = 0; i < 2 && fort_ok; ++i) {
-            fort_ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + fort_call_rvas[i]),
+            fort_ok = speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(fort_call_rvas[i])),
                 reinterpret_cast<const void*>(fort_game), reinterpret_cast<const void*>(&fort_hook),
                 fort_patches[i], error, error_size);
         }

@@ -7,6 +7,7 @@
 #include <array>
 #include <cstring>
 #include <vector>
+#include "eu4_build.hpp"
 
 namespace knowledgepatch {
 namespace {
@@ -15,7 +16,7 @@ template <std::size_t N>
 bool expect(std::uintptr_t image, std::uintptr_t rva,
     const std::array<std::uint8_t, N>& expected, ProfileResult& result,
     const char* error) noexcept {
-    if (std::memcmp(reinterpret_cast<const void*>(image + rva), expected.data(), N) != 0) {
+    if (!eu4build::code_matches(image, rva, expected.data(), N)) {
         result.error = error;
         return false;
     }
@@ -25,14 +26,14 @@ bool expect(std::uintptr_t image, std::uintptr_t rva,
 
 bool expect_call(std::uintptr_t image, std::uintptr_t site_rva,
     std::uintptr_t target_rva, ProfileResult& result, const char* error) noexcept {
-    const auto* site = reinterpret_cast<const std::uint8_t*>(image + site_rva);
+    const auto* site = reinterpret_cast<const std::uint8_t*>(image + eu4build::rva_at(image, site_rva));
     if (site[0] != 0xE8) {
         result.error = error;
         return false;
     }
     std::int32_t displacement = 0;
     std::memcpy(&displacement, site + 1, sizeof(displacement));
-    if (image + site_rva + 5 + displacement != image + target_rva) {
+    if (image + eu4build::rva_at(image, site_rva + 5) + displacement != image + eu4build::rva_at(image, target_rva)) {
         result.error = error;
         return false;
     }
@@ -59,7 +60,8 @@ ProfileResult check_eu4_image(std::uintptr_t image) noexcept {
     const auto* optional = reinterpret_cast<const IMAGE_OPTIONAL_HEADER64*>(image + nt + 24);
     if (*signature != IMAGE_NT_SIGNATURE || file->Machine != IMAGE_FILE_MACHINE_AMD64 ||
         (file->Characteristics & IMAGE_FILE_DLL) || file->SizeOfOptionalHeader < sizeof(*optional) ||
-        optional->Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC || optional->SizeOfImage != 0x25E0000) {
+        optional->Magic != IMAGE_NT_OPTIONAL_HDR64_MAGIC ||
+        eu4build::detect_at(image) == eu4build::Build::unknown) {
         result.error = "not the expected Windows x64 EU4 image layout";
         return result;
     }
@@ -70,7 +72,7 @@ ProfileResult check_eu4_image(std::uintptr_t image) noexcept {
     bool text_found = false;
     for (unsigned index = 0; index < file->NumberOfSections; ++index) {
         const auto& section = sections[index];
-        if (section.VirtualAddress == 0x1000 && section.Misc.VirtualSize >= 0x1B64D78 &&
+        if (section.VirtualAddress == 0x1000 && section.Misc.VirtualSize >= 0x1B4DEB8 &&
             (section.Characteristics & IMAGE_SCN_MEM_EXECUTE) &&
             (section.Characteristics & IMAGE_SCN_MEM_READ)) {
             text_found = true;

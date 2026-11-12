@@ -52,8 +52,25 @@ def convert(path, bases):
         neg = '!' if op == '!=' else ''
         return '%seu4build::code_matches(%s, %s, %s, sizeof(%s))' % (neg, base, tok, arr, arr)
     s = re.sub(r'std::memcmp\(\s*reinterpret_cast<(?:const )?(?:void|std::uint8_t|unsigned char)\s*\*>\((%s) \+ eu4build::rva\(([^()]+)\)\),\s*(\w+),\s*sizeof\(\3\)\)\s*(!=|==)\s*0' % b, repl, s)
+    # general form: memcmp(cast(BASE + eu4build::rva(X) [+-] N), ARR, LEN) [!= 0 | == 0 | truthy]
+    def repl2(m):
+        base, tok, adj, arr, ln, op = m.groups()
+        tok = tok.strip()
+        name = re.sub(r'\[\w+\]$', '', tok)
+        if not (is_code(tok) or (tok != name and name.endswith(('rva', 'rvas', 'RVA')))):
+            return m.group(0)
+        where = tok
+        if adj:
+            a = adj.replace(' ', '')
+            where += ' %s %s' % (a[0], a[1:])
+        neg = '' if op and '==' in op else '!'
+        return '%seu4build::code_matches(%s, %s, %s, %s)' % (neg, base, where, arr.strip(), ln.strip())
+    s = re.sub(r'std::memcmp\(\s*reinterpret_cast<(?:const )?(?:void|std::uint8_t|unsigned char)\s*\*>'
+               r'\((%s) \+ eu4build::rva\(([\w]+(?:\[\w+\])?)\)(\s*[+-]\s*(?:0x[0-9a-fA-F]+|\d+))?\),'
+               r'\s*([\w\[\]]+),\s*(sizeof\([\w\[\]]+\)|\w+)\)(\s*(?:!=|==)\s*0)?' % b, repl2, s)
     if s != orig and 'eu4_build.hpp' not in s:
-        incs = list(re.finditer(r'#include [<"][^>"]+[>"]\n', s))
+        # after the includes at the top of the file (a later #include "x.inc" is code)
+        incs = [m for m in re.finditer(r'#include [<"][^>"]+[>"]\n', s) if '.inc"' not in m.group(0)]
         pos = incs[-1].end() if incs else 0
         s = s[:pos] + '#include "eu4_build.hpp"\n' + s[pos:]
     open(path, 'w', encoding='utf-8', newline='').write(s)
