@@ -1,12 +1,14 @@
 // EU4 Menu Patch: Back on the country selection screen and Exit to Menu in a campaign return
-// to the main menu instead of restarting the game. EU4 1.37.5 Steam x64 only.
+// to the main menu instead of restarting the game. EU4 1.37.5 x64, Steam and GOG.
 //
 // A port of Hamweard (https://github.com/happy-dwarf-team/hamweard, MIT, (c) 2026 Happy Dwarf
 // Team), itself a port of EU4 Menu Patch 0.1.4 (https://github.com/YozoraTempest/EU4-Menu-Patch,
 // MIT, (c) 2026 VulonLok); see LICENSE.hamweard.txt. The clean-up sequence, the deferred world
 // reset, the canal snapshot and every address are theirs. What differs: Anvil's replace_block,
 // mid_hook, hook and swap_pointer are replaced by hand-written stubs below (5-byte jumps to code
-// within 2 GB of the image), the log is printf-style, and only the Steam build is supported.
+// within 2 GB of the image), the log is printf-style. The GOG addresses come through eu4build
+// (eu4_port) and agree with Hamweard's own GOG port (symbols.toml, GOG 1.37.5.0); the GOG
+// layout of CInGameIdler and CFrontEnd is Hamweard's Layout. The GOG build has no Steam lobby.
 // Everything the hooks do runs on the game's main thread.
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
@@ -127,16 +129,38 @@ bool rel32_reachable(std::uintptr_t from_end, std::uintptr_t to) {
     return delta >= INT32_MIN && delta <= INT32_MAX;
 }
 
-bool expect(std::uintptr_t rva, std::initializer_list<std::uint8_t> bytes, const char* what) {
-    if (std::memcmp(reinterpret_cast<const void*>(image + rva), bytes.begin(), bytes.size()) == 0) return true;
-    log("REFUSED: bytes differ at 0x%llx (%s)", static_cast<unsigned long long>(rva), what);
+bool is_gog() noexcept { return eu4build::detect() == eu4build::Build::gog; }
+
+// RVA in the running build of a Steam 1.37.5 RVA (0 if unknown). The sources keep Steam RVAs.
+std::uintptr_t gr(std::uintptr_t steam) noexcept {
+    // where the Exit to Menu branch resumes: its first instruction reads CInGameIdler's
+    // application pointer, a field GOG keeps 8 bytes lower, so the table has no window for it
+    if (steam == 0x8165F2 && is_gog()) return 0x815952;
+    return eu4build::rva(steam);
+}
+
+std::uintptr_t ga(std::uintptr_t steam) noexcept { return image + gr(steam); }
+
+// Steam bytes; on GOG the same code as verified offline (eu4build), or the GOG bytes given.
+bool expect(std::uintptr_t rva, std::initializer_list<std::uint8_t> bytes, const char* what,
+    std::initializer_list<std::uint8_t> gog = {}) {
+    bool same = false;
+    if (!gr(rva)) {
+        same = false;
+    } else if (is_gog() && gog.size()) {
+        same = std::memcmp(reinterpret_cast<const void*>(ga(rva)), gog.begin(), gog.size()) == 0;
+    } else {
+        same = eu4build::code_matches(image, rva, bytes.begin(), bytes.size());
+    }
+    if (same) return true;
+    log("REFUSED: bytes differ at 0x%llx (%s)", static_cast<unsigned long long>(gr(rva)), what);
     return false;
 }
 
 bool expect_pointer(std::uintptr_t rva, std::uintptr_t points_to, const char* what) {
-    if (*reinterpret_cast<const std::uintptr_t*>(image + rva) == image + points_to) return true;
-    log("REFUSED: 0x%llx does not point to 0x%llx (%s)", static_cast<unsigned long long>(rva),
-        static_cast<unsigned long long>(points_to), what);
+    if (gr(rva) && gr(points_to) && *reinterpret_cast<const std::uintptr_t*>(ga(rva)) == ga(points_to)) return true;
+    log("REFUSED: 0x%llx does not point to 0x%llx (%s)", static_cast<unsigned long long>(gr(rva)),
+        static_cast<unsigned long long>(gr(points_to)), what);
     return false;
 }
 
@@ -228,26 +252,29 @@ Bytes make_trampoline(std::uintptr_t at, std::size_t length, int disp_at = -1) {
 // Replaces the block at rva (length bytes) with handler; execution goes on at resume_rva
 // unless the handler sets cpu.rip.
 bool replace_block(std::uintptr_t rva, std::size_t length, std::uintptr_t resume_rva, CpuHandler handler) {
-    Bytes stub = make_cpu_stub(handler, image + resume_rva);
-    return stub && queue_jump(image + rva, length, stub);
+    if (!gr(rva) || !gr(resume_rva)) return false;
+    Bytes stub = make_cpu_stub(handler, ga(resume_rva));
+    return stub && queue_jump(ga(rva), length, stub);
 }
 
 // Runs handler at rva, then the displaced instructions and the rest of the function.
 bool mid_hook(std::uintptr_t rva, std::size_t length, CpuHandler handler) {
-    Bytes trampoline = make_trampoline(image + rva, length);
+    if (!gr(rva)) return false;
+    Bytes trampoline = make_trampoline(ga(rva), length);
     if (!trampoline) return false;
     Bytes stub = make_cpu_stub(handler, reinterpret_cast<std::uintptr_t>(trampoline));
-    return stub && queue_jump(image + rva, length, stub);
+    return stub && queue_jump(ga(rva), length, stub);
 }
 
 // Entry hook: the function jumps to hook; *original is the trampoline.
 template <class F> bool hook_entry(std::uintptr_t rva, std::size_t length, F* hook, F*& original, int disp_at = -1) {
-    Bytes trampoline = make_trampoline(image + rva, length, disp_at);
+    if (!gr(rva)) return false;
+    Bytes trampoline = make_trampoline(ga(rva), length, disp_at);
     Code relay{allocate_near(16)};
     if (!trampoline || !relay.base) return false;
     relay.jmp_abs(reinterpret_cast<std::uintptr_t>(hook));
     original = reinterpret_cast<F*>(trampoline);
-    return queue_jump(image + rva, length, relay.base);
+    return queue_jump(ga(rva), length, relay.base);
 }
 
 bool write_all() {
@@ -262,11 +289,12 @@ bool write_all() {
     return true;
 }
 
-template <class F> bool swap_slot(std::uintptr_t rva, std::uintptr_t points_to, F* replacement, F*& previous) {
-    auto* slot = reinterpret_cast<void* volatile*>(image + rva);
+// slot: Steam RVA; expected: the pointer the slot must hold now (an address in this process).
+template <class F> bool swap_slot(std::uintptr_t rva, void* expected, F* replacement, F*& previous) {
+    if (!gr(rva)) return false;
+    auto* slot = reinterpret_cast<void* volatile*>(ga(rva));
     DWORD old = 0;
     if (!VirtualProtect(const_cast<void**>(slot), 8, PAGE_READWRITE, &old)) return false;
-    void* expected = reinterpret_cast<void*>(image + points_to);
     previous = reinterpret_cast<F*>(expected);
     const bool ok = InterlockedCompareExchangePointer(slot, reinterpret_cast<void*>(replacement), expected) == expected;
     DWORD ignored = 0;
@@ -274,7 +302,7 @@ template <class F> bool swap_slot(std::uintptr_t rva, std::uintptr_t points_to, 
     return ok;
 }
 
-// ---------------------------------------------------------------- game layout (1.37.5 Steam)
+// ---------------------------------------------------------------- game layout (1.37.5; Steam RVAs)
 namespace off {
 constexpr std::ptrdiff_t app_current_idler = 0x40;
 constexpr std::ptrdiff_t app_next_idler = 0x70;
@@ -319,13 +347,21 @@ constexpr std::ptrdiff_t session_is_dummy = 0x55;
 constexpr std::ptrdiff_t achievements_loaded_begin = 0x88;
 constexpr std::ptrdiff_t achievements_loaded_end = 0x90;
 // CInGameIdler / CFrontEnd (Steam values of Hamweard's Layout)
-constexpr std::ptrdiff_t idler_app = 0x330;
-constexpr std::ptrdiff_t idler_minimap = 0x10E0;
-constexpr std::ptrdiff_t idler_exit_flag = 0x12E9;
-constexpr std::ptrdiff_t idler_notifications = 0x1400;
-constexpr std::ptrdiff_t menu_pending = 0x900;
-constexpr std::size_t main_menu_size = 0xB48;
 }  // namespace off
+
+// The offsets that differ on GOG (Hamweard's Layout, from the GOG eu4.pdb): CInGameIdler's
+// fields from its CEU4Application pointer on, and CFrontEnd's view state and size.
+struct Layout {
+    std::ptrdiff_t idler_app;
+    std::ptrdiff_t idler_minimap;
+    std::ptrdiff_t idler_exit_flag;
+    std::ptrdiff_t idler_notifications;
+    std::ptrdiff_t menu_pending;  // CFrontEnd's view state
+    std::size_t main_menu_size;
+};
+constexpr Layout kSteam{0x330, 0x10E0, 0x12E9, 0x1400, 0x900, 0xB48};
+constexpr Layout kGog{0x328, 0x10D0, 0x12D9, 0x13F0, 0x8F0, 0xB38};
+Layout lay = kSteam;
 
 namespace rva {
 constexpr std::uintptr_t in_game_menu_block = 0x815CAE, in_game_idle_epilogue = 0x8165F2;
@@ -354,7 +390,7 @@ constexpr std::uintptr_t trigger_db_validate = 0xB89690, map_randomize = 0x890D0
 constexpr std::uintptr_t custom_countries_clear = 0x468430, custom_nation_used = 0x233D911;
 }  // namespace rva
 
-template <class F> F* fn(std::uintptr_t r) { return reinterpret_cast<F*>(image + r); }
+template <class F> F* fn(std::uintptr_t r) { return reinterpret_cast<F*>(ga(r)); }
 
 using TickFn = void(void* idler, bool update);
 using RestoreFn = void(void* idler);
@@ -461,7 +497,7 @@ void finish_return(void* idler) {
     if (idler != g_pending_menu_idler || !g_pending_menu_app) return;
     Bytes app = g_pending_menu_app;
     if (at<void*>(app, off::app_current_idler) != idler || at<void*>(app, off::app_next_idler) != nullptr ||
-        at<std::uint32_t>(idler, off::menu_pending) != 0 || !at<std::uint8_t>(app, off::app_checksum_ready))
+        at<std::uint32_t>(idler, lay.menu_pending) != 0 || !at<std::uint8_t>(app, off::app_checksum_ready))
         return;
     Bytes w = world();
     if (!w) return;
@@ -502,7 +538,7 @@ void construct_menu(Bytes app, std::uint32_t reason) {
         fn<void(void*, const void*)>(rva::set_save_metadata)(app, record.valid ? &record.strings[3] : &empty);
         log("Continue game refreshed (record valid: %d)", record.valid ? 1 : 0);
     }
-    void* memory = fn<void*(std::uint64_t)>(rva::game_alloc)(off::main_menu_size);
+    void* memory = fn<void*(std::uint64_t)>(rva::game_alloc)(lay.main_menu_size);
     void* menu = fn<void*(void*, void*, void*, void*)>(rva::main_menu_construct)(memory,
         at<void*>(app, off::app_menu_arg_1), at<void*>(app, off::app_menu_arg_2), app);
     fn<void(void*, void**, bool)>(rva::set_next_idler)(app, &menu, false);
@@ -516,7 +552,7 @@ void construct_menu(Bytes app, std::uint32_t reason) {
 }
 
 void release_minimap(Bytes idler) {
-    auto& slot = at<void*>(idler, off::idler_minimap);
+    auto& slot = at<void*>(idler, lay.idler_minimap);
     void* controller = slot;
     if (!controller) return;
     if (at<void*>(controller, 0) != g_minimap_vtable) {
@@ -665,17 +701,17 @@ const char* restart_reason() {
 }
 
 void return_to_menu(Bytes idler) {
-    Bytes app = at<Bytes>(idler, off::idler_app);
+    Bytes app = at<Bytes>(idler, lay.idler_app);
     const std::uint32_t reason = potential_corruption();
     log("Exit to Menu: idler %p, world %p, potential corruption %u", static_cast<void*>(idler),
         static_cast<void*>(world()), reason);
     g_recording_windows = false;
-    at<std::uint8_t>(idler, off::idler_exit_flag) = 0;
+    at<std::uint8_t>(idler, lay.idler_exit_flag) = 0;
     BusyScope busy;
     fn<void(void*)>(rva::in_game_exit)(idler);
     leave_steam_session(app);
     fn<void()>(rva::campaign_exit_cleanup)();
-    if (void* notices = at<void*>(idler, off::idler_notifications)) fn<void(void*)>(rva::notifications_destroy)(notices);
+    if (void* notices = at<void*>(idler, lay.idler_notifications)) fn<void(void*)>(rva::notifications_destroy)(notices);
     release_minimap(idler);
     construct_menu(app, reason);
 }
@@ -780,21 +816,24 @@ bool check_all() {
     bool ok = true;
     ok &= expect(rva::in_game_menu_block, {0x48, 0x8D, 0x8D, 0x40, 0x02, 0x00, 0x00}, "in_game_menu_block");
     ok &= expect(rva::in_game_idle_epilogue, {0x49, 0x8B, 0x85, 0x30, 0x03, 0x00, 0x00, 0x48, 0x8B, 0x88, 0x70, 0x03,
-        0x00, 0x00, 0x0F, 0xB6, 0x85, 0x48, 0x02, 0x00, 0x00}, "in_game_idle_epilogue");
+        0x00, 0x00, 0x0F, 0xB6, 0x85, 0x48, 0x02, 0x00, 0x00}, "in_game_idle_epilogue",
+        {0x49, 0x8B, 0x85, 0x28, 0x03, 0x00, 0x00, 0x48, 0x8B, 0x88, 0x70, 0x03, 0x00, 0x00, 0x0F, 0xB6, 0x85, 0x48,
+            0x02, 0x00, 0x00});
     ok &= expect(rva::pregame_menu_block, {0x66, 0xC7, 0x83, 0x83, 0x00, 0x00, 0x00, 0x01, 0x01}, "pregame_menu_block");
     ok &= expect(rva::pregame_menu_continuation, {0x48, 0x8B, 0x5D, 0xB0, 0x48, 0x85, 0xDB, 0x74, 0x5C},
         "pregame_menu_continuation");
     ok &= expect_pointer(rva::frontend_tick_slot, rva::frontend_tick, "frontend_tick_slot");
     ok &= expect_pointer(rva::frontend_restore_slot, rva::frontend_restore, "frontend_restore_slot");
-    ok &= expect_pointer(rva::steam_lobby_vtable, rva::steam_lobby_slot0, "steam_lobby_vtable");
+    const bool steam_lobby = !is_gog();  // the GOG build has no Steam lobby
+    if (steam_lobby) ok &= expect_pointer(rva::steam_lobby_vtable, rva::steam_lobby_slot0, "steam_lobby_vtable");
     ok &= expect_pointer(rva::minimap_vtable, rva::minimap_slot0, "minimap_vtable");
     const std::initializer_list<std::uint8_t> small = {0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x8B, 0xD9};
     ok &= expect(rva::busy_enter, small, "busy_enter");
     ok &= expect(rva::busy_leave, small, "busy_leave");
-    ok &= expect(rva::lobby_close, {0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0x80, 0xB9, 0x99, 0x02, 0x00, 0x00, 0x00}, "lobby_close");
-    ok &= expect(rva::lobby_disconnect, {0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x8B, 0xD9, 0x8B, 0x89, 0xC4, 0x01,
+    if (steam_lobby) ok &= expect(rva::lobby_close, {0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0x80, 0xB9, 0x99, 0x02, 0x00, 0x00, 0x00}, "lobby_close");
+    if (steam_lobby) ok &= expect(rva::lobby_disconnect, {0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x8B, 0xD9, 0x8B, 0x89, 0xC4, 0x01,
         0x00, 0x00}, "lobby_disconnect");
-    ok &= expect(rva::lobby_initialize, small, "lobby_initialize");
+    if (steam_lobby) ok &= expect(rva::lobby_initialize, small, "lobby_initialize");
     ok &= expect(rva::in_game_exit, {0x40, 0x53, 0x48, 0x83, 0xEC, 0x30, 0x48, 0x8B, 0xD9}, "in_game_exit");
     ok &= expect(rva::campaign_exit_cleanup, {0x48, 0x89, 0x5C, 0x24, 0x08, 0x48, 0x89, 0x74, 0x24, 0x10, 0x48, 0x89,
         0x7C, 0x24, 0x18, 0x55, 0x48, 0x8B, 0xEC}, "campaign_exit_cleanup");
@@ -810,8 +849,8 @@ bool check_all() {
     {
         // operator new is only called, never patched here; eu4_alloc_patch (direct=1) may have
         // replaced its entry with "mov rax, hook; jmp rax", which is still a valid operator new
-        const auto* entry = reinterpret_cast<const std::uint8_t*>(image + rva::game_alloc);
-        const bool alloc_hook = entry[0] == 0x48 && entry[1] == 0xB8 && entry[10] == 0xFF &&
+        const auto* entry = reinterpret_cast<const std::uint8_t*>(ga(rva::game_alloc));
+        const bool alloc_hook = gr(rva::game_alloc) && entry[0] == 0x48 && entry[1] == 0xB8 && entry[10] == 0xFF &&
             entry[11] == 0xE0;
         if (!alloc_hook) ok &= expect(rva::game_alloc, small, "game_alloc");
     }
@@ -827,22 +866,26 @@ bool check_all() {
     ok &= expect(rva::history_execute, {0x48, 0x89, 0x5C, 0x24, 0x20, 0x4C, 0x89, 0x44, 0x24, 0x18, 0x48, 0x89, 0x54,
         0x24, 0x10, 0x55}, "history_execute");
     ok &= expect(rva::multiplayer_click, {0x48, 0x83, 0xEC, 0x28, 0x80, 0x3D, 0x81, 0xF9, 0x24, 0x01, 0x00, 0x75, 0x5E},
-        "multiplayer_click");
+        "multiplayer_click", {0x48, 0x83, 0xEC, 0x28, 0x80, 0x3D, 0x86, 0x58, 0x23, 0x01, 0x00, 0x75, 0x5E});
     ok &= expect(rva::multiplayer_availability, {0x48, 0x89, 0x5C, 0x24, 0x10, 0x57, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x8B,
-        0x41, 0x08, 0x48, 0x8B, 0x88, 0x30, 0x03, 0x00, 0x00}, "multiplayer_availability");
+        0x41, 0x08, 0x48, 0x8B, 0x88, 0x30, 0x03, 0x00, 0x00}, "multiplayer_availability",
+        {0x48, 0x89, 0x5C, 0x24, 0x10, 0x57, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x8B, 0x41, 0x08, 0x48, 0x8B, 0x88, 0x28, 0x03,
+            0x00, 0x00});
     ok &= expect(rva::canal_logic_apply, {0x4C, 0x8B, 0xDC, 0x55, 0x48, 0x8B, 0xEC, 0x48, 0x81, 0xEC, 0x80, 0x00, 0x00,
         0x00}, "canal_logic_apply");
     ok &= expect(rva::province_graphics_clear, {0x48, 0x89, 0x5C, 0x24, 0x08, 0x48, 0x89, 0x6C, 0x24, 0x10, 0x48, 0x89,
         0x74, 0x24, 0x18, 0x57}, "province_graphics_clear");
     ok &= expect(rva::achievements_instance, {0x48, 0x83, 0xEC, 0x28, 0x48, 0x8B, 0x05, 0x05, 0x78, 0x2A, 0x02, 0x48,
-        0x85, 0xC0}, "achievements_instance");
+        0x85, 0xC0}, "achievements_instance", {0x48, 0x83, 0xEC, 0x28, 0x48, 0x8B, 0x05, 0x55, 0xB6, 0x28, 0x02, 0x48,
+        0x85, 0xC0});
     ok &= expect(rva::in_game_gui_init, big, "in_game_gui_init");
     ok &= expect(rva::in_game_idler_construct, {0x48, 0x8B, 0xC4, 0x48, 0x89, 0x58, 0x18, 0x48, 0x89, 0x50, 0x10, 0x48,
         0x89, 0x48, 0x08, 0x55, 0x56, 0x57, 0x41, 0x54, 0x41, 0x55, 0x41, 0x56}, "in_game_idler_construct");
     ok &= expect(rva::gui_create_window, {0x48, 0x89, 0x5C, 0x24, 0x10, 0x57, 0x48, 0x83, 0xEC, 0x40, 0x48, 0x8B, 0xF9,
         0x48, 0x8B, 0xDA}, "gui_create_window");
     ok &= expect(rva::dialog_window_store, {0x48, 0x89, 0x7B, 0x08, 0x48, 0x85, 0xFF}, "dialog_window_store");
-    ok &= expect(rva::gui_manager_store, {0x48, 0x89, 0x35, 0xE5, 0x0B, 0xE6, 0x00}, "gui_manager_store");
+    ok &= expect(rva::gui_manager_store, {0x48, 0x89, 0x35, 0xE5, 0x0B, 0xE6, 0x00}, "gui_manager_store",
+        {0x48, 0x89, 0x35, 0xF5, 0xAE, 0xE4, 0x00});
     ok &= expect(rva::widget_registry, {0x48, 0x8B, 0xBE, 0x10, 0x01, 0x00, 0x00, 0x48, 0x8B, 0x86, 0x18, 0x01, 0x00,
         0x00}, "widget_registry");
     ok &= expect(rva::trigger_db_create, {0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0xB9, 0x80, 0x00, 0x00, 0x00}, "trigger_db_create");
@@ -853,6 +896,12 @@ bool check_all() {
         0x24, 0x10, 0x48, 0x89, 0x4C, 0x24, 0x08}, "map_randomize");
     ok &= expect(rva::custom_countries_clear, {0x48, 0x89, 0x5C, 0x24, 0x08, 0x57, 0x48, 0x83, 0xEC, 0x20},
         "custom_countries_clear");
+    for (const auto data : {rva::world, rva::history, rva::trigger_db, rva::custom_nation_used, rva::map}) {
+        if (!gr(data)) {
+            log("REFUSED: no address for 0x%llx in this build", static_cast<unsigned long long>(data));
+            ok = false;
+        }
+    }
     return ok;
 }
 
@@ -880,36 +929,36 @@ DWORD install_checked(HMODULE module) {
         return 0;
     }
     image = reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
-    if (eu4build::detect() != eu4build::Build::steam) {
-        // the main-loop object and the Steam lobby code differ in other builds
-        log("REFUSED: build=%s; only the Steam build of eu4.exe 1.37.5 is supported; no bytes changed",
-            eu4build::name());
+    if (eu4build::detect() == eu4build::Build::unknown) {
+        log("REFUSED: build=unknown; only eu4.exe 1.37.5 from Steam or GOG is supported; no bytes changed");
         installation_status.store(-4);
         return 4;
     }
+    lay = is_gog() ? kGog : kSteam;
+    log("build=%s", eu4build::name());
     if (!check_all()) {
         installation_status.store(-4);
         return 4;
     }
-    g_world = reinterpret_cast<std::uintptr_t*>(image + rva::world);
-    g_history = reinterpret_cast<std::uintptr_t*>(image + rva::history);
-    g_trigger_db = reinterpret_cast<std::uintptr_t*>(image + rva::trigger_db);
-    g_custom_nation_used = reinterpret_cast<std::uint8_t*>(image + rva::custom_nation_used);
-    g_map = reinterpret_cast<std::uintptr_t*>(image + rva::map);
-    g_minimap_vtable = reinterpret_cast<void*>(image + rva::minimap_vtable);
-    g_lobby_vtable = reinterpret_cast<void*>(image + rva::steam_lobby_vtable);
+    g_world = reinterpret_cast<std::uintptr_t*>(ga(rva::world));
+    g_history = reinterpret_cast<std::uintptr_t*>(ga(rva::history));
+    g_trigger_db = reinterpret_cast<std::uintptr_t*>(ga(rva::trigger_db));
+    g_custom_nation_used = reinterpret_cast<std::uint8_t*>(ga(rva::custom_nation_used));
+    g_map = reinterpret_cast<std::uintptr_t*>(ga(rva::map));
+    g_minimap_vtable = reinterpret_cast<void*>(ga(rva::minimap_vtable));
+    g_lobby_vtable = is_gog() ? nullptr : reinterpret_cast<void*>(ga(rva::steam_lobby_vtable));
     {
         std::int32_t disp = 0;
-        std::memcpy(&disp, reinterpret_cast<const void*>(image + rva::gui_manager_store + 3), 4);
-        g_manager_global = reinterpret_cast<std::uintptr_t*>(image + rva::gui_manager_store + 7 + disp);
+        std::memcpy(&disp, reinterpret_cast<const void*>(ga(rva::gui_manager_store) + 3), 4);
+        g_manager_global = reinterpret_cast<std::uintptr_t*>(ga(rva::gui_manager_store) + 7 + disp);
         std::uint32_t begin = 0, end = 0;
-        std::memcpy(&begin, reinterpret_cast<const void*>(image + rva::widget_registry + 3), 4);
-        std::memcpy(&end, reinterpret_cast<const void*>(image + rva::widget_registry + 10), 4);
+        std::memcpy(&begin, reinterpret_cast<const void*>(ga(rva::widget_registry) + 3), 4);
+        std::memcpy(&end, reinterpret_cast<const void*>(ga(rva::widget_registry) + 10), 4);
         g_registry_begin = static_cast<std::ptrdiff_t>(begin);
         g_registry_end = static_cast<std::ptrdiff_t>(end);
     }
-    g_in_game_stock_path = image + rva::in_game_menu_block + 7;
-    g_pregame_stock_path = image + rva::pregame_menu_block + 9;
+    g_in_game_stock_path = ga(rva::in_game_menu_block) + 7;
+    g_pregame_stock_path = ga(rva::pregame_menu_block) + 9;
 
     bool ok = replace_block(rva::in_game_menu_block, 7, rva::in_game_idle_epilogue, &in_game_block) &&
         replace_block(rva::pregame_menu_block, 9, rva::pregame_menu_continuation, &pregame_block) &&
@@ -929,11 +978,11 @@ DWORD install_checked(HMODULE module) {
         return 5;
     }
     // The slots first (they only act once a return is queued), then the code.
-    if (!swap_slot(rva::frontend_tick_slot, rva::frontend_tick, &on_frontend_tick, original_tick) ||
-        !swap_slot(rva::frontend_restore_slot, rva::frontend_restore, &on_frontend_restore, original_restore)) {
-        if (original_tick && *reinterpret_cast<void**>(image + rva::frontend_tick_slot) == reinterpret_cast<void*>(&on_frontend_tick)) {
+    if (!swap_slot(rva::frontend_tick_slot, fn<void>(rva::frontend_tick), &on_frontend_tick, original_tick) ||
+        !swap_slot(rva::frontend_restore_slot, fn<void>(rva::frontend_restore), &on_frontend_restore, original_restore)) {
+        if (original_tick && *reinterpret_cast<void**>(ga(rva::frontend_tick_slot)) == reinterpret_cast<void*>(&on_frontend_tick)) {
             TickFn* ignored = nullptr;
-            swap_slot(rva::frontend_tick_slot, reinterpret_cast<std::uintptr_t>(&on_frontend_tick) - image,
+            swap_slot(rva::frontend_tick_slot, reinterpret_cast<void*>(&on_frontend_tick),
                 fn<TickFn>(rva::frontend_tick), ignored);
         }
         log("REFUSED: frontend idler slots differ; no code bytes changed");
@@ -946,7 +995,8 @@ DWORD install_checked(HMODULE module) {
         return 7;
     }
     installation_status.store(1);
-    log("initialized version=0.1.0 (Hamweard port): %zu code patches, 2 slots", pending.size());
+    log("initialized version=0.2.0 (Hamweard port) build=%s: %zu code patches, 2 slots", eu4build::name(),
+        pending.size());
     return 0;
 }
 
