@@ -37,6 +37,7 @@
 
 #include "call_patch.hpp"
 #include "eu4_build.hpp"
+#include "eu4_cpu.hpp"
 
 namespace {
 
@@ -2192,12 +2193,8 @@ DWORD install_checked(HMODULE module) {
     QueryPerformanceFrequency(&frequency);
     qpc_frequency = frequency.QuadPart > 0 ? frequency.QuadPart : 1;
 
-    SYSTEM_INFO info{};
-    GetSystemInfo(&info);
-    int workers = static_cast<int>(info.dwNumberOfProcessors) - 4;
-    workers = GetPrivateProfileIntW(L"country", L"workers", workers, ini.c_str());
-    if (workers < 1) workers = 1;
-    if (workers > max_workers) workers = max_workers;
+    // workers=auto (or missing): from physical cores, see eu4_cpu.hpp
+    const int workers = eu4cpu::read_workers(L"country", ini.c_str(), 4, max_workers);
     if (cb_mode != Mode::off) {
         const int spin_us = static_cast<int>(GetPrivateProfileIntW(L"country", L"cb_spin_us", 200, ini.c_str()));
         hot_spin_qpc = qpc_frequency * (spin_us < 0 ? 0 : spin_us) / 1000000;
@@ -2497,8 +2494,9 @@ DWORD install_checked(HMODULE module) {
     installation_status.store(mode == Mode::on ? 1 : 2);
     auto name = [](Mode m) { return m == Mode::on ? "on" : m == Mode::shadow ? "shadow" : "off"; };
     log("initialized version=0.6.0-experimental estates=%s strength=%s colony=%s reforms=%s "
-        "cb=%s provmod=%s relpf=%s pmpf=%s merc=%s hist=%s maint=%s relguard=%s workers=%d", name(mode), name(strength_mode), name(colony_mode),
-        name(reform_mode), name(cb_mode), name(pm_mode), name(relpf_mode), name(pmpf_mode), name(merc_mode), name(hist_mode), name(maint_mode), relguard_on ? "on" : "off", worker_count);
+        "cb=%s provmod=%s relpf=%s pmpf=%s merc=%s hist=%s maint=%s relguard=%s workers=%d (cores %d/%d)", name(mode), name(strength_mode), name(colony_mode),
+        name(reform_mode), name(cb_mode), name(pm_mode), name(relpf_mode), name(pmpf_mode), name(merc_mode), name(hist_mode), name(maint_mode), relguard_on ? "on" : "off", worker_count,
+        eu4cpu::physical_cores(), eu4cpu::logical_processors());
     return 0;
 }
 

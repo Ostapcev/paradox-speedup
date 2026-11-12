@@ -22,6 +22,7 @@
 #include "scheduler_wait.hpp"
 #include "two_phase.hpp"
 #include "eu4_build.hpp"
+#include "eu4_cpu.hpp"
 
 extern "C" {
 void* knowledge_original_target = nullptr;
@@ -661,7 +662,9 @@ DWORD install_checked(HMODULE module) {
         }
     }
     if (parallel_selected) {
-        const auto workers = (std::max)(1U, (std::min)(4U, std::thread::hardware_concurrency()));
+        // the pool counts the main thread too; extra threads from [knowledge] workers
+        // (auto: physical cores, see eu4_cpu.hpp)
+        const auto workers = static_cast<std::size_t>(eu4cpu::read_workers(L"knowledge", (directory + L"\\eu4_knowledge_patch.ini").c_str(), 3, 7)) + 1;
         if (!parallel_pool.start(workers)) {
             log("REFUSED: cannot start the parallel worker pool; no game bytes changed");
             cleanup();
