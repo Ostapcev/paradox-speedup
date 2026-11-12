@@ -907,7 +907,15 @@ DWORD install_checked(HMODULE module) {
             static_cast<double>(alert_interval) * static_cast<double>(qpc_frequency));
         speedpatch::CallPatch alert;
         original_alert = reinterpret_cast<AlertFn>(image + eu4build::rva(0xdf5860));
-        if (!eu4build::code_matches(image, 0x8153c2, alert_bytes, sizeof(alert_bytes)) ||
+        // GOG: same code, but the main-loop object keeps the alert manager at +0x13f0
+        constexpr std::uint8_t alert_load_gog[] = {0x49, 0x8b, 0x8d, 0xf0, 0x13, 0x00, 0x00};
+        const bool alert_site_ok = eu4build::detect() == eu4build::Build::gog
+            ? eu4build::rva(0x8153c9) != 0 &&
+                std::memcmp(reinterpret_cast<const void*>(image + eu4build::rva(0x8153c9) - 7),
+                    alert_load_gog, sizeof(alert_load_gog)) == 0 &&
+                eu4build::code_matches(image, 0x8153c9, alert_bytes + 7, 5)
+            : eu4build::code_matches(image, 0x8153c2, alert_bytes, sizeof(alert_bytes));
+        if (!alert_site_ok ||
             !speedpatch::prepare_call(reinterpret_cast<std::uint8_t*>(image + eu4build::rva(0x8153c9)),
                 reinterpret_cast<const void*>(original_alert),
                 reinterpret_cast<const void*>(&alert_hook), alert, error, sizeof(error)) ||
