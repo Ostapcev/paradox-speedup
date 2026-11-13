@@ -1,68 +1,73 @@
-# Ускорение игр Paradox — плагины
+# Paradox games speed-up — plugins
 
-Исходный код DLL-плагинов, которые ускоряют **Europa Universalis IV 1.37.5 (Steam, Windows x64)**, включая крупные моды вроде Anbennar. Позже здесь появятся плагины для других игр Paradox.
+[Русская версия](README.ru.md)
 
-Готовые сборки удобнее ставить [установщиком](https://github.com/Ostapcev/paradox-speedup-launcher). Он сам находит игру, объясняет каждый плагин и настраивает его.
+Source code of DLL plugins that speed up **Europa Universalis IV 1.37.5 (Steam and GOG, Windows x64)**, including large mods such as Anbennar. Plugins for other Paradox games will come later.
 
-## Как это работает
+The easiest way to install the ready builds is the [installer](https://github.com/Ostapcev/paradox-speedup-launcher) (English and Russian). It finds the game, explains every plugin and sets it up.
 
-Плагины — это обычные DLL в папке `plugins` рядом с `eu4.exe`. Их загружает `VERSION.dll` — загрузчик из EU4 Unicode Patch. Сам `eu4.exe` на диске не меняется: каждый плагин при запуске меняет код игры только в памяти.
+## How it works
 
-Перед любым изменением плагин проверяет, та ли это версия игры:
-- размер образа `eu4.exe`;
-- байты в каждом месте, которое он меняет.
+The plugins are ordinary DLLs in the `plugins` folder next to `eu4.exe`. They are loaded by `VERSION.dll`, the loader from EU4 Unicode Patch. `eu4.exe` on disk is never changed: each plugin changes the game's code only in memory, at start-up.
 
-Если что-то не совпало, плагин пишет в свой журнал `REFUSED` и ничего не трогает. У каждого плагина есть ini с режимом `off`/`disabled`.
+Before any change a plugin checks that this is the right game build:
+- the build of `eu4.exe` (Steam or GOG 1.37.5, from its PE header);
+- the bytes at every place it changes.
 
-Многие плагины умеют работать в теневом режиме (`shadow`): считают по-своему, сравнивают с результатом игры и пишут в журнал число расхождений. Так проверялась точность.
+If anything differs, the plugin writes `REFUSED` to its log and touches nothing. Every plugin has an ini file with an `off`/`disabled` mode.
 
-## Плагины EU4
+Many plugins can run in shadow mode (`shadow`): they compute their own way, compare with the game's result and log the number of differences. This is how their accuracy was checked.
 
-| Папка | Что делает | Меняет ход игры? |
+## EU4 plugins
+
+| Folder | What it does | Changes gameplay? |
 |---|---|---|
-| `eu4_render_patch` | Реже рисует кадры на быстрой скорости (самое большое ускорение) | нет |
-| `eu4_alloc_patch` | Быстрая работа с памятью | **да**: другой порядок адресов |
-| `eu4_country_patch` | Расчёты по странам заранее, в несколько потоков; защита от вылета `relguard` | нет; 4 редких расчёта можно выключить |
-| `eu4_ai_serial` | Кэши в расчётах ИИ | нет |
-| `eu4_knowledge_patch` | Параллельный расчёт знания карты | нет |
-| `eu4_modifier_patch` | Быстрый поиск и слияние модификаторов | нет |
-| `eu4_gov_patch` | Запоминает свойства реформ правительства | нет |
-| `eu4_pops_patch` | Убирает лишнее ожидание онлайн-сервисов Paradox | нет |
-| `eu4_load_patch` | Быстрая загрузка игры и сохранений | нет |
-| `eu4_loc_patch` | Быстрая загрузка локализации | нет |
-| `eu4_menu_patch` | «Выйти в меню» без перезапуска | нет |
-| `eu4_save_patch` | Быстрые сохранения | нет |
+| `eu4_render_patch` | Draws fewer frames at fast speeds (the largest speed-up) | no |
+| `eu4_alloc_patch` | Fast memory allocation | **yes**: a different order of addresses |
+| `eu4_country_patch` | Country calculations ahead of time on several threads; crash guard `relguard` | no; 4 rare calculations can be turned off |
+| `eu4_ai_serial` | Caches in AI calculations | no |
+| `eu4_knowledge_patch` | Parallel map knowledge | no |
+| `eu4_modifier_patch` | Fast modifier search and merge | no |
+| `eu4_gov_patch` | Remembers government reform properties | no |
+| `eu4_pops_patch` | Removes needless waiting in Paradox online services | no |
+| `eu4_load_patch` | Fast game and save loading | no |
+| `eu4_loc_patch` | Fast localisation loading | no |
+| `eu4_menu_patch` | "Exit to Menu" without restarting | no |
+| `eu4_save_patch` | Fast saving | no |
 
-Экспериментальные и служебные папки (в установщик не входят):
+Experimental and service folders (not in the installer):
 
-| Папка | Назначение |
+| Folder | Purpose |
 |---|---|
-| `eu4_speed_patch` | Расписание поиска целей армейским ИИ |
-| `eu4_trigger_patch` | Параллельные триггеры, только диагностика |
-| `eu4_det_patch` | Фиксированный seed для воспроизводимых сравнений |
-| `eu4_sampler` | Профайлер: стеки потоков игры |
-| `eu4_bench` | Замер скорости по журналу `-gamestatetimer` |
+| `eu4_speed_patch` | Schedule of the army AI target search |
+| `eu4_trigger_patch` | Parallel triggers, diagnostics only |
+| `eu4_det_patch` | Fixed seed for reproducible comparisons |
+| `eu4_sampler` | Profiler: stacks of the game's threads |
+| `eu4_bench` | Speed measurement from the `-gamestatetimer` log |
+| `eu4_port` | Steam → GOG address translation (see below) |
 
-## Сборка
+## Building
 
-Нужен [Zig 0.13.0](https://ziglang.org/download/#release-0.13.0) (он же компилятор C++).
+You need [Zig 0.13.0](https://ziglang.org/download/#release-0.13.0) (it is also the C++ compiler).
 
-1. Распакуйте Zig в `.tools/zig-windows-x86_64-0.13.0/` в корне репозитория.
-2. Положите копию игры в папку `Europa Universalis IV/` рядом с ним или поправьте путь `PLUGINS` в скриптах.
-3. Соберите плагин:
+1. Unpack Zig into `.tools/zig-windows-x86_64-0.13.0/` in the repository root.
+2. Put a copy of the game into an `Europa Universalis IV/` folder next to it, or change the `PLUGINS` path in the scripts.
+3. Build a plugin:
    ```
    python eu4_country_patch/tools/build.py
    ```
-   Скрипт собирает `build/<плагин>.dll` и копирует её в `Europa Universalis IV/plugins/`.
+   The script builds `build/<plugin>.dll` and copies it into `Europa Universalis IV/plugins/`.
 
-Для инструментов анализа (`eu4_sampler/tools`, `eu4_knowledge_patch/tools`) нужен Python-пакет `capstone`: `pip install capstone`.
+The analysis tools (`eu4_sampler/tools`, `eu4_knowledge_patch/tools`, `eu4_port/tools`) need the Python package `capstone`: `pip install capstone`.
 
-## Адреса в коде
+## Addresses in the code
 
-Хуки привязаны к точным адресам (RVA) в `eu4.exe` 1.37.5 (SHA-256 `9ad3efe1af169f40ee577f9dae5debbc87af6fb8b5450fb345ebf110dc4d771a`). В комментариях функции игры указаны по адресам вида `140a5e130` (база образа `0x140000000`). С другой версией игры плагины не включатся, пока адреса не обновлены.
+Hooks are tied to exact addresses (RVAs) in the Steam `eu4.exe` 1.37.5 (SHA-256 `9ad3efe1af169f40ee577f9dae5debbc87af6fb8b5450fb345ebf110dc4d771a`). Comments name game functions by addresses such as `140a5e130` (image base `0x140000000`).
 
-## Лицензии
+The GOG build of the same version (SHA-256 `5f4145ce5ff9a4140cc4d14440920382b698dd91e1cdae1d1dc053357d9388ee`) has the same code at other addresses. `eu4_port` matches the functions of the two builds, and `eu4_port/include/eu4_build.hpp` translates every Steam address a plugin uses at run time, comparing against GOG bytes verified offline (`eu4_gog_table.inc`). With any other game version the plugins do not turn on until the addresses are updated.
 
-Часть кода перенесена из проектов с лицензией MIT, см. [THIRD_PARTY.md](THIRD_PARTY.md). Наш код распространяется по лицензии MIT (файл [LICENSE](LICENSE)); перенесённые части остаются под лицензиями своих авторов.
+## Licences
 
-Europa Universalis IV — торговая марка Paradox Interactive. Проект с ней не связан; файлов игры в репозитории нет.
+Part of the code is ported from MIT-licensed projects, see [THIRD_PARTY.md](THIRD_PARTY.md). Our code is under the MIT licence ([LICENSE](LICENSE)); the ported parts stay under their authors' licences.
+
+Europa Universalis IV is a trademark of Paradox Interactive. This project is not affiliated with it; the repository contains no game files.
