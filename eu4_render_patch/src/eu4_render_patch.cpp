@@ -1,4 +1,4 @@
-// EU4 Render Patch 0.6.0 experimental, for EU4 1.37.5.0 Windows x64.
+// EU4 Render Patch 0.6.1 experimental, for EU4 1.37.5.0 Windows x64.
 //
 // Long ticks (the daily/monthly country and province loops) call 140769ea0
 // every few countries; it draws a full frame (1414c25a0) when more than
@@ -197,7 +197,9 @@ std::atomic<std::uint64_t> alerts_run{0}, alerts_skipped{0}, alert_qpc{0}, alert
 
 void alert_hook(void* manager) {
     const auto now = qpc_now();
-    if (alert_interval_ticks > 0 && last_alert && now - last_alert < alert_interval_ticks) {
+    // only while the game runs at speed 5: on pause and slow speeds fewer checks gain no game time
+    if (alert_interval_ticks > 0 && last_alert && now - last_alert < alert_interval_ticks &&
+        game_running(now)) {
         alert_recheck_skip = 1;
         original_alert(manager);
         alert_recheck_skip = 0;
@@ -455,8 +457,8 @@ bool install_alert_recheck_gate(char* error, std::size_t error_size) {
 // which places/fills that province's icon widgets each frame (8-9% of a paused
 // frame with the build menu open). The widgets are persistent GUI objects, so a
 // skipped update leaves them where they were.
-// map_icons_interval > 0: run the per-province pass at most that often, but at
-// once when the map camera matrix changes or a mouse button is down.
+// map_icons_interval > 0: while the game runs at speed 5, run the per-province pass at most
+// that often, but at once when the map camera matrix changes or a mouse button is down.
 // map_icons_hide: icon kinds to remove; 14132e300 called with a null anchor
 // destroys the icon (the game's own path for icons that should not exist).
 using IconPassFn = void (*)(void*, std::uint64_t, std::uint64_t);
@@ -607,8 +609,11 @@ void icon_pass_hook(void* map, std::uint64_t a, std::uint64_t b) {
     const auto now = qpc_now();
     const bool mouse = (GetAsyncKeyState(VK_LBUTTON) & 0x8000) != 0 ||
         (GetAsyncKeyState(VK_RBUTTON) & 0x8000) != 0;
+    // Throttled only while the game runs at speed 5 (game_running). On pause and at slow speeds
+    // every pass runs as in the game: fewer passes there gain no game time, and the skipped
+    // passes made movement arrows and their animation update twice a second.
     icon_pass_run = icon_interval_ticks <= 0 || icon_force_next || mouse ||
-        now - last_icon_pass >= icon_interval_ticks;
+        now - last_icon_pass >= icon_interval_ticks || !game_running(now);
     icon_force_next = mouse;  // one more full pass after the button is released
     if (icon_pass_run) {
         if (original_text_draw) text_clear();
@@ -1067,7 +1072,7 @@ DWORD install_checked(HMODULE module) {
     HANDLE thread = CreateThread(nullptr, 0, reporter, nullptr, 0, nullptr);
     if (thread) CloseHandle(thread);
     installation_status.store(mode == Mode::throttle ? 1 : 2);
-    log("initialized version=0.6.0-experimental build=%s mode=%s tick_interval=%g "
+    log("initialized version=0.6.1-experimental build=%s mode=%s tick_interval=%g "
         "frame_interval=%g running_frame_interval=%g skip_map_update=%d", eu4build::name(),
         mode == Mode::throttle ? "throttle" : "count",
         static_cast<double>(interval), static_cast<double>(frame_interval),
