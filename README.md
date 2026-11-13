@@ -2,7 +2,7 @@
 
 [Русская версия](README.ru.md)
 
-Source code of DLL plugins that speed up **Europa Universalis IV 1.37.5 (Steam and GOG, Windows x64)**, including large mods such as Anbennar. Plugins for other Paradox games will come later.
+Source code of DLL plugins that speed up **Europa Universalis IV 1.37.5 (Steam and GOG, Windows x64)**, including large mods such as Anbennar, and **Hearts of Iron IV 1.19.5 (Steam, Windows x64)**. Plugins for other Paradox games will come later.
 
 The easiest way to install the ready builds is the [installer](https://github.com/Ostapcev/paradox-speedup-launcher) (English and Russian). It finds the game, explains every plugin and sets it up.
 
@@ -46,6 +46,20 @@ Experimental and service folders (not in the installer):
 | `eu4_bench` | Speed measurement from the `-gamestatetimer` log |
 | `eu4_port` | Steam → GOG address translation (see below) |
 
+## HoI4 plugins
+
+For HoI4 1.19.5.0 and 1.19.4.2 (Steam). The two builds differ only in version strings and one small text-parser function, which no plugin touches. `hoi4_common/hoi4_build.hpp` recognises both builds from the PE header of `hoi4.exe`; with any other build the plugins write `REFUSED` and change nothing. On a late save (1941) a game day takes about 800–860 ms instead of about 1020–1190 ms without plugins.
+
+| Folder | What it does | Changes gameplay? |
+|---|---|---|
+| `hoi4_loader` | Our own plugin loader `VERSION.dll` | no |
+| `hoi4_render_patch` | Draws frames, province graphics, unit models and the 3D scene less often at fast speeds | no (with `supply_interval=1`, as the installer sets it) |
+| `hoi4_supply_patch` | Reuses the supply path calculation of a country whose inputs did not change; byte for byte the game's result | no |
+| `hoi4_load_patch` | Faster start-up and save loading: trigger registry, file index, country tag lookup | no |
+| `hoi4_alloc_patch` | Fast memory allocation (port of `eu4_alloc_patch`) | **yes**: a different order of addresses |
+
+Not in the installer: `hoi4_tick_patch` (measurements and experiments), `hoi4_bench_helper` (switches to observer mode for benchmarks), `hoi4_sampler` (profiler), `hoi4_bench` (speed measurement from the `-gamestatetimer` log).
+
 ## Building
 
 You need [Zig 0.13.0](https://ziglang.org/download/#release-0.13.0) (it is also the C++ compiler).
@@ -57,6 +71,8 @@ You need [Zig 0.13.0](https://ziglang.org/download/#release-0.13.0) (it is also 
    python eu4_country_patch/tools/build.py
    ```
    The script builds `build/<plugin>.dll` and copies it into `Europa Universalis IV/plugins/`.
+
+HoI4 plugins are built the same way (`python hoi4_render_patch/tools/build.py`, add `--install` to copy into `Hearts of Iron IV/plugins/` next to the repository); the loader is `python hoi4_loader/tools/build.py`.
 
 The analysis tools (`eu4_sampler/tools`, `eu4_knowledge_patch/tools`, `eu4_port/tools`) need the Python package `capstone`: `pip install capstone`.
 

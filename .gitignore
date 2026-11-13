@@ -14,6 +14,13 @@
 !/eu4_bench/
 !/eu4_port/
 
+!/hoi4_*_patch/
+!/hoi4_bench_helper/
+!/hoi4_loader/
+!/hoi4_sampler/
+!/hoi4_bench/
+!/hoi4_common/
+
 # build output and local data inside the plugin folders
 build/
 dist/
@@ -27,6 +34,8 @@ vendor/
 /eu4_bench/results/
 /eu4_bench/saves/
 /eu4_bench/state/
+/hoi4_bench/results/
+/hoi4_bench/state/
 *.dll
 *.exe
 *.lib
@@ -36,5 +45,6 @@ vendor/
 *.log
 *.dmp
 *.eu4
+*.hoi4
 *.zip
 /eu4_port/data/functions.json
