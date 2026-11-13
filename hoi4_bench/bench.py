@@ -55,6 +55,10 @@ PLUGIN_KEYS: dict[str, tuple[str, str, str, object]] = {
     # обновление 3D-сцены движка не чаще раза в N секунд на быстрой скорости (графика)
     "scene": ("hoi4_render_patch.ini", "render", "scene_interval", ("0", "0.05", "0.1", "0.25")),
     "aiframes": ("hoi4_render_patch.ini", "render", "ai_frames", ("0", "1")),
+    "tags": ("hoi4_load_patch.ini", "load", "tags", ("off", "shadow", "on")),
+    "aiwait": ("hoi4_render_patch.ini", "render", "ai_wait", ("0", "1")),
+    "tickint": ("hoi4_render_patch.ini", "render", "tick_interval", ("0", "0.25", "0.5")),
+    "pfor": ("hoi4_tick_patch.ini", "tick", "pfor", ("off", "probe", "on")),
 }
 
 _OFF: dict[str, str] = {"render": "disabled"}
@@ -66,6 +70,16 @@ PRESETS: dict[str, dict[str, str]] = {
     "render_alloc": {"render": "throttle", "alloc": "on", "observe": "on", "supply": "off"},
     "full": {"render": "throttle", "alloc": "on", "observe": "on", "supply": "on", "scene": "0"},
     "full_scene": {"render": "throttle", "alloc": "on", "observe": "on", "supply": "on", "scene": "0.1", "aiframes": "0"},
+    # все ускорения выключены / все включены (как в рабочей установке)
+    "none": {"render": "disabled", "alloc": "off", "observe": "on", "supply": "off", "registry": "off",
+             "files": "off", "tags": "off", "scene": "0", "aiframes": "0"},
+    "all": {"render": "throttle", "alloc": "on", "observe": "on", "supply": "on", "registry": "on",
+            "files": "on", "tags": "on", "scene": "0.1", "aiframes": "0", "aiwait": "0", "tickint": "0", "pfor": "off"},
+    "all_new": {"render": "throttle", "alloc": "on", "observe": "on", "supply": "on", "registry": "on",
+                "files": "on", "tags": "on", "scene": "0.1", "aiframes": "0", "aiwait": "1", "tickint": "0.5", "pfor": "on"},
+    # как all_new, но без перехода в наблюдателя: играем за страну из сохранения (интерфейс активен)
+    "all_play": {"render": "throttle", "alloc": "on", "observe": "off", "supply": "on", "registry": "on",
+                 "files": "on", "tags": "on", "scene": "0.1", "aiframes": "0", "aiwait": "1", "tickint": "0.5", "pfor": "on"},
     "full_ai": {"render": "throttle", "alloc": "on", "observe": "on", "supply": "on", "scene": "0.1", "aiframes": "1"},
 }
 

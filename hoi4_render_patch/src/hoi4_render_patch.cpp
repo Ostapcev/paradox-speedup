@@ -39,6 +39,7 @@
 //   disabled - ничего не меняет (default)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <intrin.h>
 
 #include "hoi4_build.hpp"
 
@@ -104,6 +105,17 @@ constexpr std::uintptr_t due_call_rva = 0x1ee6b2;
 constexpr std::uintptr_t due_function_rva = 0x2ba690;
 constexpr std::uintptr_t nested_call_rva = 0x1ee6fc;
 constexpr std::uintptr_t nested_function_rva = 0x22943b0;
+// tick_interval: вход 1402ba690 («пора ли нарисовать кадр посреди тика», механизм debug_smooth;
+// ~60 мест в часовом/дневном тике и цикл ожидания ИИ). Пока с прошлого «да» прошло меньше
+// tick_interval, ответ «нет» без вызова игры; иначе решает игра. Только графика.
+// Пролог: mov [rsp+10],rbx | push rdi | sub rsp,30 | mov rax,[rcx]  (13 байт, без rip)
+constexpr std::uint8_t due_prologue[13] = {0x48, 0x89, 0x5c, 0x24, 0x10, 0x57, 0x48, 0x83, 0xec,
+                                           0x30, 0x48, 0x8b, 0x01};
+// ai_wait: в цикле ожидания ИИ вместо `call SwitchToThread` (1401ee72f -> thunk 1425a3678)
+// короткая пауза на pause-инструкциях (~3 мкс), SwitchToThread раз в ~50 мкс. Главный поток
+// меньше мешает соседнему логическому ядру, на котором может считаться ИИ.
+constexpr std::uintptr_t yield_call_rva = 0x1ee72f;
+constexpr std::uintptr_t yield_function_rva = 0x25a3678;
 // int: монотонный счётчик часов в gamestate (дата = (hours - 43800000) / 8760)
 constexpr std::uintptr_t hours_offset = 0x468;
 
@@ -130,6 +142,13 @@ SupplyFn original_supply = nullptr;
 SceneFn original_scene = nullptr;
 std::int64_t scene_interval_ticks = 0;
 bool ai_frames = false;
+std::int64_t tick_interval_ticks = 0;
+std::int64_t last_due_yes = 0, last_due_asked = 0, ask_ticks = 1;
+DueFn due_game = nullptr;  // трамплин на оригинал 1402ba690 (если вход перехвачен)
+std::atomic<std::uint64_t> entry_calls{0}, entry_asked{0}, entry_yes{0};
+bool ai_wait = false;
+std::int64_t pause_ticks = 1, yield_ticks = 1;
+std::atomic<std::uint64_t> pauses{0}, pause_yields{0};
 DueFn original_due = nullptr;
 NestedFn original_nested = nullptr;
 bool in_ai_frame = false;
@@ -288,9 +307,39 @@ void scene_hook(void* object, float dt) {
     scene_qpc.fetch_add(static_cast<std::uint64_t>(qpc_now() - now), std::memory_order_relaxed);
 }
 
+// Вход 1402ba690 (главный поток): ограничение вложенных кадров по tick_interval.
+bool due_entry_hook(void* engine, std::int32_t arg) {
+    entry_calls.fetch_add(1, std::memory_order_relaxed);
+    const auto now = qpc_now();
+    if (now - last_due_yes < tick_interval_ticks) return false;
+    // и спрашивать игру не чаще раза в ~2 мс: кадр посреди тика начнётся не более чем на 2 мс позже
+    if (now - last_due_asked < ask_ticks) return false;
+    last_due_asked = now;
+    entry_asked.fetch_add(1, std::memory_order_relaxed);
+    const bool yes = due_game(engine, arg);
+    if (yes) { last_due_yes = now; entry_yes.fetch_add(1, std::memory_order_relaxed); }
+    return yes;
+}
+
+// Вместо SwitchToThread в цикле ожидания ИИ.
+void ai_pause_hook() {
+    static std::int64_t spin_start = 0, last_seen = 0;
+    const auto t0 = qpc_now();
+    if (t0 - last_seen > yield_ticks) spin_start = t0;  // новое ожидание
+    for (auto t = t0; t - t0 < pause_ticks; t = qpc_now())
+        for (int i = 0; i < 16; ++i) _mm_pause();
+    last_seen = qpc_now();
+    pauses.fetch_add(1, std::memory_order_relaxed);
+    if (last_seen - spin_start >= yield_ticks) {
+        spin_start = last_seen;
+        pause_yields.fetch_add(1, std::memory_order_relaxed);
+        SwitchToThread();
+    }
+}
+
 // Вместо `call 1402ba690` в цикле ожидания ИИ (главный поток).
 bool due_hook(void* engine, std::int32_t arg) {
-    const bool game = original_due(engine, arg);
+    const bool game = (due_game ? due_entry_hook : original_due)(engine, arg);
     due_calls.fetch_add(1, std::memory_order_relaxed);
     if (game) due_game_yes.fetch_add(1, std::memory_order_relaxed);
     if (!ai_frames) return game;
@@ -387,6 +436,14 @@ DWORD WINAPI reporter(void*) {
                 static_cast<unsigned long long>(nms),
                 static_cast<unsigned long long>(n ? nms * 1000 / n : 0));
         }
+        if (due_game)
+            log("stats tick_frames calls=%llu asked_game=%llu yes=%llu",
+                static_cast<unsigned long long>(entry_calls.load()),
+                static_cast<unsigned long long>(entry_asked.load()),
+                static_cast<unsigned long long>(entry_yes.load()));
+        if (ai_wait)
+            log("stats ai_wait pauses=%llu yields=%llu", static_cast<unsigned long long>(pauses.load()),
+                static_cast<unsigned long long>(pause_yields.load()));
         if (original_supply) {
             const auto runs = supply_run.load();
             const auto sms = supply_qpc.load() * 1000 /
@@ -476,6 +533,15 @@ DWORD install_checked(HMODULE module) {
         scene_interval_ticks = static_cast<std::int64_t>(
             static_cast<double>(scene_interval) * static_cast<double>(qpc_frequency));
         ai_frames = GetPrivateProfileIntW(L"render", L"ai_frames", 0, ini.c_str()) != 0;
+        ai_wait = GetPrivateProfileIntW(L"render", L"ai_wait", 0, ini.c_str()) != 0;
+        GetPrivateProfileStringW(L"render", L"tick_interval", L"0", value, 32, ini.c_str());
+        float tick_interval = std::wcstof(value, nullptr);
+        if (!(tick_interval >= 0.0f && tick_interval <= 10.0f)) tick_interval = 0.0f;
+        tick_interval_ticks = static_cast<std::int64_t>(
+            static_cast<double>(tick_interval) * static_cast<double>(qpc_frequency));
+        pause_ticks = qpc_frequency * 3 / 1000000 + 1;   // ~3 мкс
+        ask_ticks = qpc_frequency * 2 / 1000 + 1;         // ~2 мс
+        yield_ticks = qpc_frequency * 50 / 1000000 + 1;  // ~50 мкс
         supply_interval_hours = GetPrivateProfileIntW(L"render", L"supply_interval", 1, ini.c_str());
         if (supply_interval_hours < 1 || supply_interval_hours > 168) supply_interval_hours = 1;
     }
@@ -543,6 +609,38 @@ DWORD install_checked(HMODULE module) {
                 log("scene hook REFUSED (%s)", error);
             }
         }
+    }
+
+    // Вход 1402ba690: tick_interval > 0 (до ai_frames, который вызывает уже перехваченный вход).
+    if (mode == Mode::throttle && tick_interval_ticks > 0) {
+        auto* entry = reinterpret_cast<std::uint8_t*>(image + due_function_rva);
+        auto* tramp = static_cast<std::uint8_t*>(
+            VirtualAlloc(nullptr, 64, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE));
+        DWORD old = 0;
+        if (std::memcmp(entry, due_prologue, sizeof(due_prologue)) != 0 || !tramp) {
+            log("tick_interval REFUSED (1402ba690 bytes differ)");
+        } else if (VirtualProtect(entry, 13, PAGE_EXECUTE_READWRITE, &old)) {
+            std::memcpy(tramp, due_prologue, 13);
+            const std::uint64_t back = image + due_function_rva + 13;
+            tramp[13] = 0xff; tramp[14] = 0x25; std::memset(tramp + 15, 0, 4);  // jmp [rip+0]
+            std::memcpy(tramp + 19, &back, 8);
+            FlushInstructionCache(GetCurrentProcess(), tramp, 64);
+            due_game = reinterpret_cast<DueFn>(tramp);
+            std::uint8_t patch[13] = {0x48, 0xb8};
+            const auto target = reinterpret_cast<std::uint64_t>(&due_entry_hook);
+            std::memcpy(patch + 2, &target, 8);
+            patch[10] = 0xff; patch[11] = 0xe0; patch[12] = 0xcc;  // jmp rax; int3
+            std::memcpy(entry, patch, 13);
+            VirtualProtect(entry, 13, old, &old);
+            FlushInstructionCache(GetCurrentProcess(), entry, 13);
+            log("tick_interval=%g installed", static_cast<double>(tick_interval_ticks) / static_cast<double>(qpc_frequency));
+        }
+    }
+    if (mode == Mode::throttle && ai_wait) {
+        if (!patch_call(yield_call_rva, yield_function_rva, reinterpret_cast<const void*>(&ai_pause_hook), "ai_wait"))
+            ai_wait = false;
+        else
+            log("ai_wait installed");
     }
 
     // Кадры во время ожидания ИИ: только в throttle и при ai_frames=1 (в count — только счёт).

@@ -55,10 +55,11 @@ For HoI4 1.19.5.0 and 1.19.4.2 (Steam). The two builds differ only in version st
 | `hoi4_loader` | Our own plugin loader `VERSION.dll` | no |
 | `hoi4_render_patch` | Draws frames, province graphics, unit models and the 3D scene less often at fast speeds | no (with `supply_interval=1`, as the installer sets it) |
 | `hoi4_supply_patch` | Reuses the supply path calculation of a country whose inputs did not change; byte for byte the game's result | no |
+| `hoi4_tick_patch` | Runs 23 small parallel loops of the hourly tick in the calling thread, the game's own single-job path | no |
 | `hoi4_load_patch` | Faster start-up and save loading: trigger registry, file index, country tag lookup | no |
 | `hoi4_alloc_patch` | Fast memory allocation (port of `eu4_alloc_patch`) | **yes**: a different order of addresses |
 
-Not in the installer: `hoi4_tick_patch` (measurements and experiments), `hoi4_bench_helper` (switches to observer mode for benchmarks), `hoi4_sampler` (profiler), `hoi4_bench` (speed measurement from the `-gamestatetimer` log).
+Not in the installer: `hoi4_bench_helper` (switches to observer mode for benchmarks), `hoi4_sampler` (profiler), `hoi4_bench` (speed measurement from the `-gamestatetimer` log).
 
 ## Building
 
