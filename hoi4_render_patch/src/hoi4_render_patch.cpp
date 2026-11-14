@@ -64,6 +64,13 @@ constexpr std::uint8_t render_bytes[] = {0x84, 0xc0, 0x74, 0x0c, 0x48, 0x8b, 0x0
     0x8b, 0xce, 0xff, 0x90, 0xe8, 0x00, 0x00, 0x00};
 constexpr std::uintptr_t render_call_rva = 0x2b909e;  // 6 байт FF 90 E8 00 00 00
 // Update Provinces: movaps xmm2,xmm6; mov rdx,rsi; mov rcx,r15; call 140bae670
+// xmm2 = dt (кадровое время, слот 3-го аргумента), НЕ счётчик: xmm6 этой функции сама
+// получена как movaps xmm6,xmm2 из 3-го параметра (float) ЕЁ родителя и дальше передаётся
+// как dt в несколько похожих обновлений (movaps xmm1,xmm6 рядом). Раньше здесь был неверный
+// тип (uint32_t counter в r8d) — реального параметра в r8 нет, и при реальном вызове
+// original_provinces() игра получала мусор вместо dt на КАЖДОМ вызове, а не только при
+// пропуске. Найдено 2026-11-14 при разборе мигания значков/моделек. Исправлено на float dt
+// с накоплением пропущенного времени, как у scene_hook.
 constexpr std::uintptr_t provinces_site_rva = 0xbabc2b;
 constexpr std::uint8_t provinces_bytes[] = {0x0f, 0x28, 0xd6, 0x48, 0x8b, 0xd6, 0x49, 0x8b,
     0xcf, 0xe8, 0x37, 0x2a, 0x00, 0x00};
@@ -120,7 +127,7 @@ constexpr std::uintptr_t yield_function_rva = 0x25a3678;
 constexpr std::uintptr_t hours_offset = 0x468;
 
 using RenderFn = void (*)(void*);
-using ProvincesFn = void (*)(void*, void*, std::uint32_t);
+using ProvincesFn = void (*)(void*, void*, float);
 using UnitGfxFn = void (*)(void*, void*);
 using SupplyFn = void (*)(void*);
 using SceneFn = void (*)(void*, float);
@@ -161,6 +168,7 @@ std::atomic<std::uint64_t> scene_run{0}, scene_skipped{0}, scene_qpc{0};
 // Только главный поток.
 std::int64_t last_render = 0;
 std::int64_t last_provinces = 0;
+float provinces_pending_dt = 0.0f;
 std::int64_t last_unitgfx = 0;
 std::int64_t last_hours = -1;
 std::int64_t last_hour_change = 0;
@@ -236,15 +244,18 @@ void render_hook(void* idler) {
     render_qpc.fetch_add(static_cast<std::uint64_t>(qpc_now() - now), std::memory_order_relaxed);
 }
 
-// Вызывается вместо `call 140bae670`: rcx = карта, rdx = idler, r8d = счётчик.
-void provinces_hook(void* map, void* idler, std::uint32_t counter) {
+// Вызывается вместо `call 140bae670`: rcx = карта, rdx = idler, xmm2 = dt (кадровое время).
+void provinces_hook(void* map, void* idler, float dt) {
     const auto now = qpc_now();
     if (game_running_fast(now, provinces_interval_ticks) &&
         now - last_provinces < provinces_interval_ticks) {
+        provinces_pending_dt += dt;  // накапливаем, как scene_hook: игра получит время целиком
         provinces_skipped.fetch_add(1, std::memory_order_relaxed);
         return;
     }
-    original_provinces(map, idler, counter);
+    const float total = dt + provinces_pending_dt;
+    provinces_pending_dt = 0.0f;
+    original_provinces(map, idler, total);
     last_provinces = now;
     provinces_run.fetch_add(1, std::memory_order_relaxed);
     provinces_qpc.fetch_add(static_cast<std::uint64_t>(qpc_now() - now), std::memory_order_relaxed);
