@@ -508,9 +508,9 @@ DWORD install_checked(HMODULE module) {
     float frame_interval = 0.0f;
     float provinces_interval = 0.0f;
     if (mode == Mode::throttle) {
-        GetPrivateProfileStringW(L"render", L"frame_interval", L"0.1", value, 32, ini.c_str());
+        GetPrivateProfileStringW(L"render", L"frame_interval", L"0.05", value, 32, ini.c_str());
         frame_interval = std::wcstof(value, nullptr);
-        if (!(frame_interval > 0.0f && frame_interval <= 2.0f)) frame_interval = 0.1f;
+        if (!(frame_interval > 0.0f && frame_interval <= 2.0f)) frame_interval = 0.05f;
         frame_interval_ticks = static_cast<std::int64_t>(
             static_cast<double>(frame_interval) * static_cast<double>(qpc_frequency));
         GetPrivateProfileStringW(L"render", L"provinces_interval", L"0.25", value, 32, ini.c_str());
