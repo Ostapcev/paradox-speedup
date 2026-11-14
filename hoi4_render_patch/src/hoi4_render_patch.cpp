@@ -1,4 +1,4 @@
-// HOI4 Render Patch 0.3.0 experimental, for HOI4 1.19.4.2 ("Operation Postern") Windows x64.
+// HOI4 Render Patch 0.4.0 experimental, for HOI4 1.19.4.2 ("Operation Postern") Windows x64.
 //
 // Порт eu4_render_patch 0.6.0 на Hearts of Iron IV. Разбор адресов:
 // hoi4_kit/docs/02_hot_functions.md и 03_render_loop.md.
@@ -228,10 +228,31 @@ bool frame_skippable(std::int64_t now) noexcept {
         now - last_render < frame_interval_ticks;
 }
 
+// Сцена (CInGameIdler::Update, слот 4) и отрисовка (слот 28 -> Render, слот 29) идут по разу за
+// проход главного цикла. Решение «рисовать/пропустить» принимает тот хук, что сработал в проходе
+// первым, второй берёт его же: каждый нарисованный кадр получает свежее обновление сцены, а
+// пропущенные обновления сцены приходятся только на пропущенные кадры. Раньше у сцены был свой
+// интервал (scene_interval 0.1 при frame_interval 0.05 = каждый второй кадр без обновления
+// сцены): модельки мигали. Только главный поток.
+enum PassOwner { pass_none = 0, pass_render = 1, pass_scene = 2 };
+int pass_owner = pass_none;
+bool pass_skip = false;
+
+bool pass_decision(int me, std::int64_t now) noexcept {
+    if (pass_owner != pass_none && pass_owner != me) {
+        pass_owner = pass_none;
+        return pass_skip;
+    }
+    pass_skip = frame_skippable(now);
+    pass_owner = me;
+    return pass_skip;
+}
+
 // Вызывается вместо `call [rax+0xe8]`: rcx = CInGameIdler (this), как у оригинала.
 void render_hook(void* idler) {
     const auto now = qpc_now();
-    if (frame_skippable(now)) {
+    const bool skip = original_scene ? pass_decision(pass_render, now) : frame_skippable(now);
+    if (skip) {
         frames_skipped.fetch_add(1, std::memory_order_relaxed);
         return;
     }
@@ -305,7 +326,7 @@ void supply_hook(void* supply) {
 // Вызывается вместо `call 1402b6480`: rcx = объект idler'а (vfunc +0x130), xmm1 = dt.
 void scene_hook(void* object, float dt) {
     const auto now = qpc_now();
-    if (game_running_fast(now, scene_interval_ticks) && now - last_scene < scene_interval_ticks) {
+    if (pass_decision(pass_scene, now)) {
         scene_pending_dt += dt;
         scene_skipped.fetch_add(1, std::memory_order_relaxed);
         return;
@@ -690,7 +711,7 @@ DWORD install_checked(HMODULE module) {
     HANDLE thread = CreateThread(nullptr, 0, reporter, nullptr, 0, nullptr);
     if (thread) CloseHandle(thread);
     installation_status.store(mode == Mode::throttle ? 1 : 2);
-    log("initialized version=0.3.0-experimental mode=%s frame_interval=%g provinces_interval=%g"
+    log("initialized version=0.4.0-experimental mode=%s frame_interval=%g provinces_interval=%g"
         " unitgfx_interval=%g supply_interval=%ld%s%s%s",
         mode == Mode::throttle ? "throttle" : "count", static_cast<double>(frame_interval),
         static_cast<double>(provinces_interval),
