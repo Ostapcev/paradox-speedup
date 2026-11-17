@@ -1,5 +1,5 @@
 // EU4 Menu Patch: Back on the country selection screen and Exit to Menu in a campaign return
-// to the main menu instead of restarting the game. EU4 1.37.5 x64, Steam and GOG.
+// to the main menu instead of restarting the game. EU4 1.37.5 x64, Steam, GOG and Epic Games Store.
 //
 // A port of Hamweard (https://github.com/happy-dwarf-team/hamweard, MIT, (c) 2026 Happy Dwarf
 // Team), itself a port of EU4 Menu Patch 0.1.4 (https://github.com/YozoraTempest/EU4-Menu-Patch,
@@ -130,6 +130,9 @@ bool rel32_reachable(std::uintptr_t from_end, std::uintptr_t to) {
 }
 
 bool is_gog() noexcept { return eu4build::detect() == eu4build::Build::gog; }
+// Only the Steam build has the Steam lobby; GOG and EGS (Epic Online Services) have none.
+// EGS keeps Steam's object layout (CInGameIdler, CFrontEnd, main menu size), checked offline.
+bool has_steam_lobby() noexcept { return eu4build::detect() == eu4build::Build::steam; }
 
 // RVA in the running build of a Steam 1.37.5 RVA (0 if unknown). The sources keep Steam RVAs.
 std::uintptr_t gr(std::uintptr_t steam) noexcept {
@@ -824,7 +827,7 @@ bool check_all() {
         "pregame_menu_continuation");
     ok &= expect_pointer(rva::frontend_tick_slot, rva::frontend_tick, "frontend_tick_slot");
     ok &= expect_pointer(rva::frontend_restore_slot, rva::frontend_restore, "frontend_restore_slot");
-    const bool steam_lobby = !is_gog();  // the GOG build has no Steam lobby
+    const bool steam_lobby = has_steam_lobby();
     if (steam_lobby) ok &= expect_pointer(rva::steam_lobby_vtable, rva::steam_lobby_slot0, "steam_lobby_vtable");
     ok &= expect_pointer(rva::minimap_vtable, rva::minimap_slot0, "minimap_vtable");
     const std::initializer_list<std::uint8_t> small = {0x40, 0x53, 0x48, 0x83, 0xEC, 0x20, 0x48, 0x8B, 0xD9};
@@ -930,7 +933,7 @@ DWORD install_checked(HMODULE module) {
     }
     image = reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
     if (eu4build::detect() == eu4build::Build::unknown) {
-        log("REFUSED: build=unknown; only eu4.exe 1.37.5 from Steam or GOG is supported; no bytes changed");
+        log("REFUSED: build=unknown; only eu4.exe 1.37.5 from Steam, GOG or EGS is supported; no bytes changed");
         installation_status.store(-4);
         return 4;
     }
@@ -946,7 +949,7 @@ DWORD install_checked(HMODULE module) {
     g_custom_nation_used = reinterpret_cast<std::uint8_t*>(ga(rva::custom_nation_used));
     g_map = reinterpret_cast<std::uintptr_t*>(ga(rva::map));
     g_minimap_vtable = reinterpret_cast<void*>(ga(rva::minimap_vtable));
-    g_lobby_vtable = is_gog() ? nullptr : reinterpret_cast<void*>(ga(rva::steam_lobby_vtable));
+    g_lobby_vtable = has_steam_lobby() ? reinterpret_cast<void*>(ga(rva::steam_lobby_vtable)) : nullptr;
     {
         std::int32_t disp = 0;
         std::memcpy(&disp, reinterpret_cast<const void*>(ga(rva::gui_manager_store) + 3), 4);

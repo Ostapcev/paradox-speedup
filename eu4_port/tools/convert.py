@@ -16,7 +16,9 @@ import re
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MAP = json.load(open(os.path.join(ROOT, 'data', 'rva_map.json')))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from match_functions import port_file  # noqa: E402
+MAP = json.load(open(port_file(ROOT, 'rva_map')))
 
 
 def section_of(value):

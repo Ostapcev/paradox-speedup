@@ -1,6 +1,7 @@
 """Offline check of eu4_menu_patch's check_all() against the Steam and GOG eu4.exe 1.37.5.
 
 Usage: python check_menu.py STEAM_EXE GOG_EXE MENU_CPP
+       EU4_PORT_BUILD=egs python check_menu.py STEAM_EXE EGS_EXE MENU_CPP
 
 Simulates what the plugin does on each build: every expect(rva::X, {steam}, "what"[, {gog}])
 and expect_pointer(rva::S, rva::P, ...), with GOG addresses from eu4_gog_table.inc (plus the
@@ -12,11 +13,12 @@ import os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from match_functions import Image  # noqa: E402
+from match_functions import Image, PORT  # noqa: E402
 from check_plugin import table, find  # noqa: E402
 
 BASE = 0x140000000
-OVERRIDE = {0x8165F2: 0x815952}
+# the plugin's explicit GOG override and GOG bytes apply only to GOG (EU4_PORT_BUILD=gog)
+OVERRIDE = {0x8165F2: 0x815952} if PORT == 'gog' else {}
 
 
 def main():
@@ -46,7 +48,7 @@ def main():
         ga, e = g(x)
         if ga is None:
             g_ok, how = False, 'NO ADDRESS'
-        elif gb:
+        elif gb and PORT == 'gog':
             gbytes = blist(gb)
             g_ok, how = gog.img[ga:ga + len(gbytes)] == gbytes, 'gog bytes'
         else:

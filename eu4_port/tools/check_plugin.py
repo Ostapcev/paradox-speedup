@@ -13,14 +13,14 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from match_functions import Image  # noqa: E402
+from match_functions import Image, port_file  # noqa: E402
 
 ROOT = os.path.dirname(HERE)
 
 
 def table():
     rows = []
-    for line in open(os.path.join(ROOT, 'include', 'eu4_gog_table.inc')):
+    for line in open(port_file(ROOT, 'table')):
         m = re.match(r'\{0x([0-9a-f]+), 0x([0-9a-f]+), +(\d+),', line)
         if m:
             rows.append((int(m.group(1), 16), int(m.group(2), 16), int(m.group(3))))

@@ -23,6 +23,20 @@ HEX = re.compile(r'0x[0-9a-f]+')
 RIP = re.compile(r'rip ([+-]) (0x[0-9a-f]+)')
 
 
+# Which second build the data files are for: EU4_PORT_BUILD=gog (default) or egs.
+PORT = __import__('os').environ.get('EU4_PORT_BUILD', 'gog')
+
+
+def port_file(root, kind):
+    """data/functions.json, data/rva_map.json, include/eu4_gog_table.inc for GOG;
+    the same names with _egs / eu4_egs_table.inc for the Epic Games Store build."""
+    import os
+    sfx = '' if PORT == 'gog' else '_' + PORT
+    return {'functions': os.path.join(root, 'data', 'functions%s.json' % sfx),
+            'rva_map': os.path.join(root, 'data', 'rva_map%s.json' % sfx),
+            'table': os.path.join(root, 'include', 'eu4_%s_table.inc' % PORT)}[kind]
+
+
 class Image:
     def __init__(self, path):
         raw = open(path, 'rb').read()

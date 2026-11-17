@@ -792,7 +792,7 @@ DWORD install_checked(HMODULE module) {
 
     image = reinterpret_cast<std::uintptr_t>(GetModuleHandleW(nullptr));
     if (eu4build::detect() == eu4build::Build::unknown) {
-        log("REFUSED: unknown eu4.exe build (needs Steam or GOG 1.37.5); no bytes changed");
+        log("REFUSED: unknown eu4.exe build (needs Steam, GOG or EGS 1.37.5); no bytes changed");
         installation_status.store(-4);
         return 4;
     }

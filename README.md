@@ -2,7 +2,7 @@
 
 [Русская версия](README.ru.md)
 
-Source code of DLL plugins that speed up **Europa Universalis IV 1.37.5 (Steam and GOG, Windows x64)**, including large mods such as Anbennar, **Hearts of Iron IV 1.19.5 (Steam, Windows x64)** and **Stellaris 4.5.4 (Steam, Windows x64)**. Plugins for other Paradox games will come later.
+Source code of DLL plugins that speed up **Europa Universalis IV 1.37.5 (Steam, GOG and Epic Games Store, Windows x64)**, including large mods such as Anbennar, **Hearts of Iron IV 1.19.5 (Steam, Windows x64)** and **Stellaris 4.5.4 (Steam, Windows x64)**. Plugins for other Paradox games will come later.
 
 The easiest way to install the ready builds is the [installer](https://github.com/Ostapcev/paradox-speedup-launcher) (English and Russian). It finds the game, explains every plugin and sets it up.
 
@@ -11,7 +11,7 @@ The easiest way to install the ready builds is the [installer](https://github.co
 The plugins are ordinary DLLs in the `plugins` folder next to `eu4.exe`. They are loaded by `VERSION.dll`, the loader from EU4 Unicode Patch. `eu4.exe` on disk is never changed: each plugin changes the game's code only in memory, at start-up.
 
 Before any change a plugin checks that this is the right game build:
-- the build of `eu4.exe` (Steam or GOG 1.37.5, from its PE header);
+- the build of `eu4.exe` (Steam, GOG or EGS 1.37.5, from its PE header);
 - the bytes at every place it changes.
 
 If anything differs, the plugin writes `REFUSED` to its log and touches nothing. Every plugin has an ini file with an `off`/`disabled` mode.
@@ -44,7 +44,7 @@ Experimental and service folders (not in the installer):
 | `eu4_det_patch` | Fixed seed for reproducible comparisons |
 | `eu4_sampler` | Profiler: stacks of the game's threads |
 | `eu4_bench` | Speed measurement from the `-gamestatetimer` log |
-| `eu4_port` | Steam → GOG address translation (see below) |
+| `eu4_port` | Steam → GOG and Steam → EGS address translation (see below) |
 
 ## HoI4 plugins
 
@@ -111,7 +111,7 @@ The analysis tools (`eu4_sampler/tools`, `eu4_knowledge_patch/tools`, `eu4_port/
 
 Hooks are tied to exact addresses (RVAs) in the Steam `eu4.exe` 1.37.5 (SHA-256 `9ad3efe1af169f40ee577f9dae5debbc87af6fb8b5450fb345ebf110dc4d771a`). Comments name game functions by addresses such as `140a5e130` (image base `0x140000000`).
 
-The GOG build of the same version (SHA-256 `5f4145ce5ff9a4140cc4d14440920382b698dd91e1cdae1d1dc053357d9388ee`) has the same code at other addresses. `eu4_port` matches the functions of the two builds, and `eu4_port/include/eu4_build.hpp` translates every Steam address a plugin uses at run time, comparing against GOG bytes verified offline (`eu4_gog_table.inc`). With any other game version the plugins do not turn on until the addresses are updated.
+The GOG build of the same version (SHA-256 `5f4145ce5ff9a4140cc4d14440920382b698dd91e1cdae1d1dc053357d9388ee`) has the same code at other addresses. `eu4_port` matches the functions of the two builds, and `eu4_port/include/eu4_build.hpp` translates every Steam address a plugin uses at run time, comparing against GOG bytes verified offline (`eu4_gog_table.inc`). The Epic Games Store build (SHA-256 `b43f73e9f562e242c69a082778e7f78ee05e215171a4a74dd9cb7eba84d18c71`) is handled the same way: `EU4_PORT_BUILD=egs` makes the `eu4_port` tools write `eu4_egs_table.inc`; it keeps the Steam object layout but has no Steam lobby. With any other game version the plugins do not turn on until the addresses are updated.
 
 ## Licences
 

@@ -17,7 +17,7 @@ import capstone
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from match_functions import Image  # noqa: E402
+from match_functions import Image, port_file  # noqa: E402
 
 ROOT = os.path.dirname(HERE)
 
@@ -25,10 +25,10 @@ ROOT = os.path.dirname(HERE)
 def main():
     a, b = Image(sys.argv[1]), Image(sys.argv[2])
     md = capstone.Cs(capstone.CS_ARCH_X86, capstone.CS_MODE_64)
-    funcs = json.load(open(os.path.join(ROOT, 'data', 'functions.json')))['functions']
+    funcs = json.load(open(port_file(ROOT, 'functions')))['functions']
     fmap = {f[0]: f[2] for f in funcs}
     rows = []
-    for line in open(os.path.join(ROOT, 'include', 'eu4_gog_table.inc')):
+    for line in open(port_file(ROOT, 'table')):
         m = re.match(r'\{0x([0-9a-f]+), 0x([0-9a-f]+), +(\d+), "(.*)"\},', line)
         if m:
             data = bytes(int(x, 16) for x in re.findall(r'\\x([0-9a-f]{2})', m.group(4)))
