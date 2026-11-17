@@ -2,7 +2,7 @@
 
 [Русская версия](README.ru.md)
 
-Source code of DLL plugins that speed up **Europa Universalis IV 1.37.5 (Steam and GOG, Windows x64)**, including large mods such as Anbennar, and **Hearts of Iron IV 1.19.5 (Steam, Windows x64)**. Plugins for other Paradox games will come later.
+Source code of DLL plugins that speed up **Europa Universalis IV 1.37.5 (Steam and GOG, Windows x64)**, including large mods such as Anbennar, **Hearts of Iron IV 1.19.5 (Steam, Windows x64)** and **Stellaris 4.5.4 (Steam, Windows x64)**. Plugins for other Paradox games will come later.
 
 The easiest way to install the ready builds is the [installer](https://github.com/Ostapcev/paradox-speedup-launcher) (English and Russian). It finds the game, explains every plugin and sets it up.
 
@@ -60,6 +60,36 @@ For HoI4 1.19.5.0 and 1.19.4.2 (Steam). The two builds differ only in version st
 | `hoi4_alloc_patch` | Fast memory allocation (port of `eu4_alloc_patch`) | **yes**: a different order of addresses |
 
 Not in the installer: `hoi4_bench_helper` (switches to observer mode for benchmarks), `hoi4_sampler` (profiler), `hoi4_bench` (speed measurement from the `-gamestatetimer` log).
+
+## Stellaris plugins
+
+For Stellaris 4.5.4 (Steam, build 1b4f). `stellaris_common/stellaris_build.hpp` recognises it from the PE header of `stellaris.exe`; with any other build the plugins write `REFUSED` and change nothing. All plugins use the shared `stellaris_common/stellaris_plugin.hpp` (build check, byte check, log, ini). Many exact plugins were checked in shadow mode: they compute their own way next to the game and compare, 0 differences.
+
+Measured over the same date span in the game's log: late game (5000-star galaxy, year 2446) ×2.07, early game (2200) ×1.52 with all installer plugins.
+
+| Folder | What it does | Changes gameplay? |
+|---|---|---|
+| `stellaris_loader` | Our own plugin loader `VERSION.dll` | no |
+| `stellaris_render_patch` | Draws frames from inside the day calculation less often | no |
+| `stellaris_budget_patch` | Reads the timer less often in the frame-budget check | no |
+| `stellaris_path_patch` | Distance table between all systems in one multi-threaded pass (load: ~20 s → ~2 s) | no |
+| `stellaris_dijk_patch` | Our own path search with the same rules, continuing a repeated search | no |
+| `stellaris_pathq_patch` | Writes paths into the shared cache without extra exclusive locking | no |
+| `stellaris_reach_patch` | Replays the finished part of the search in the gateway reachability check | no |
+| `stellaris_fleet_patch`, `stellaris_ship_patch`, `stellaris_tick_patch`, `stellaris_scan_patch` | Fleet state reset in one pass and data prefetch in micro-tick loops | no |
+| `stellaris_vis_patch`, `stellaris_pair_patch` | A table instead of a scan in visibility, an early answer in the hyperlane check | no |
+| `stellaris_tdisp_patch` | Short ready-made jumps instead of the object check in script conditions | no |
+| `stellaris_ai_patch` | Task pool on all logical cores but two | no |
+| `stellaris_alloc_patch` | Fast memory allocation (port of `hoi4_alloc_patch`) | **yes**: a different order of addresses |
+| `stellaris_aiskip_patch` | Every country's AI thinks once in K days (3 by default) | **yes** |
+| `stellaris_intel_patch` | Fast system visibility calculation; intel once in K days | **yes** (no with `rr=1`) |
+| `stellaris_fleetscan_patch` | Exact cache in the "known fleets" task; update once in K days | **yes** (no with `rr=1`) |
+| `stellaris_lazy_patch` | Visibility, sector scores, intel level, casus belli not every day | **yes** |
+| `stellaris_modflush_patch` | Defers the modifier graph recalculation to the planned one | **yes** |
+| `stellaris_opday_patch` | One country's opinion of another once per game day | **yes** |
+| `stellaris_cmpc_patch` | Cache of "count and compare" conditions within a micro tick | **yes**, very little |
+
+Not in the installer: measurements and closed experiments (`stellaris_focus_patch`, `stellaris_graph_patch`, `stellaris_opin_patch`, `stellaris_sched_patch`, `stellaris_sysq_patch`, `stellaris_tail_patch`, `stellaris_trig_patch`, `stellaris_wait_patch`), the test plugin `stellaris_hello` and the profiler `stellaris_sampler`. A Stellaris plugin is built with `python stellaris_common/build_plugin.py stellaris_render_patch` (`--install` copies it into the game folder from the `STELLARIS_DIR` variable).
 
 ## Building
 

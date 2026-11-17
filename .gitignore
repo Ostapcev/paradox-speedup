@@ -21,6 +21,20 @@
 !/hoi4_bench/
 !/hoi4_common/
 
+!/stellaris_*_patch/
+!/stellaris_loader/
+!/stellaris_sampler/
+!/stellaris_common/
+!/stellaris_hello/
+/stellaris_sampler/latest/
+/stellaris_sampler/trial*/
+/stellaris_sampler/stellaris_sampler_latest/
+# sampler: only sources, tools and the launch script; profile results stay local
+/stellaris_sampler/*/
+!/stellaris_sampler/src/
+!/stellaris_sampler/tools/
+/stellaris_*/**/*.csv
+
 # build output and local data inside the plugin folders
 build/
 dist/

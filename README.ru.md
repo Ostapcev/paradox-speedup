@@ -2,7 +2,7 @@
 
 [English version](README.md)
 
-Исходный код DLL-плагинов, которые ускоряют **Europa Universalis IV 1.37.5 (Steam и GOG, Windows x64)**, включая крупные моды вроде Anbennar, и **Hearts of Iron IV 1.19.5 (Steam, Windows x64)**. Позже здесь появятся плагины для других игр Paradox.
+Исходный код DLL-плагинов, которые ускоряют **Europa Universalis IV 1.37.5 (Steam и GOG, Windows x64)**, включая крупные моды вроде Anbennar, **Hearts of Iron IV 1.19.5 (Steam, Windows x64)** и **Stellaris 4.5.4 (Steam, Windows x64)**. Позже здесь появятся плагины для других игр Paradox.
 
 Готовые сборки удобнее ставить [установщиком](https://github.com/Ostapcev/paradox-speedup-launcher) (на русском и английском). Он сам находит игру, объясняет каждый плагин и настраивает его.
 
@@ -60,6 +60,36 @@
 | `hoi4_alloc_patch` | Быстрое выделение памяти (порт `eu4_alloc_patch`) | **да**: другой порядок адресов |
 
 Не входят в установщик: `hoi4_bench_helper` (включает наблюдателя для бенчмарка), `hoi4_sampler` (профайлер), `hoi4_bench` (замер скорости по журналу `-gamestatetimer`).
+
+## Плагины Stellaris
+
+Для Stellaris 4.5.4 (Steam, сборка 1b4f). `stellaris_common/stellaris_build.hpp` узнаёт её по PE-заголовку `stellaris.exe`; с любой другой сборкой плагины пишут `REFUSED` и ничего не меняют. Все плагины работают через общий `stellaris_common/stellaris_plugin.hpp` (проверка сборки, сверка байтов, журнал, ini). Многие точные плагины проверены в режиме тени (`shadow`): считают своим способом рядом с игрой и сравнивают, 0 расхождений.
+
+Замер на одном и том же отрезке дат по журналу игры: поздняя игра (галактика 5000 звёзд, 2446 год) ×2,07, ранняя (2200 год) ×1,52 со всеми плагинами установщика.
+
+| Папка | Что делает | Меняет ход игры? |
+|---|---|---|
+| `stellaris_loader` | Свой загрузчик плагинов `VERSION.dll` | нет |
+| `stellaris_render_patch` | Реже рисует кадры изнутри расчёта дня | нет |
+| `stellaris_budget_patch` | Реже читает таймер в проверке бюджета кадра | нет |
+| `stellaris_path_patch` | Таблица расстояний между всеми системами одним проходом на несколько потоков (загрузка: ~20 с → ~2 с) | нет |
+| `stellaris_dijk_patch` | Свой поиск пути с теми же правилами и продолжением повторного поиска | нет |
+| `stellaris_pathq_patch` | Запись путей в общий кэш без лишней исключительной блокировки | нет |
+| `stellaris_reach_patch` | Повтор готовой части поиска в проверке достижимости через врата | нет |
+| `stellaris_fleet_patch`, `stellaris_ship_patch`, `stellaris_tick_patch`, `stellaris_scan_patch` | Сброс состояния флотов одним проходом и подкачка данных в циклах микротика | нет |
+| `stellaris_vis_patch`, `stellaris_pair_patch` | Таблица вместо перебора в видимости, ранний ответ в проверке гиперлиний | нет |
+| `stellaris_tdisp_patch` | Короткие готовые переходы вместо проверки объекта в условиях скриптов | нет |
+| `stellaris_ai_patch` | Пул задач на все логические ядра, кроме двух | нет |
+| `stellaris_alloc_patch` | Быстрое выделение памяти (порт `hoi4_alloc_patch`) | **да**: другой порядок адресов |
+| `stellaris_aiskip_patch` | ИИ каждой страны думает раз в K дней (по умолчанию 3) | **да** |
+| `stellaris_intel_patch` | Быстрый расчёт видимости систем; разведданные раз в K дней | **да** (при `rr=1` — нет) |
+| `stellaris_fleetscan_patch` | Точный кэш в задаче «известные флоты»; обновление раз в K дней | **да** (при `rr=1` — нет) |
+| `stellaris_lazy_patch` | Видимость, оценки секторов, уровень разведки, поводы к войне — не каждый день | **да** |
+| `stellaris_modflush_patch` | Откладывает пересчёт графа модификаторов до планового | **да** |
+| `stellaris_opday_patch` | Мнение страны о стране — раз в игровой день | **да** |
+| `stellaris_cmpc_patch` | Кэш условий «посчитать и сравнить» в пределах микротика | **да**, очень мало |
+
+Не входят в установщик: замеры и закрытые эксперименты (`stellaris_focus_patch`, `stellaris_graph_patch`, `stellaris_opin_patch`, `stellaris_sched_patch`, `stellaris_sysq_patch`, `stellaris_tail_patch`, `stellaris_trig_patch`, `stellaris_wait_patch`), проверочный `stellaris_hello` и профайлер `stellaris_sampler`. Плагин Stellaris собирается так: `python stellaris_common/build_plugin.py stellaris_render_patch` (с `--install` — копия в папку игры из переменной `STELLARIS_DIR`).
 
 ## Сборка
 
