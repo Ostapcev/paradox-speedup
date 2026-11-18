@@ -1,4 +1,4 @@
-// EU4 Alloc Patch 0.3.0 experimental, for EU4 1.37.5.0 Windows x64.
+// EU4 Alloc Patch 0.3.1 experimental, for EU4 1.37.5.0 Windows x64.
 //
 // eu4.exe links the CRT statically; its _malloc_base/_free_base/_calloc_base/
 // _realloc_base/_msize_base call HeapAlloc/HeapFree/... on the process heap
@@ -12,6 +12,8 @@
 // Installed from DllMain (before the game's CRT starts) by a 12-byte
 // "mov rax, hook; jmp rax" at each function entry.
 //
+// 0.3.1: free-list links are kept at the end of a free block (offset 0, the
+// vtable of a freed object, stays intact until reuse).
 // 0.3.0: size classes up to 32 KB (max_small=, default 32768; 2048 = 0.2.0), the
 // per-thread cache keeps head/full/count of a class together, and direct=1 also
 // sends the game's own new/delete thunks straight to the allocator:
@@ -85,14 +87,26 @@ inline int batch_of(int c) noexcept {
     return b < 4 ? 4 : static_cast<int>(b);
 }
 int batch_table[class_count];
+std::size_t size_table[class_count];
 
 struct alignas(64) ClassState {
     SRWLOCK lock = SRWLOCK_INIT;
     std::uint8_t* cursor = nullptr;     // next never-used block
     std::uint8_t* committed = nullptr;  // end of committed memory
     std::uint8_t* limit = nullptr;      // end of the class region
-    void* chains = nullptr;  // stack of 32-block chains; block[1] links chains
+    void* chains = nullptr;  // stack of chains; linked through chain_link()
 };
+
+// Free-list links live at the END of a free block, not at offset 0: the game
+// sometimes still reads a just-freed object (its vtable is at offset 0), and with
+// the Windows heap that stale read sees the old vtable.  Keeping offset 0 intact
+// until the block is reused avoids turning that latent game bug into a crash.
+inline void*& next_link(void* p, std::size_t size) noexcept {
+    return *reinterpret_cast<void**>(static_cast<std::uint8_t*>(p) + size - 8);
+}
+inline void*& chain_link(void* p, std::size_t size) noexcept {
+    return *reinterpret_cast<void**>(static_cast<std::uint8_t*>(p) + size - 16);
+}
 
 // Per class: `head` is a partial list (count < batch); `full` is one complete
 // chain of exactly `batch` blocks kept back so alloc/free never walk a list.
@@ -145,12 +159,12 @@ void* take_chain(int c) noexcept {
     ClassState& s = classes[c];
     AcquireSRWLockExclusive(&s.lock);
     void* chain = s.chains;
+    const std::size_t size = class_size(c);
     if (chain) {
-        s.chains = static_cast<void**>(chain)[1];
+        s.chains = chain_link(chain, size);
         ReleaseSRWLockExclusive(&s.lock);
         return chain;
     }
-    const std::size_t size = class_size(c);
     const int batch = batch_table[c];
     const std::size_t bytes = size * batch;
     while (s.cursor + bytes > s.committed) {
@@ -166,16 +180,16 @@ void* take_chain(int c) noexcept {
     s.cursor += bytes;
     ReleaseSRWLockExclusive(&s.lock);
     for (int i = 0; i < batch - 1; ++i) {
-        *reinterpret_cast<void**>(first + i * size) = first + (i + 1) * size;
+        next_link(first + i * size, size) = first + (i + 1) * size;
     }
-    *reinterpret_cast<void**>(first + (batch - 1) * size) = nullptr;
+    next_link(first + (batch - 1) * size, size) = nullptr;
     return first;
 }
 
 void give_chain(int c, void* chain) noexcept {
     ClassState& s = classes[c];
     AcquireSRWLockExclusive(&s.lock);
-    static_cast<void**>(chain)[1] = s.chains;
+    chain_link(chain, class_size(c)) = s.chains;
     s.chains = chain;
     ReleaseSRWLockExclusive(&s.lock);
 }
@@ -202,7 +216,7 @@ void* small_alloc(std::size_t n) noexcept {
         }
         k.count = batch_table[c];
     }
-    k.head = *static_cast<void**>(p);
+    k.head = next_link(p, size_table[c]);
     --k.count;
     return p;
 }
@@ -212,7 +226,7 @@ void small_free(void* p) noexcept {
     ThreadCache* t = cache();
     if (!t) return;  // only if the per-thread cache cannot be created; the block is kept
     ClassCache& k = t->c[c];
-    *static_cast<void**>(p) = k.head;
+    next_link(p, size_table[c]) = k.head;
     k.head = p;
     if (++k.count == batch_table[c]) {
         if (k.full) {
@@ -424,7 +438,7 @@ LONG install(HMODULE module) noexcept {
     if (max_small < 256) max_small = 256;
     if (max_small > class_limit) max_small = class_limit;
     const bool direct = GetPrivateProfileIntW(L"alloc", L"direct", 1, ini) != 0;
-    for (int c = 0; c < class_count; ++c) batch_table[c] = batch_of(c);
+    for (int c = 0; c < class_count; ++c) { batch_table[c] = batch_of(c); size_table[c] = class_size(c); }
     const std::uint64_t crt_heap = *reinterpret_cast<std::uint64_t*>(image + eu4build::rva(0x233d850));
     heap = GetProcessHeap();
     tls_index = TlsAlloc();
@@ -490,7 +504,7 @@ LONG install(HMODULE module) noexcept {
     }
     HANDLE thread = CreateThread(nullptr, 0, reporter, nullptr, 0, nullptr);
     if (thread) CloseHandle(thread);
-    log("initialized version=0.3.0-experimental crt_heap_at_install=%llx process_heap=%p "
+    log("initialized version=0.3.1-experimental crt_heap_at_install=%llx process_heap=%p "
         "arena=%p tls=%lu max_small=%llu direct_sites=%d",
         static_cast<unsigned long long>(crt_heap), heap, arena, tls_index,
         static_cast<unsigned long long>(max_small), direct_sites);
