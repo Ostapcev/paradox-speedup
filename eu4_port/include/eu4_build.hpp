@@ -50,7 +50,9 @@ inline Build detect_at(std::uintptr_t image) noexcept {
     const auto size = nt->OptionalHeader.SizeOfImage;
     const auto stamp = nt->FileHeader.TimeDateStamp;
     if (size == 0x25E0000 && stamp == 0x66FE6AB9) return Build::steam;
-    if (size == 0x25C3000 && stamp == 0x66FE67E2) return Build::gog;
+    // GOG 1.37.5: the original build and a 2025 rebuild (stamp 0x6915E11F) that differs only in
+    // 33 functions no plugin touches; every table window and checked site is byte-identical.
+    if (size == 0x25C3000 && (stamp == 0x66FE67E2 || stamp == 0x6915E11F)) return Build::gog;
     if (size == 0x25D0000 && stamp == 0x66FE6BE2) return Build::egs;
     return Build::unknown;
 }
